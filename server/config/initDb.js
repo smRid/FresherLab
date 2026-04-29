@@ -49,6 +49,31 @@ const initDb = async () => {
         CREATE INDEX IF NOT EXISTS job_applications_user_id_idx
         ON job_applications (user_id, created_at DESC)
     `;
+
+    await sql`
+        CREATE TABLE IF NOT EXISTS subscriptions (
+            id SERIAL PRIMARY KEY,
+            user_id TEXT NOT NULL UNIQUE,
+            stripe_customer_id TEXT,
+            stripe_subscription_id TEXT,
+            plan TEXT NOT NULL DEFAULT 'free',
+            status TEXT NOT NULL DEFAULT 'active',
+            free_usage INT NOT NULL DEFAULT 0,
+            current_period_end TIMESTAMPTZ,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    `;
+
+    await sql`
+        CREATE INDEX IF NOT EXISTS subscriptions_user_id_idx
+        ON subscriptions (user_id)
+    `;
+
+    await sql`
+        CREATE INDEX IF NOT EXISTS subscriptions_stripe_customer_id_idx
+        ON subscriptions (stripe_customer_id)
+    `;
 };
 
 export default initDb;

@@ -5,6 +5,7 @@ import { clerkMiddleware, requireAuth } from '@clerk/express'
 import aiRouter from './routes/aiRoutes.js';
 import connectCloudinary from './config/cloudinary.js';
 import userRouter from './routes/userRoutes.js';
+import stripeRouter, { handleStripeWebhook } from './routes/stripeRoutes.js';
 import initDb from './config/initDb.js';
 
 const app = express();
@@ -13,6 +14,10 @@ await connectCloudinary()
 await initDb()
 
 app.use(cors());
+
+// Stripe webhook needs raw body — must come BEFORE express.json()
+app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), handleStripeWebhook);
+
 app.use(express.json());
 app.use(clerkMiddleware())
 
@@ -20,6 +25,7 @@ app.get('/', (req, res) => res.send('Server is Live!'));
 
 app.use('/api/ai', requireAuth(), aiRouter);
 app.use('/api/user', requireAuth(), userRouter);
+app.use('/api/stripe', requireAuth(), stripeRouter);
 
 const PORT = process.env.PORT || 3000;
 

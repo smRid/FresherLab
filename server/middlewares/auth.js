@@ -1,28 +1,23 @@
-import { clerkClient } from "@clerk/express";
+import sql from "../config/db.js";
 
-// Middleware to check userId and hasPremiumPlan
-export const auth = async (req, res, next)=>{
+// Middleware to check userId and plan from subscriptions table
+export const auth = async (req, res, next) => {
     try {
-        const {userId, has} = await req.auth();
-        const hasPremiumPlan = await has({plan: 'premium'});
+        const { userId } = req.auth();
 
-        const user = await clerkClient.users.getUser(userId);
+        // Get or create subscription record
+        let [sub] = await sql`SELECT plan, free_usage FROM subscriptions WHERE user_id = ${userId}`;
 
-        if(!hasPremiumPlan && user.privateMetadata.free_usage){
-            req.free_usage = user.privateMetadata.free_usage
-        } else {
-            await clerkClient.users.updateUserMetadata(userId, {
-                privateMetadata: {
-                    free_usage: 0
-                }
-            })
-            req.free_usage = 0;
+        if (!sub) {
+            await sql`INSERT INTO subscriptions (user_id, plan, free_usage) VALUES (${userId}, 'free', 0)`;
+            sub = { plan: 'free', free_usage: 0 };
         }
 
-        req.plan = hasPremiumPlan ? 'premium' : 'free';
-        next()
+        req.plan = sub.plan;
+        req.free_usage = sub.free_usage || 0;
+        next();
 
     } catch (error) {
-        res.json({ success: false, message: 'Authentication failed', error: error.message });
+        res.status(401).json({ success: false, message: 'Authentication failed', error: error.message });
     }
 }

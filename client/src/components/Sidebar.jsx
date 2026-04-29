@@ -1,4 +1,6 @@
-import { Protect, useClerk, useUser } from '@clerk/clerk-react'
+import { useAuth, useClerk, useUser } from '@clerk/clerk-react'
+import { useEffect, useState } from 'react'
+import { api } from '../lib/api'
 import { BarChart3, BookOpen, BriefcaseBusiness, Code2, FileSearch, FileText, Github, GraduationCap, LayoutDashboard, Linkedin, LogOut, Mail, PenTool, Search, Send } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
@@ -22,6 +24,20 @@ const Sidebar = ({ sidebar, setSidebar }) => {
 
   const { user } = useUser();
   const { signOut, openUserProfile } = useClerk()
+  const { getToken } = useAuth()
+  const [plan, setPlan] = useState('free')
+
+  useEffect(() => {
+    const fetchPlan = async () => {
+      try {
+        const { data } = await api.get('/api/stripe/subscription-status', {
+          headers: { Authorization: `Bearer ${await getToken()}` }
+        })
+        if (data.success) setPlan(data.plan)
+      } catch { /* silent */ }
+    }
+    fetchPlan()
+  }, [getToken])
 
   return (
     <div className={`w-64 bg-white border-r border-gray-200 flex flex-col justify-between items-center max-sm:absolute top-14 bottom-0 z-20 ${sidebar ? 'translate-x-0' : 'max-sm:-translate-x-full'} transition-all duration-300 ease-in-out`}>
@@ -50,8 +66,7 @@ const Sidebar = ({ sidebar, setSidebar }) => {
           <div>
             <h1 className='text-sm font-medium'>{user.fullName}</h1>
             <p className='text-xs text-gray-500'>
-              <Protect plan='premium' fallback="Free">Premium</Protect>
-              {" "}Plan
+              {plan === 'premium' ? 'Premium' : 'Free'} Plan
             </p>
           </div>
         </div>

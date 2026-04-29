@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import sql from "../config/db.js";
-import { clerkClient } from "@clerk/express";
+// clerkClient removed — usage tracking via subscriptions table
 import axios from "axios";
 import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs";
@@ -87,11 +87,7 @@ export const generateArticle = async (req, res) => {
         await sql` INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${prompt}, ${content}, 'article');`;
 
         if (plan !== 'premium') {
-            await clerkClient.users.updateUserMetadata(userId, {
-                privateMetadata: {
-                    free_usage: free_usage + 1
-                }
-            })
+            await sql`UPDATE subscriptions SET free_usage = free_usage + 1, updated_at = NOW() WHERE user_id = ${userId}`;
         }
 
         res.json({
@@ -134,11 +130,7 @@ export const generateBlogTitle = async (req, res) => {
         await sql` INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${prompt}, ${content}, 'blog-title');`;
 
         if (plan !== 'premium') {
-            await clerkClient.users.updateUserMetadata(userId, {
-                privateMetadata: {
-                    free_usage: free_usage + 1
-                }
-            })
+            await sql`UPDATE subscriptions SET free_usage = free_usage + 1, updated_at = NOW() WHERE user_id = ${userId}`;
         }
 
         res.json({
@@ -687,11 +679,7 @@ Keep it under 200 words, genuine, and professional.`
         await sql` INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${prompt}, ${content}, 'email');`;
 
         if (plan !== 'premium') {
-            await clerkClient.users.updateUserMetadata(userId, {
-                privateMetadata: {
-                    free_usage: free_usage + 1
-                }
-            })
+            await sql`UPDATE subscriptions SET free_usage = free_usage + 1, updated_at = NOW() WHERE user_id = ${userId}`;
         }
 
         res.json({
@@ -762,11 +750,7 @@ Use proper Markdown formatting. Make it portfolio-ready and impressive for recru
         await sql` INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${prompt}, ${content}, 'readme');`;
 
         if (plan !== 'premium') {
-            await clerkClient.users.updateUserMetadata(userId, {
-                privateMetadata: {
-                    free_usage: free_usage + 1
-                }
-            })
+            await sql`UPDATE subscriptions SET free_usage = free_usage + 1, updated_at = NOW() WHERE user_id = ${userId}`;
         }
 
         res.json({
@@ -841,11 +825,7 @@ Keep the original meaning. Make it professional and suitable for job application
         await sql` INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${prompt}, ${content}, 'grammar-enhancement');`;
 
         if (plan !== 'premium') {
-            await clerkClient.users.updateUserMetadata(userId, {
-                privateMetadata: {
-                    free_usage: free_usage + 1
-                }
-            })
+            await sql`UPDATE subscriptions SET free_usage = free_usage + 1, updated_at = NOW() WHERE user_id = ${userId}`;
         }
 
         res.json({
@@ -917,11 +897,7 @@ Keep it concise (under 400 words), genuine, and ATS-friendly.`
         await sql` INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${prompt}, ${content}, 'cover-letter');`;
 
         if (plan !== 'premium') {
-            await clerkClient.users.updateUserMetadata(userId, {
-                privateMetadata: {
-                    free_usage: free_usage + 1
-                }
-            })
+            await sql`UPDATE subscriptions SET free_usage = free_usage + 1, updated_at = NOW() WHERE user_id = ${userId}`;
         }
 
         res.json({
@@ -1023,11 +999,7 @@ Only return the formatted text, no explanations.`;
         `;
 
         if (plan !== 'premium') {
-            await clerkClient.users.updateUserMetadata(userId, {
-                privateMetadata: {
-                    free_usage: free_usage + 1
-                }
-            })
+            await sql`UPDATE subscriptions SET free_usage = free_usage + 1, updated_at = NOW() WHERE user_id = ${userId}`;
         }
 
         res.json({

@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { BarChart3, BriefcaseBusiness, FileSearch, FileText, Gem, Mail, Sparkles } from 'lucide-react'
-import { Protect, useAuth } from '@clerk/clerk-react'
+import { useAuth } from '@clerk/clerk-react'
 import CreationItem from '../components/CreationItem'
 import { api } from '../lib/api'
 import toast from 'react-hot-toast'
@@ -45,17 +45,22 @@ const Dashboard = () => {
   }, [getDashboardData])
 
   const [jobCount, setJobCount] = useState(0)
+  const [plan, setPlan] = useState('free')
 
   useEffect(() => {
-    const fetchJobCount = async () => {
+    const fetchExtra = async () => {
       try {
-        const { data } = await api.get('/api/user/job-applications', {
-          headers: { Authorization: `Bearer ${await getToken()}` }
-        })
-        if (data.success) setJobCount(data.jobs.length)
+        const token = await getToken()
+        const headers = { Authorization: `Bearer ${token}` }
+        const [jobRes, planRes] = await Promise.all([
+          api.get('/api/user/job-applications', { headers }),
+          api.get('/api/stripe/subscription-status', { headers }),
+        ])
+        if (jobRes.data.success) setJobCount(jobRes.data.jobs.length)
+        if (planRes.data.success) setPlan(planRes.data.plan)
       } catch { /* silent */ }
     }
-    fetchJobCount()
+    fetchExtra()
   }, [getToken])
 
   const careerCreations = creations.filter(c => CAREER_TYPES.includes(c.type))
@@ -112,7 +117,7 @@ const Dashboard = () => {
           <div className='text-slate-600'>
             <p className='text-sm'>Active Plan</p>
             <h2 className='text-xl font-semibold'>
-              <Protect plan='premium' fallback="Free">Premium</Protect>
+              {plan === 'premium' ? 'Premium' : 'Free'}
             </h2>
           </div>
           <div className='w-10 h-10 rounded-lg bg-gradient-to-br from-[#FF61C5] to-[#9E53EE] text-white flex justify-center items-center'>
