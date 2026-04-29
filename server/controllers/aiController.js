@@ -6,6 +6,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs";
 import pdf from "pdf-parse/lib/pdf-parse.js";
 import { getLimit } from "../config/usageLimits.js";
+import { buildResumeLatex, splitBullets } from "../utils/latexResume.js";
 
 
 const AI = new OpenAI({
@@ -1434,40 +1435,99 @@ Tell the user whether they should apply now or improve first.`;
 export const resumeBuilder = async (req, res) => {
     try {
         const { userId } = req.auth();
-        const { fullName, email, phone, location, degree, college, graduationYear, skills, certifications, projects, githubUrl, linkedinUrl, portfolioUrl, targetRole, targetCompany, summary } = req.body;
+        const {
+            fullName, email, phone, location,
+            linkedinUrl, portfolioUrl, githubUrl,
+            experiences = [], skills = {}, projects = [],
+            certifications = [], educations = [], research = {},
+            targetRole = '',
+        } = req.body;
 
-        if (!fullName || !skills || !targetRole) return res.status(400).json({ success: false, message: "Name, skills, and target role are required." });
+        if (!fullName || !fullName.trim()) {
+            return res.status(400).json({ success: false, message: "Full name is required." });
+        }
 
-        const prompt = `You are an expert resume writer for freshers entering the IT/tech industry. Generate a complete, ATS-friendly resume in clean Markdown format.
+        const polished = await polishBulletsWithAI({ experiences, projects, targetRole });
 
-Candidate Details:
-- Name: ${fullName}
-- Email: ${email || 'N/A'} | Phone: ${phone || 'N/A'} | Location: ${location || 'N/A'}
-- Degree: ${degree || 'N/A'} from ${college || 'N/A'} (${graduationYear || 'N/A'})
-- Skills: ${skills}
-- Certifications: ${certifications || 'None'}
-- Projects: ${projects || 'None provided'}
-- GitHub: ${githubUrl || 'N/A'} | LinkedIn: ${linkedinUrl || 'N/A'} | Portfolio: ${portfolioUrl || 'N/A'}
-- Target Role: ${targetRole}${targetCompany ? ` at ${targetCompany}` : ''}
-- Summary: ${summary || 'Auto-generate a professional summary'}
+        const data = {
+            fullName, email, phone, location,
+            linkedinUrl, portfolioUrl, githubUrl,
+            experiences: polished.experiences,
+            skills,
+            projects: polished.projects,
+            certifications,
+            educations,
+            research,
+        };
 
-Generate sections: Contact Info, Professional Summary, Skills, Projects (with bullet points and tech stack), Education, Certifications, Links. Use action verbs, quantify where possible, and optimize for ATS keyword matching.`;
+        const content = buildResumeLatex(data);
 
-        const response = await AI.chat.completions.create({
-            model: "gemini-2.0-flash",
-            messages: [{ role: "user", content: prompt }],
-            temperature: 0.7,
-            max_tokens: 2000,
-        });
-
-        const content = response.choices[0].message.content;
-        await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, 'Build resume for ${targetRole}', ${content}, 'resume-builder')`;
+        const promptLabel = `Build LaTeX resume${targetRole ? ` for ${targetRole}` : ''}`.replace(/'/g, "''");
+        await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${promptLabel}, ${content}, 'resume-builder')`;
 
         res.json({ success: true, content, message: "Resume generated successfully" });
     } catch (error) {
         console.log(error.message);
         res.json({ success: false, message: error.message });
     }
+}
+
+const polishBulletsWithAI = async ({ experiences, projects, targetRole }) => {
+    const buildItems = (group, list, getBullets) => list.map((entry, idx) => ({
+        group,
+        index: idx,
+        bullets: splitBullets(getBullets(entry)),
+    })).filter(item => item.bullets.length);
+
+    const items = [
+        ...buildItems('experience', experiences || [], e => e.bullets),
+        ...buildItems('project', projects || [], p => p.bullets),
+    ];
+
+    if (!items.length) return { experiences: experiences || [], projects: projects || [] };
+
+    const prompt = `You are an expert resume bullet writer for freshers applying to ${targetRole || 'tech roles'}.
+Rewrite each bullet to start with a strong action verb, be concise (max ~22 words), highlight impact and quantify when possible. Keep technical keywords. Do NOT invent metrics; only quantify if the original implies it.
+
+Return ONLY valid JSON in this exact shape (no prose, no markdown fences):
+{ "items": [ { "group": "experience"|"project", "index": <number>, "bullets": ["..."] } ] }
+
+Input items:
+${JSON.stringify(items)}`;
+
+    let polishedMap = new Map();
+    try {
+        const response = await AI.chat.completions.create({
+            model: "gemini-2.0-flash",
+            messages: [{ role: "user", content: prompt }],
+            temperature: 0.5,
+            max_tokens: 1500,
+        });
+        const raw = response.choices[0].message.content || '';
+        const jsonMatch = raw.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[0]);
+            (parsed.items || []).forEach(it => {
+                polishedMap.set(`${it.group}:${it.index}`, it.bullets || []);
+            });
+        }
+    } catch (err) {
+        console.log('Bullet polish failed, using originals:', err.message);
+    }
+
+    const applyPolish = (group, list, getBullets) => (list || []).map((entry, idx) => {
+        const polished = polishedMap.get(`${group}:${idx}`);
+        if (polished && polished.length) {
+            return { ...entry, bullets: polished.join('\n') };
+        }
+        const original = splitBullets(getBullets(entry));
+        return { ...entry, bullets: original.join('\n') };
+    });
+
+    return {
+        experiences: applyPolish('experience', experiences, e => e.bullets),
+        projects: applyPolish('project', projects, p => p.bullets),
+    };
 }
 
 export const jobDescriptionAnalysis = async (req, res) => {
