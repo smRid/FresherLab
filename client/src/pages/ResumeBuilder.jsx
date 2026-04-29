@@ -67,17 +67,17 @@ const ResumeBuilder = () => {
   const personalStep = (
     <div className='space-y-4'>
       <div className='grid grid-cols-2 gap-3'>
-        <Field label='Full Name *' value={personal.fullName} onChange={v => setPersonal({ ...personal, fullName: v })} placeholder='John Doe' />
-        <Field label='Target Role' value={personal.targetRole} onChange={v => setPersonal({ ...personal, targetRole: v })} placeholder='Frontend Developer' />
+        <Field label='Full Name *' value={personal.fullName} onChange={v => setPersonal({ ...personal, fullName: v })} placeholder='Alex Carter' />
+        <Field label='Target Role' value={personal.targetRole} onChange={v => setPersonal({ ...personal, targetRole: v })} placeholder='Junior Software Engineer' />
       </div>
       <div className='grid grid-cols-2 gap-3'>
-        <Field label='Phone' value={personal.phone} onChange={v => setPersonal({ ...personal, phone: v })} placeholder='+8801611510841' />
-        <Field label='Email' value={personal.email} onChange={v => setPersonal({ ...personal, email: v })} placeholder='john@example.com' type='email' />
+        <Field label='Phone' value={personal.phone} onChange={v => setPersonal({ ...personal, phone: v })} placeholder='+1 555 123 4567' />
+        <Field label='Email' value={personal.email} onChange={v => setPersonal({ ...personal, email: v })} placeholder='alex.carter@example.com' type='email' />
       </div>
-      <Field label='Location' value={personal.location} onChange={v => setPersonal({ ...personal, location: v })} placeholder='Khilgaon, Dhaka, Bangladesh' />
-      <Field label='LinkedIn URL' value={personal.linkedinUrl} onChange={v => setPersonal({ ...personal, linkedinUrl: v })} placeholder='https://linkedin.com/in/username' />
-      <Field label='Portfolio URL' value={personal.portfolioUrl} onChange={v => setPersonal({ ...personal, portfolioUrl: v })} placeholder='https://yourportfolio.com' />
-      <Field label='GitHub URL' value={personal.githubUrl} onChange={v => setPersonal({ ...personal, githubUrl: v })} placeholder='https://github.com/username' />
+      <Field label='Location' value={personal.location} onChange={v => setPersonal({ ...personal, location: v })} placeholder='Austin, TX, USA' />
+      <Field label='LinkedIn URL' value={personal.linkedinUrl} onChange={v => setPersonal({ ...personal, linkedinUrl: v })} placeholder='https://linkedin.com/in/alex-carter' />
+      <Field label='Portfolio URL' value={personal.portfolioUrl} onChange={v => setPersonal({ ...personal, portfolioUrl: v })} placeholder='https://alexcarter.dev' />
+      <Field label='GitHub URL' value={personal.githubUrl} onChange={v => setPersonal({ ...personal, githubUrl: v })} placeholder='https://github.com/alexcarter' />
     </div>
   )
 
@@ -86,16 +86,16 @@ const ResumeBuilder = () => {
     <ArraySection title='Work Experience' items={experiences} onAdd={addArrayItem(setExperiences, emptyExperience)} onRemove={removeArrayItem(setExperiences)} renderItem={(exp, idx) => (
       <>
         <div className='grid grid-cols-2 gap-3'>
-          <Field label='Company *' value={exp.company} onChange={v => updateArrayItem(setExperiences)(idx, 'company', v)} placeholder='Arena Web Security' />
-          <Field label='Company URL' value={exp.companyUrl} onChange={v => updateArrayItem(setExperiences)(idx, 'companyUrl', v)} placeholder='https://company.com' />
+          <Field label='Company *' value={exp.company} onChange={v => updateArrayItem(setExperiences)(idx, 'company', v)} placeholder='TechNova Solutions' />
+          <Field label='Company URL' value={exp.companyUrl} onChange={v => updateArrayItem(setExperiences)(idx, 'companyUrl', v)} placeholder='https://technova.example.com' />
         </div>
         <div className='grid grid-cols-2 gap-3'>
-          <Field label='Role *' value={exp.role} onChange={v => updateArrayItem(setExperiences)(idx, 'role', v)} placeholder='Software Engineer' />
-          <Field label='Dates' value={exp.dates} onChange={v => updateArrayItem(setExperiences)(idx, 'dates', v)} placeholder='Jan 2026 – Current' />
+          <Field label='Role *' value={exp.role} onChange={v => updateArrayItem(setExperiences)(idx, 'role', v)} placeholder='Frontend Developer Intern' />
+          <Field label='Dates' value={exp.dates} onChange={v => updateArrayItem(setExperiences)(idx, 'dates', v)} placeholder='June 2024 – August 2024' />
         </div>
-        <Field label='Location' value={exp.location} onChange={v => updateArrayItem(setExperiences)(idx, 'location', v)} placeholder='Dhaka, Bangladesh' />
+        <Field label='Location' value={exp.location} onChange={v => updateArrayItem(setExperiences)(idx, 'location', v)} placeholder='Remote' />
         <TextareaField label='Bullets (one per line)' value={exp.bullets} onChange={v => updateArrayItem(setExperiences)(idx, 'bullets', v)} rows={4}
-          placeholder={'Developed full-stack apps using React and Node.js\nOptimized database performance and scalability\nCollaborated with team to translate requirements'} />
+          placeholder={'Built reusable React components for customer dashboard\nIntegrated REST APIs and handled client-side validation\nImproved page load performance by optimizing assets'} />
       </>
     )} />
   )
@@ -103,10 +103,10 @@ const ResumeBuilder = () => {
   // Skills step
   const skillsStep = (
     <div className='space-y-4'>
-      <Field label='Programming Languages' value={skills.languages} onChange={v => setSkills({ ...skills, languages: v })} placeholder='JavaScript, Python, Java, SQL' />
-      <Field label='Frameworks' value={skills.frameworks} onChange={v => setSkills({ ...skills, frameworks: v })} placeholder='React, Next.js, Node.js, Django' />
-      <Field label='Databases' value={skills.databases} onChange={v => setSkills({ ...skills, databases: v })} placeholder='MySQL, PostgreSQL, MongoDB' />
-      <Field label='Tools & Others' value={skills.tools} onChange={v => setSkills({ ...skills, tools: v })} placeholder='Git, GitHub, Docker' />
+      <Field label='Programming Languages' value={skills.languages} onChange={v => setSkills({ ...skills, languages: v })} placeholder='JavaScript, TypeScript, Python, SQL' />
+      <Field label='Frameworks' value={skills.frameworks} onChange={v => setSkills({ ...skills, frameworks: v })} placeholder='React, Express.js, Next.js, Tailwind CSS' />
+      <Field label='Databases' value={skills.databases} onChange={v => setSkills({ ...skills, databases: v })} placeholder='PostgreSQL, MongoDB, Firebase' />
+      <Field label='Tools & Others' value={skills.tools} onChange={v => setSkills({ ...skills, tools: v })} placeholder='Git, Docker, Vercel, Postman' />
     </div>
   )
 
@@ -115,15 +115,15 @@ const ResumeBuilder = () => {
     <ArraySection title='Personal Projects' items={projects} onAdd={addArrayItem(setProjects, emptyProject)} onRemove={removeArrayItem(setProjects)} renderItem={(p, idx) => (
       <>
         <div className='grid grid-cols-2 gap-3'>
-          <Field label='Project Name *' value={p.name} onChange={v => updateArrayItem(setProjects)(idx, 'name', v)} placeholder='E-commerce App' />
-          <Field label='Tech Stack' value={p.stack} onChange={v => updateArrayItem(setProjects)(idx, 'stack', v)} placeholder='React, Node, MongoDB, Stripe' />
+          <Field label='Project Name *' value={p.name} onChange={v => updateArrayItem(setProjects)(idx, 'name', v)} placeholder='Task Management Platform' />
+          <Field label='Tech Stack' value={p.stack} onChange={v => updateArrayItem(setProjects)(idx, 'stack', v)} placeholder='React, Express.js, PostgreSQL, JWT' />
         </div>
         <div className='grid grid-cols-2 gap-3'>
-          <Field label='GitHub URL' value={p.githubUrl} onChange={v => updateArrayItem(setProjects)(idx, 'githubUrl', v)} placeholder='https://github.com/...' />
-          <Field label='Live URL' value={p.liveUrl} onChange={v => updateArrayItem(setProjects)(idx, 'liveUrl', v)} placeholder='https://demo.example.com' />
+          <Field label='GitHub URL' value={p.githubUrl} onChange={v => updateArrayItem(setProjects)(idx, 'githubUrl', v)} placeholder='https://github.com/alexcarter/task-manager' />
+          <Field label='Live URL' value={p.liveUrl} onChange={v => updateArrayItem(setProjects)(idx, 'liveUrl', v)} placeholder='https://task-manager-demo.vercel.app' />
         </div>
         <TextareaField label='Bullets (one per line)' value={p.bullets} onChange={v => updateArrayItem(setProjects)(idx, 'bullets', v)} rows={3}
-          placeholder={'Built cart and checkout with Stripe and JWT auth\nDeveloped admin dashboard with Redis caching'} />
+          placeholder={'Created task boards with drag-and-drop workflow\nImplemented JWT authentication and protected API routes\nDesigned responsive UI for desktop and mobile users'} />
       </>
     )} />
   )
@@ -133,10 +133,10 @@ const ResumeBuilder = () => {
     <ArraySection title='Training Certifications' items={certifications} onAdd={addArrayItem(setCertifications, emptyCertification)} onRemove={removeArrayItem(setCertifications)} renderItem={(c, idx) => (
       <>
         <div className='grid grid-cols-2 gap-3'>
-          <Field label='Institution' value={c.institution} onChange={v => updateArrayItem(setCertifications)(idx, 'institution', v)} placeholder='FreeCodeCamp' />
-          <Field label='Course Name' value={c.course} onChange={v => updateArrayItem(setCertifications)(idx, 'course', v)} placeholder='JavaScript Algorithms and Data Structures' />
+          <Field label='Institution' value={c.institution} onChange={v => updateArrayItem(setCertifications)(idx, 'institution', v)} placeholder='Coursera' />
+          <Field label='Course Name' value={c.course} onChange={v => updateArrayItem(setCertifications)(idx, 'course', v)} placeholder='Full-Stack Web Development Specialization' />
         </div>
-        <Field label='Certificate URL' value={c.certificateUrl} onChange={v => updateArrayItem(setCertifications)(idx, 'certificateUrl', v)} placeholder='https://certificate.example.com/...' />
+        <Field label='Certificate URL' value={c.certificateUrl} onChange={v => updateArrayItem(setCertifications)(idx, 'certificateUrl', v)} placeholder='https://coursera.org/verify/example-id' />
       </>
     )} />
   )
@@ -146,12 +146,12 @@ const ResumeBuilder = () => {
     <ArraySection title='Education' items={educations} onAdd={addArrayItem(setEducations, emptyEducation)} onRemove={removeArrayItem(setEducations)} renderItem={(e, idx) => (
       <>
         <div className='grid grid-cols-2 gap-3'>
-          <Field label='Institution' value={e.institution} onChange={v => updateArrayItem(setEducations)(idx, 'institution', v)} placeholder='University of Asia Pacific' />
-          <Field label='Dates' value={e.dates} onChange={v => updateArrayItem(setEducations)(idx, 'dates', v)} placeholder='March 2019 – Dec 2024' />
+          <Field label='Institution' value={e.institution} onChange={v => updateArrayItem(setEducations)(idx, 'institution', v)} placeholder='State University' />
+          <Field label='Dates' value={e.dates} onChange={v => updateArrayItem(setEducations)(idx, 'dates', v)} placeholder='August 2020 – May 2024' />
         </div>
         <div className='grid grid-cols-2 gap-3'>
-          <Field label='Degree' value={e.degree} onChange={v => updateArrayItem(setEducations)(idx, 'degree', v)} placeholder='B.Sc. in Computer Science & Engineering' />
-          <Field label='Grade (CGPA/GPA)' value={e.grade} onChange={v => updateArrayItem(setEducations)(idx, 'grade', v)} placeholder='CGPA 3.5' />
+          <Field label='Degree' value={e.degree} onChange={v => updateArrayItem(setEducations)(idx, 'degree', v)} placeholder='Bachelor of Science in Computer Science' />
+          <Field label='Grade (CGPA/GPA)' value={e.grade} onChange={v => updateArrayItem(setEducations)(idx, 'grade', v)} placeholder='GPA 3.7 / 4.0' />
         </div>
       </>
     )} />
@@ -161,9 +161,9 @@ const ResumeBuilder = () => {
   const researchStep = (
     <div className='space-y-4'>
       <Field label='Research Title (optional)' value={research.title} onChange={v => setResearch({ ...research, title: v })}
-        placeholder='Multiclass Skin Cancer Classification Using Transfer Learning Models with Explainable AI' />
+        placeholder='Optimizing Neural Networks for Real-Time Image Classification' />
       <Field label='Tech / Methods (optional)' value={research.stack} onChange={v => setResearch({ ...research, stack: v })}
-        placeholder='Python, Deep Learning, TensorFlow, Keras, CNN' />
+        placeholder='Python, TensorFlow, Computer Vision, CNN' />
       <p className='text-xs text-gray-500 dark:text-gray-400'>Leave blank if you don't have research to include — the section will be omitted.</p>
     </div>
   )
@@ -215,8 +215,6 @@ const ResumeBuilder = () => {
     </div>
   )
 }
-
-// --- small reusable building blocks ---
 
 const Field = ({ label, value, onChange, placeholder, type = 'text' }) => (
   <div>
