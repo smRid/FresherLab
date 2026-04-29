@@ -1,9 +1,8 @@
-import { FileText, Sparkles } from 'lucide-react';
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useAuth } from '@clerk/clerk-react';
+import { AlertTriangle, CheckCircle2, Copy, Download, FileText, ListChecks, Loader2, Sparkles, Target, TrendingUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { api } from '../lib/api';
-import GeneratedOutput from '../components/GeneratedOutput';
 
 const targetRoles = [
   'Frontend Developer', 'Backend Developer', 'Full Stack Developer',
@@ -27,6 +26,8 @@ const ReviewResume = () => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     if (!file) { toast.error('Please upload a resume PDF'); return }
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) { toast.error('Only PDF files are accepted'); return }
+    if (file.size > 5 * 1024 * 1024) { toast.error('Resume must be under 5MB'); return }
     try {
       setLoading(true)
       const formData = new FormData();
@@ -41,84 +42,370 @@ const ReviewResume = () => {
 
       if (data.success) {
         setContent(data.content)
+        toast.success(data.message)
       } else {
         toast.error(data.message)
       }
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error.response?.data?.message || error.message)
     }
     setLoading(false)
   }
 
   return (
-    <div className='h-full overflow-y-scroll p-6 flex items-start flex-wrap gap-4 text-slate-700 dark:text-gray-300'>
+    <div className='h-full overflow-y-scroll p-4 text-slate-700 dark:text-gray-300 sm:p-6'>
+      <div className='mb-6'>
+        <h1 className='text-2xl font-bold text-slate-800 dark:text-white'>Resume Review</h1>
+        <p className='mt-1 text-sm text-slate-500 dark:text-gray-400'>Get a structured recruiter-style review with scores, strengths, weaknesses, and an action plan</p>
+      </div>
+
+      <div className='grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(360px,620px)_minmax(420px,1fr)]'>
       {/* left col */}
-      <form onSubmit={onSubmitHandler} className='w-full max-w-lg p-4 bg-white dark:bg-[#111827] rounded-lg border border-gray-200 dark:border-gray-800 space-y-4'>
-        <div className='flex items-center gap-3'>
-          <Sparkles className='w-6 text-[#00DA83]' />
-          <h1 className='text-xl font-semibold dark:text-white'>Resume Review</h1>
+      <form onSubmit={onSubmitHandler} className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-[#0F172A] xl:sticky xl:top-6'>
+        <div className='mb-5 flex items-start gap-3'>
+          <div className='rounded-xl bg-emerald-100 p-3 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300'>
+            <Sparkles className='h-5 w-5' />
+          </div>
+          <div>
+            <h2 className='text-lg font-semibold text-slate-900 dark:text-white'>Review Resume</h2>
+            <p className='text-sm text-slate-500 dark:text-gray-400'>Upload your resume and choose your target role.</p>
+          </div>
         </div>
 
+        <div className='space-y-5'>
         <div>
-          <p className='text-sm font-medium mb-1'>Upload Resume <span className='text-red-500'>*</span></p>
+          <label className='mb-1 block text-sm font-medium text-slate-700 dark:text-gray-300'>Upload Resume (PDF, max 5MB)</label>
           <input
-            onChange={(e) => setFile(e.target.files[0])}
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
             type="file"
-            accept="application/pdf"
-            className='w-full p-2 px-3 outline-none text-sm rounded-md border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 dark:bg-[#1E293B]'
+            accept=".pdf,application/pdf"
+            className='block w-full text-sm text-slate-500 file:mr-4 file:rounded-lg file:border-0 file:bg-emerald-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-emerald-700 hover:file:bg-emerald-100 dark:text-gray-400 dark:file:bg-emerald-900/30 dark:file:text-emerald-300 dark:hover:file:bg-emerald-900/50'
             required
           />
-          {file && <p className='mt-1 text-xs text-gray-500'>Selected: {file.name}</p>}
-          <p className='text-xs text-gray-400 mt-0.5'>PDF only, max 5MB</p>
+          {file && <p className='mt-1 text-xs text-slate-500 dark:text-gray-400'>Selected: {file.name}</p>}
         </div>
 
+        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
         <div>
-          <p className='text-sm font-medium mb-1'>Target Role <span className='text-red-500'>*</span></p>
+          <label className='mb-1 block text-sm font-medium text-slate-700 dark:text-gray-300'>Target Role</label>
           <select value={targetRole} onChange={(e) => setTargetRole(e.target.value)}
-            className='w-full p-2 px-3 text-sm rounded-md border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 dark:bg-[#1E293B]'>
+            className='w-full rounded-lg border border-gray-300 p-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300'>
             {targetRoles.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
         </div>
 
         <div>
-          <p className='text-sm font-medium mb-1'>Experience Level <span className='text-red-500'>*</span></p>
+          <label className='mb-1 block text-sm font-medium text-slate-700 dark:text-gray-300'>Experience Level</label>
           <select value={experienceLevel} onChange={(e) => setExperienceLevel(e.target.value)}
-            className='w-full p-2 px-3 text-sm rounded-md border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 dark:bg-[#1E293B]'>
+            className='w-full rounded-lg border border-gray-300 p-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300'>
             {experienceLevels.map(l => <option key={l} value={l}>{l}</option>)}
           </select>
         </div>
-
-        <div>
-          <p className='text-sm font-medium mb-1'>Job Description <span className='text-gray-400 font-normal'>(optional)</span></p>
-          <textarea value={jobDescription} onChange={(e) => setJobDescription(e.target.value)}
-            rows={4} placeholder='Paste the target job description for role-specific feedback...'
-            className='w-full p-2 px-3 text-sm rounded-md border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 dark:bg-[#1E293B] resize-none' />
         </div>
 
-        <button disabled={loading} className='w-full flex justify-center items-center gap-2
-        bg-gradient-to-r from-[#00DA83] to-[#009BB3] text-white px-4 py-2
-        text-sm rounded-lg cursor-pointer disabled:opacity-60'>
+        <div>
+          <label className='mb-1 block text-sm font-medium text-slate-700 dark:text-gray-300'>Job Description <span className='font-normal text-slate-400'>(optional)</span></label>
+          <textarea value={jobDescription} onChange={(e) => setJobDescription(e.target.value)}
+            rows={8} maxLength={10000} placeholder='Paste the target job description for role-specific feedback...'
+            className='w-full resize-none rounded-lg border border-gray-300 p-3 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300' />
+        </div>
+
+        <button type='submit' disabled={loading} className='inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#00DA83] to-[#009BB3] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:opacity-90 disabled:opacity-50 sm:w-auto'>
           {loading
-            ? <span className='w-4 h-4 my-1 rounded-full border-2 border-t-transparent animate-spin'></span>
-            : <FileText className='w-5' />
+            ? <><Loader2 className='h-4 w-4 animate-spin' /> Reviewing...</>
+            : <><FileText className='h-4 w-4' /> Review Resume</>
           }
-          Review Resume
         </button>
+        </div>
       </form>
 
       {/* Right col */}
-      <div className='w-full max-w-lg'>
-        {content ? (
-          <GeneratedOutput content={content} title='Resume Review Report' filename='resume-review' />
-        ) : (
-          <div className='p-4 bg-white dark:bg-[#111827] rounded-lg flex flex-col border border-gray-200 dark:border-gray-800 min-h-96 items-center justify-center'>
-            <FileText className='w-9 h-9 text-gray-300' />
-            <p className='mt-3 text-sm text-gray-400'>Upload a resume and click "Review Resume" to get started</p>
-          </div>
-        )}
+      <ResumeReviewReportPanel content={content} targetRole={targetRole} experienceLevel={experienceLevel} />
       </div>
     </div>
   )
 }
+
+const ResumeReviewReportPanel = ({ content, targetRole, experienceLevel }) => {
+  const report = useMemo(() => parseResumeReviewReport(content, targetRole, experienceLevel), [content, targetRole, experienceLevel])
+
+  const copyContent = async () => {
+    await navigator.clipboard.writeText(content)
+    toast.success('Report copied')
+  }
+
+  const downloadContent = (extension) => {
+    const blob = new Blob([content], { type: extension === 'md' ? 'text/markdown' : 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `resume-review-report.${extension}`
+    link.click()
+    URL.revokeObjectURL(url)
+    toast.success(`Downloaded .${extension}`)
+  }
+
+  if (!content) {
+    return (
+      <aside className='rounded-2xl border border-dashed border-slate-300 bg-white/70 p-8 text-center shadow-sm dark:border-gray-800 dark:bg-[#0F172A]/80'>
+        <div className='mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300'>
+          <FileText className='h-7 w-7' />
+        </div>
+        <h2 className='text-xl font-bold text-slate-900 dark:text-white'>Resume review preview</h2>
+        <p className='mx-auto mt-2 max-w-md text-sm text-slate-500 dark:text-gray-400'>
+          Your structured resume review will appear here with score cards, strengths, weaknesses, skills, and a 7-day action plan.
+        </p>
+        <div className='mt-6 grid gap-3 sm:grid-cols-3'>
+          {['Overall Score', 'ATS Score', 'Role Match'].map(item => (
+            <div key={item} className='rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-gray-800 dark:bg-[#111827]'>
+              <div className='mx-auto mb-3 h-2 w-16 rounded-full bg-slate-200 dark:bg-gray-700' />
+              <p className='text-xs font-medium text-slate-500 dark:text-gray-400'>{item}</p>
+            </div>
+          ))}
+        </div>
+      </aside>
+    )
+  }
+
+  return (
+    <aside className='rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-gray-800 dark:bg-[#0F172A] xl:sticky xl:top-6'>
+      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 p-5 dark:border-gray-800'>
+        <div>
+          <p className='text-xs font-semibold uppercase tracking-[0.2em] text-emerald-500'>Structured Report</p>
+          <h2 className='mt-1 text-xl font-bold text-slate-900 dark:text-white'>Resume Review Report</h2>
+        </div>
+        <div className='flex flex-wrap gap-2'>
+          <button type='button' onClick={copyContent} className='inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800'>
+            <Copy className='h-4 w-4' /> Copy
+          </button>
+          <button type='button' onClick={() => downloadContent('txt')} className='inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800'>
+            <Download className='h-4 w-4' /> TXT
+          </button>
+          <button type='button' onClick={() => downloadContent('md')} className='inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800'>
+            <Download className='h-4 w-4' /> MD
+          </button>
+        </div>
+      </div>
+
+      <div className='max-h-none space-y-5 overflow-y-auto p-5 xl:max-h-[calc(100vh-170px)]'>
+        <div className='grid gap-4 md:grid-cols-3'>
+          <ScoreCard label='Overall Score' score={report.scores.overall} Icon={TrendingUp} />
+          <ScoreCard label='ATS Compatibility' score={report.scores.ats} Icon={FileText} />
+          <ScoreCard label='Role Match' score={report.scores.role} Icon={Target} />
+        </div>
+
+        <div className='grid gap-3 sm:grid-cols-2'>
+          <InfoBadge label='Target Role' value={report.meta.targetRole} />
+          <InfoBadge label='Experience Level' value={report.meta.experienceLevel} />
+        </div>
+
+        <div className='grid gap-4 lg:grid-cols-2'>
+          <ReportSection title='Strengths' Icon={CheckCircle2} items={report.lists.strengths} tone='success' />
+          <ReportSection title='Weaknesses' Icon={AlertTriangle} items={report.lists.weaknesses} tone='warning' />
+        </div>
+
+        <div className='grid gap-4 lg:grid-cols-2'>
+          <SkillPanel title='Skills Found' groups={report.skillGroups} />
+          <KeywordPanel title='Missing Skills for This Role' items={report.lists.missingSkills} tone='warning' />
+        </div>
+
+        <ReportSection title='Missing Sections' Icon={AlertTriangle} items={report.lists.missingSections} tone='warning' />
+        <ReportSection title='Project Improvement Suggestions' Icon={ListChecks} items={report.lists.projectSuggestions} tone='neutral' />
+        <ReportSection title='Formatting and Layout Suggestions' Icon={FileText} items={report.lists.formattingSuggestions} tone='neutral' />
+        <ReportSection title='Grammar and Clarity Fixes' Icon={CheckCircle2} items={report.lists.grammarFixes} tone='success' />
+        <TextPanel title='Suggested Professional Summary' text={report.sections.summary} />
+        <ReportSection title='7-Day Action Plan' Icon={ListChecks} items={report.lists.actionPlan} tone='success' />
+      </div>
+    </aside>
+  )
+}
+
+const ScoreCard = ({ label, score, Icon }) => {
+  const value = Number.isFinite(score) ? Math.max(0, Math.min(100, score)) : null
+  const color = value >= 75 ? '#22c55e' : value >= 55 ? '#f59e0b' : '#ef4444'
+  const tone = value >= 75 ? 'Strong' : value >= 55 ? 'Needs Work' : 'Improve'
+
+  return (
+    <div className='rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-gray-800 dark:bg-[#111827]'>
+      <div className='mb-4 flex items-center justify-between'>
+        <div className='rounded-xl bg-white p-2 text-slate-600 dark:bg-[#0B1120] dark:text-gray-300'>
+          <Icon className='h-4 w-4' />
+        </div>
+        <span className='rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-slate-600 dark:bg-[#0B1120] dark:text-gray-300'>{value === null ? 'Pending' : tone}</span>
+      </div>
+      <div className='flex items-end justify-between gap-3'>
+        <div>
+          <p className='text-xs font-medium text-slate-500 dark:text-gray-400'>{label}</p>
+          <p className='mt-1 text-2xl font-bold text-slate-900 dark:text-white'>{value === null ? '—' : value}<span className='text-sm text-slate-400'>/100</span></p>
+        </div>
+        <div className='h-12 w-12 rounded-full p-1' style={{ background: `conic-gradient(${color} ${(value || 0) * 3.6}deg, rgba(148,163,184,0.22) 0deg)` }}>
+          <div className='h-full w-full rounded-full bg-slate-50 dark:bg-[#111827]' />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const InfoBadge = ({ label, value }) => (
+  <div className='rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-gray-800 dark:bg-[#111827]'>
+    <p className='text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400'>{label}</p>
+    <p className='mt-1 text-sm font-semibold text-slate-900 dark:text-white'>{value || 'Not specified'}</p>
+  </div>
+)
+
+const KeywordPanel = ({ title, items, tone }) => {
+  const toneClass = tone === 'success'
+    ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300'
+    : 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300'
+
+  return (
+    <section className='rounded-2xl border border-slate-200 p-4 dark:border-gray-800'>
+      <h3 className='text-sm font-bold text-slate-900 dark:text-white'>{title}</h3>
+      <div className='mt-3 flex flex-wrap gap-2'>
+        {items.length ? items.map(item => (
+          <span key={item} className={`rounded-full border px-3 py-1 text-xs font-semibold ${toneClass}`}>{item}</span>
+        )) : (
+          <p className='text-sm text-slate-500 dark:text-gray-400'>No items found.</p>
+        )}
+      </div>
+    </section>
+  )
+}
+
+const SkillPanel = ({ title, groups }) => (
+  <section className='rounded-2xl border border-slate-200 p-4 dark:border-gray-800'>
+    <h3 className='text-sm font-bold text-slate-900 dark:text-white'>{title}</h3>
+    <div className='mt-3 space-y-3'>
+      {groups.length ? groups.map(group => (
+        <div key={group.label}>
+          <p className='mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-gray-400'>{group.label}</p>
+          <div className='flex flex-wrap gap-2'>
+            {group.items.length ? group.items.map(item => (
+              <span key={`${group.label}-${item}`} className='rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-300'>{item}</span>
+            )) : (
+              <span className='text-sm text-slate-500 dark:text-gray-400'>Not clearly detected</span>
+            )}
+          </div>
+        </div>
+      )) : (
+        <p className='text-sm text-slate-500 dark:text-gray-400'>No skill groups found.</p>
+      )}
+    </div>
+  </section>
+)
+
+const ReportSection = ({ title, Icon, items, tone }) => {
+  const iconClass = tone === 'warning'
+    ? 'bg-amber-100 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300'
+    : tone === 'success'
+      ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300'
+      : 'bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-300'
+
+  return (
+    <section className='rounded-2xl border border-slate-200 p-4 dark:border-gray-800'>
+      <div className='mb-3 flex items-center gap-2'>
+        <span className={`rounded-lg p-2 ${iconClass}`}>
+          <Icon className='h-4 w-4' />
+        </span>
+        <h3 className='text-sm font-bold text-slate-900 dark:text-white'>{title}</h3>
+      </div>
+      <div className='space-y-2'>
+        {items.length ? items.map(item => (
+          <div key={item} className='rounded-xl bg-slate-50 px-3 py-2 text-sm text-slate-700 dark:bg-[#111827] dark:text-gray-300'>{item}</div>
+        )) : (
+          <p className='text-sm text-slate-500 dark:text-gray-400'>No details available.</p>
+        )}
+      </div>
+    </section>
+  )
+}
+
+const TextPanel = ({ title, text }) => (
+  <section className='rounded-2xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-500/20 dark:bg-blue-500/10'>
+    <h3 className='text-sm font-bold text-slate-900 dark:text-white'>{title}</h3>
+    <p className='mt-2 text-sm leading-6 text-slate-600 dark:text-gray-300'>{text || 'No details available.'}</p>
+  </section>
+)
+
+const parseResumeReviewReport = (content = '', targetRole, experienceLevel) => {
+  const sections = getMarkdownSections(content)
+  const roleSection = getSection(sections, 'Role Match Score')
+  const metaTarget = roleSection.match(/Target Role:\s*([^\n]+)/i)?.[1]?.trim()
+  const metaExperience = roleSection.match(/Experience Level:\s*([^\n]+)/i)?.[1]?.trim()
+
+  return {
+    scores: {
+      overall: extractScore(getSection(sections, 'Overall Score')),
+      ats: extractScore(getSection(sections, 'ATS Compatibility Score')),
+      role: extractScore(roleSection),
+    },
+    meta: {
+      targetRole: metaTarget || targetRole,
+      experienceLevel: metaExperience || experienceLevel,
+    },
+    lists: {
+      strengths: extractListItems(getSection(sections, 'Strengths')),
+      weaknesses: extractListItems(getSection(sections, 'Weaknesses')),
+      missingSections: extractListItems(getSection(sections, 'Missing Sections')),
+      missingSkills: extractListItems(getSection(sections, 'Missing Skills for This Role')),
+      projectSuggestions: extractListItems(getSection(sections, 'Project Improvement Suggestions')),
+      formattingSuggestions: extractListItems(getSection(sections, 'Formatting and Layout Suggestions')),
+      grammarFixes: extractListItems(getSection(sections, 'Grammar and Clarity Fixes')),
+      actionPlan: extractListItems(getSection(sections, 'Action Plan')),
+    },
+    skillGroups: extractSkillGroups(getSection(sections, 'Skills Found')),
+    sections: {
+      summary: cleanSectionText(getSection(sections, 'Suggested Professional Summary')),
+    },
+  }
+}
+
+const getMarkdownSections = (content) => {
+  const matches = [...content.matchAll(/^##\s+(.+)$/gm)]
+  return matches.reduce((acc, match, index) => {
+    const next = matches[index + 1]
+    const title = normalizeHeading(match[1])
+    acc[title] = content.slice(match.index + match[0].length, next?.index ?? content.length).trim()
+    return acc
+  }, {})
+}
+
+const getSection = (sections, title) => sections[normalizeHeading(title)] || ''
+
+const normalizeHeading = (value) => value.toLowerCase().replace(/^\d+\s*[.)-]?\s*/, '').replace(/[^a-z0-9]+/g, '')
+
+const extractScore = (text) => {
+  const score = Number(text.match(/(\d{1,3})\s*\/\s*100/)?.[1])
+  if (!Number.isFinite(score)) return null
+  return Math.max(0, Math.min(100, score))
+}
+
+const extractListItems = (text) => text
+  .split('\n')
+  .map(line => line.trim())
+  .filter(line => /^[-*•]\s+/.test(line) || /^\d+[.)]\s+/.test(line))
+  .map(line => cleanInlineText(line.replace(/^[-*•]\s+/, '').replace(/^\d+[.)]\s+/, '')))
+  .filter(Boolean)
+
+const extractSkillGroups = (text) => extractListItems(text).map(item => {
+  const [label, ...rest] = item.split(':')
+  const value = rest.join(':').trim()
+  return {
+    label: label.trim(),
+    items: value && !/not clearly detected/i.test(value) ? value.split(',').map(skill => skill.trim()).filter(Boolean) : [],
+  }
+}).filter(group => group.label)
+
+const cleanSectionText = (text) => cleanInlineText(text
+  .split('\n')
+  .filter(line => !/^[-*•]\s+/.test(line.trim()) && !/^\d{1,3}\s*\/\s*100/.test(line.trim()) && !/^Target Role:/i.test(line.trim()) && !/^Experience Level:/i.test(line.trim()))
+  .join(' ')
+  .trim())
+
+const cleanInlineText = (text) => text
+  .replace(/\*\*/g, '')
+  .replace(/`/g, '')
+  .replace(/\s+/g, ' ')
+  .trim()
 
 export default ReviewResume

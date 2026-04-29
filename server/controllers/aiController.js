@@ -147,6 +147,111 @@ ${overallScore >= 75 ? 'You can apply now, but add measurable achievements where
 `;
 }
 
+const buildLocalResumeReview = ({ resumeText, target_role, experience_level, job_description }) => {
+    const normalizedResume = normalizeAtsText(resumeText);
+    const roleKeywords = extractAtsKeywords(`${target_role || ''} ${job_description || ''}`);
+    const foundSkills = ATS_SKILL_KEYWORDS.filter(keyword => normalizedResume.includes(keyword));
+    const missingSkills = roleKeywords.filter(keyword => !keywordExists(normalizedResume, keyword)).slice(0, 14);
+    const sectionChecks = {
+        contact: /mail|email|linkedin|phone|\+?\d{7,}/.test(normalizedResume),
+        education: /education|university|college|bachelor|degree|cgpa|gpa/.test(normalizedResume),
+        projects: /project|projects|github|portfolio/.test(normalizedResume),
+        skills: /skill|skills|technologies|tools/.test(normalizedResume),
+        experience: /experience|intern|developer|engineer|work/.test(normalizedResume),
+        summary: /summary|profile|objective/.test(normalizedResume),
+    };
+    const sectionScore = Math.round((Object.values(sectionChecks).filter(Boolean).length / Object.keys(sectionChecks).length) * 100);
+    const roleScore = roleKeywords.length ? Math.round(((roleKeywords.length - missingSkills.length) / roleKeywords.length) * 100) : 65;
+    const atsScore = Math.round((sectionScore * 0.45) + (Math.min(foundSkills.length * 8, 100) * 0.35) + (roleScore * 0.20));
+    const overallScore = Math.round((atsScore * 0.60) + (roleScore * 0.40));
+
+    const strengths = [];
+    if (sectionChecks.contact) strengths.push('Contact information is present and likely readable by ATS systems.');
+    if (sectionChecks.education) strengths.push('Education information is included.');
+    if (sectionChecks.projects) strengths.push('Projects or portfolio evidence is present.');
+    if (foundSkills.length) strengths.push(`Technical keywords found: ${foundSkills.slice(0, 10).join(', ')}.`);
+
+    const weaknesses = [];
+    if (!sectionChecks.summary) weaknesses.push('Add a short professional summary tailored to the target role.');
+    if (!sectionChecks.skills) weaknesses.push('Add a clearly labeled technical skills section.');
+    if (!sectionChecks.projects) weaknesses.push('Add project descriptions with tech stack, impact, and links.');
+    if (!/\d+%|\d+\+|\d+\s*(users|projects|apis|pages|components|hours|seconds)/i.test(resumeText)) weaknesses.push('Add measurable outcomes or numbers to strengthen bullet points.');
+    if (missingSkills.length) weaknesses.push('Resume should include more role-specific keywords from the target job.');
+
+    const missingSections = Object.entries(sectionChecks)
+        .filter(([, exists]) => !exists)
+        .map(([section]) => section.charAt(0).toUpperCase() + section.slice(1));
+
+    return `# Resume Review Report
+
+## 1. Overall Score
+${overallScore}/100
+
+The resume has a usable foundation for a ${target_role || 'software'} role, but it should be improved with stronger role-specific keywords, clearer sections, and measurable impact.
+
+## 2. ATS Compatibility Score
+${atsScore}/100
+
+The resume appears ${atsScore >= 75 ? 'mostly ATS-friendly' : atsScore >= 55 ? 'partially ATS-friendly' : 'weak for ATS parsing'} based on readable sections, skills visibility, contact details, and keyword coverage.
+
+## 3. Role Match Score
+${roleScore}/100
+
+Target Role: ${target_role || 'Software Engineer'}
+Experience Level: ${experience_level || 'Fresher'}
+
+The role match is based on technical keyword overlap, project visibility, and fresher-level resume completeness.
+
+## 4. Strengths
+${formatMarkdownList(strengths, 'The resume has enough readable text to perform a review.')}
+
+## 5. Weaknesses
+${formatMarkdownList(weaknesses, 'Add more specific achievements and role-focused wording.')}
+
+## 6. Missing Sections
+${formatMarkdownList(missingSections, 'No major missing sections detected.')}
+
+## 7. Skills Found
+- Programming Languages: ${foundSkills.filter(skill => ['javascript', 'typescript', 'python', 'java', 'c++', 'c#', 'php', 'go', 'ruby', 'sql', 'html', 'css'].includes(skill)).join(', ') || 'Not clearly detected'}
+- Frameworks: ${foundSkills.filter(skill => ['react', 'next.js', 'node.js', 'express.js', 'vue', 'angular', 'django', 'flask', 'spring boot', 'tailwind', 'bootstrap', 'redux'].includes(skill)).join(', ') || 'Not clearly detected'}
+- Databases: ${foundSkills.filter(skill => ['mongodb', 'mysql', 'postgresql', 'firebase', 'redis', 'database'].includes(skill)).join(', ') || 'Not clearly detected'}
+- Tools: ${foundSkills.filter(skill => ['docker', 'kubernetes', 'aws', 'azure', 'gcp', 'git', 'github', 'ci/cd', 'linux', 'vercel', 'jest', 'cypress', 'selenium', 'figma'].includes(skill)).join(', ') || 'Not clearly detected'}
+- Soft Skills: Communication, teamwork, problem-solving should be demonstrated through project or internship bullets.
+
+## 8. Missing Skills for This Role
+${formatMarkdownList(missingSkills, 'No critical missing skills detected from the supplied role/job description.')}
+
+## 9. Project Improvement Suggestions
+- Start each project bullet with a strong action verb such as Built, Designed, Implemented, Optimized, or Integrated.
+- Mention the tech stack directly beside each project title.
+- Add measurable outcomes such as performance improvement, users supported, API count, or feature count where truthful.
+- Include GitHub and live demo links for portfolio credibility.
+
+## 10. Formatting and Layout Suggestions
+- Keep headings simple: Summary, Skills, Projects, Experience, Education, Certifications.
+- Use consistent date formatting and avoid graphics/tables that ATS parsers may miss.
+- Keep bullets concise, ideally one to two lines each.
+- Put the most relevant skills near the top of the resume.
+
+## 11. Grammar and Clarity Fixes
+- Replace generic wording with specific technical actions.
+- Avoid repeating the same action verb across many bullets.
+- Make each bullet answer what you built, how you built it, and why it mattered.
+
+## 12. Suggested Professional Summary
+Fresher ${target_role || 'software engineering'} candidate with hands-on project experience and technical skills in ${foundSkills.slice(0, 6).join(', ') || 'modern web technologies'}. Eager to build scalable, user-friendly solutions while continuously improving code quality and product impact.
+
+## 13. Action Plan
+- Day 1: Add or improve the professional summary for the target role.
+- Day 2: Rewrite project bullets with action verbs and measurable outcomes.
+- Day 3: Add missing role-specific skills and tools where you have real experience.
+- Day 4: Improve formatting consistency and ATS-readable section headings.
+- Day 5: Add GitHub/live links and certification links where available.
+- Day 6: Proofread grammar, tense, and repeated wording.
+- Day 7: Re-run ATS/resume review and compare score improvements.
+`;
+}
+
 const clampNumber = (value, min, max, fallback) => {
     const number = Number(value);
     if (!Number.isFinite(number)) return fallback;
@@ -476,16 +581,38 @@ export const removeImageObject = async (req, res) => {
 }
 
 export const resumeReview = async (req, res) => {
+    const resume = req.file;
     try {
         const { userId } = req.auth();
-        const resume = req.file;
         const { target_role, experience_level, job_description } = req.body;
 
-        if (!resume) return res.json({ success: false, message: "Please upload a resume PDF." });
-        if (resume.size > 5 * 1024 * 1024) return res.json({ success: false, message: "Resume file size exceeds 5MB." });
+        if (!resume) return res.status(400).json({ success: false, message: "Please upload a resume PDF." });
+        if (!resume.originalname?.toLowerCase().endsWith('.pdf') && resume.mimetype !== 'application/pdf') {
+            cleanupUploadedFile(resume);
+            return res.status(400).json({ success: false, message: "Only PDF files are accepted." });
+        }
+        if (resume.size > 5 * 1024 * 1024) {
+            cleanupUploadedFile(resume);
+            return res.status(400).json({ success: false, message: "Resume file size exceeds 5MB." });
+        }
 
-        const dataBuffer = fs.readFileSync(resume.path);
-        const pdfData = await pdf(dataBuffer);
+        let pdfData;
+        try {
+            const dataBuffer = fs.readFileSync(resume.path);
+            pdfData = await pdf(dataBuffer);
+        } catch (parseError) {
+            cleanupUploadedFile(resume);
+            return res.status(400).json({ success: false, message: `Could not read this PDF. Please upload a text-based resume PDF. (${parseError.message})` });
+        }
+
+        const resumeText = pdfData.text?.trim();
+        if (!resumeText) {
+            cleanupUploadedFile(resume);
+            return res.status(400).json({ success: false, message: "No readable text found in this PDF. Please upload a text-based resume PDF instead of a scanned image." });
+        }
+
+        const resumeTextForAI = resumeText.slice(0, 15000);
+        const jobDescriptionForAI = (job_description || '').trim().slice(0, 10000);
 
         const prompt = `You are a senior technical recruiter, ATS resume expert, and career mentor for fresher IT candidates.
 
@@ -493,9 +620,9 @@ Analyze the resume deeply for the target role.
 
 Target Role: ${target_role || 'Software Engineer'}
 Experience Level: ${experience_level || 'Fresher'}
-${job_description ? `Optional Job Description:\n${job_description}\n` : ''}
+${jobDescriptionForAI ? `Optional Job Description:\n${jobDescriptionForAI}\n` : ''}
 Resume Text:
-${pdfData.text}
+${resumeTextForAI}
 
 Return the response in clean Markdown with this exact structure:
 
@@ -547,20 +674,43 @@ Give a 7-day improvement plan.
 
 Keep the response professional, direct, and actionable.`;
 
-        const response = await AI.chat.completions.create({
-            model: "gemini-2.0-flash",
-            messages: [{ role: "user", content: prompt }],
-            temperature: 0.7,
-            max_tokens: 3000,
-        });
+        let content;
+        let usedLocalFallback = false;
 
-        const content = response.choices[0].message.content;
-        await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, 'Resume review for ${target_role || 'general'}', ${content}, 'resume-review')`;
+        try {
+            const response = await AI.chat.completions.create({
+                model: "gemini-2.0-flash",
+                messages: [{ role: "user", content: prompt }],
+                temperature: 0.7,
+                max_tokens: 3000,
+            });
 
-        res.json({ success: true, content, message: "Resume reviewed successfully" });
+            content = response.choices?.[0]?.message?.content;
+        } catch (aiError) {
+            usedLocalFallback = true;
+            console.warn('Resume review AI unavailable, using local analysis:', aiError.message);
+            content = buildLocalResumeReview({ resumeText: resumeTextForAI, target_role, experience_level, job_description: jobDescriptionForAI });
+        }
+
+        if (!content) {
+            usedLocalFallback = true;
+            content = buildLocalResumeReview({ resumeText: resumeTextForAI, target_role, experience_level, job_description: jobDescriptionForAI });
+        }
+
+        const promptLabel = `Resume review for ${target_role || 'general'}`;
+        try {
+            await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${promptLabel}, ${content}, 'resume-review')`;
+        } catch (dbError) {
+            console.error('Resume review history save failed:', dbError.message);
+        }
+
+        cleanupUploadedFile(resume);
+
+        res.json({ success: true, content, message: usedLocalFallback ? "Resume reviewed using local analysis" : "Resume reviewed successfully" });
     } catch (error) {
-        console.log(error.message);
-        res.json({ success: false, message: error.message });
+        cleanupUploadedFile(resume);
+        console.error('Resume Review Error:', error.message);
+        res.status(500).json({ success: false, message: error.message || "Resume review failed." });
     }
 }
 
