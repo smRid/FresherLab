@@ -65,7 +65,7 @@ const CoverLetterGenerator = () => {
         <div className='h-full overflow-y-auto p-4 text-slate-700 dark:text-gray-300 sm:p-6'>
             <div className='grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(360px,520px)_minmax(420px,1fr)]'>
             <form onSubmit={onSubmitHandler} className='w-full rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-[#111827] xl:sticky xl:top-6 xl:max-h-[calc(100vh-96px)] xl:overflow-hidden'>
-                <div className='max-h-none space-y-4 overflow-y-auto pr-1 xl:max-h-[calc(100vh-128px)]'>
+                <div className='max-h-none space-y-5 overflow-y-auto px-1 py-1 xl:max-h-[calc(100vh-128px)]'>
                 <div className='flex items-center gap-3'>
                     <Briefcase className='w-6 text-[#00AD25]' />
                     <h1 className='text-xl font-semibold dark:text-white'>Cover Letter Generator</h1>
@@ -74,58 +74,58 @@ const CoverLetterGenerator = () => {
                 <div>
                     <label className='block text-sm font-medium mb-1'>Candidate Name</label>
                     <input type='text' name='candidate_name' value={formData.candidate_name} onChange={handleInputChange}
-                        placeholder='Your full name' className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300' />
+                        placeholder='Your full name' className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#00AD25] focus:outline-none focus:ring-2 focus:ring-[#00AD25]/30 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300' />
                 </div>
 
                 <div className='grid grid-cols-2 gap-3'>
                     <div>
                         <label className='block text-sm font-medium mb-1'>Job Title *</label>
                         <input type='text' name='job_title' value={formData.job_title} onChange={handleInputChange}
-                            placeholder='e.g., Software Engineer' required className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300' />
+                            placeholder='e.g., Software Engineer' required className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#00AD25] focus:outline-none focus:ring-2 focus:ring-[#00AD25]/30 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300' />
                     </div>
                     <div>
                         <label className='block text-sm font-medium mb-1'>Company Name *</label>
                         <input type='text' name='company_name' value={formData.company_name} onChange={handleInputChange}
-                            placeholder='e.g., Google' required className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300' />
+                            placeholder='e.g., Google' required className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#00AD25] focus:outline-none focus:ring-2 focus:ring-[#00AD25]/30 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300' />
                     </div>
                 </div>
 
                 <div>
                     <label className='block text-sm font-medium mb-1'>Job Description</label>
                     <textarea name='job_description' value={formData.job_description} onChange={handleInputChange}
-                        rows={3} placeholder='Paste the job description...' className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300 resize-none' />
+                        rows={4} placeholder='Paste the job description...' className='block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#00AD25] focus:outline-none focus:ring-2 focus:ring-[#00AD25]/30 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300' />
                 </div>
 
                 <div>
                     <label className='block text-sm font-medium mb-1'>Resume Highlights / Key Skills</label>
                     <textarea name='resume_highlights' value={formData.resume_highlights} onChange={handleInputChange}
-                        rows={3} placeholder='Your relevant skills and experience...' className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300 resize-none' />
+                        rows={3} placeholder='Your relevant skills and experience...' className='block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#00AD25] focus:outline-none focus:ring-2 focus:ring-[#00AD25]/30 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300' />
                 </div>
 
                 <div>
                     <label className='block text-sm font-medium mb-1'>Key Achievements</label>
                     <textarea name='key_achievements' value={formData.key_achievements} onChange={handleInputChange}
-                        rows={2} placeholder='Notable achievements, projects, or certifications...' className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300 resize-none' />
+                        rows={3} placeholder='Notable achievements, projects, or certifications...' className='block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#00AD25] focus:outline-none focus:ring-2 focus:ring-[#00AD25]/30 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300' />
                 </div>
 
                 <div>
                     <label className='block text-sm font-medium mb-1'>Skills to Emphasize</label>
                     <input type='text' name='skills_to_emphasize' value={formData.skills_to_emphasize} onChange={handleInputChange}
-                        placeholder='e.g., React, Node.js, TypeScript' className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300' />
+                        placeholder='e.g., React, Node.js, TypeScript' className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#00AD25] focus:outline-none focus:ring-2 focus:ring-[#00AD25]/30 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300' />
                 </div>
 
                 <div className='grid grid-cols-2 gap-3'>
                     <div>
                         <label className='block text-sm font-medium mb-1'>Experience Level</label>
                         <select name='experience_level' value={formData.experience_level} onChange={handleInputChange}
-                            className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300'>
+                            className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#00AD25] focus:outline-none focus:ring-2 focus:ring-[#00AD25]/30 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300'>
                             {experienceLevels.map(l => <option key={l} value={l}>{l}</option>)}
                         </select>
                     </div>
                     <div>
                         <label className='block text-sm font-medium mb-1'>Tone</label>
                         <select name='tone' value={formData.tone} onChange={handleInputChange}
-                            className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300'>
+                            className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#00AD25] focus:outline-none focus:ring-2 focus:ring-[#00AD25]/30 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300'>
                             {tones.map(t => <option key={t} value={t}>{t}</option>)}
                         </select>
                     </div>
@@ -156,6 +156,11 @@ const CoverLetterGenerator = () => {
 
 const CoverLetterOutput = ({ content, filename }) => {
     const displayContent = content.replace(/^#\s+Cover Letter\s*/i, '').trim()
+    const talkingPointsMatch = displayContent.match(/##\s*Key Talking Points\s*\n([\s\S]*)/i)
+    const mainContent = talkingPointsMatch ? displayContent.slice(0, talkingPointsMatch.index).trim() : displayContent
+    const talkingPoints = talkingPointsMatch
+        ? talkingPointsMatch[1].split('\n').map(line => line.trim().replace(/^[-*•]\s+/, '')).filter(Boolean)
+        : []
 
     const copyContent = async () => {
         await navigator.clipboard.writeText(content)
@@ -190,9 +195,22 @@ const CoverLetterOutput = ({ content, filename }) => {
                 </div>
             </div>
             <div className='min-h-0 flex-1 overflow-y-auto px-6 pb-6 pt-5 text-sm leading-7 text-slate-700 dark:text-gray-300'>
-                <div className='prose prose-sm max-w-none prose-headings:mb-3 prose-headings:mt-5 prose-headings:text-slate-900 prose-h2:text-xl prose-p:my-3 prose-ul:my-3 prose-li:my-1 dark:prose-invert dark:prose-headings:text-white'>
-                    <ReactMarkdown>{displayContent}</ReactMarkdown>
+                <div className='prose prose-sm max-w-none prose-headings:mb-4 prose-headings:mt-6 prose-headings:text-slate-900 prose-h2:text-2xl prose-h2:font-bold prose-p:my-3 prose-ul:my-3 prose-li:my-1 dark:prose-invert dark:prose-headings:text-white'>
+                    <ReactMarkdown>{mainContent}</ReactMarkdown>
                 </div>
+                {talkingPoints.length > 0 && (
+                    <section className='mt-6 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-5 dark:border-emerald-500/20 dark:bg-emerald-500/10'>
+                        <h3 className='text-2xl font-bold text-slate-900 dark:text-white'>Key Talking Points</h3>
+                        <ul className='mt-4 space-y-3'>
+                            {talkingPoints.map((point, index) => (
+                                <li key={index} className='flex gap-3 text-sm leading-6 text-slate-700 dark:text-gray-300'>
+                                    <span className='mt-2 h-2 w-2 shrink-0 rounded-full bg-emerald-500' />
+                                    <span>{point}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+                )}
             </div>
         </div>
     )
