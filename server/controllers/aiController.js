@@ -18,6 +18,135 @@ const cleanupUploadedFile = (file) => {
     if (file?.path) fs.unlink(file.path, () => { });
 }
 
+const ATS_STOP_WORDS = new Set([
+    'the', 'and', 'for', 'with', 'that', 'this', 'you', 'your', 'are', 'will', 'our', 'from', 'have', 'has', 'using',
+    'use', 'used', 'work', 'team', 'teams', 'role', 'candidate', 'experience', 'skills', 'ability', 'strong', 'good',
+    'excellent', 'knowledge', 'understanding', 'responsible', 'including', 'such', 'etc', 'job', 'description', 'about',
+    'within', 'across', 'their', 'they', 'them', 'must', 'should', 'required', 'requirements', 'preferred', 'plus'
+]);
+
+const ATS_SKILL_KEYWORDS = [
+    'javascript', 'typescript', 'python', 'java', 'c++', 'c#', 'php', 'go', 'ruby', 'sql', 'html', 'css',
+    'react', 'next.js', 'node.js', 'express.js', 'vue', 'angular', 'django', 'flask', 'spring boot', 'tailwind',
+    'bootstrap', 'redux', 'rest api', 'graphql', 'mongodb', 'mysql', 'postgresql', 'firebase', 'redis',
+    'docker', 'kubernetes', 'aws', 'azure', 'gcp', 'git', 'github', 'ci/cd', 'linux', 'vercel',
+    'testing', 'jest', 'cypress', 'selenium', 'figma', 'ui/ux', 'responsive design', 'api', 'database'
+];
+
+const normalizeAtsText = (value = '') => String(value)
+    .toLowerCase()
+    .replace(/node\.js/g, 'node.js')
+    .replace(/next\.js/g, 'next.js')
+    .replace(/express\.js/g, 'express.js')
+    .replace(/ci\/cd/g, 'ci/cd')
+    .replace(/[^a-z0-9+#./\s-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const keywordExists = (normalizedText, keyword) => {
+    const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(`(^|\\s)${escaped}(\\s|$)`, 'i').test(normalizedText);
+}
+
+const extractAtsKeywords = (text = '') => {
+    const normalized = normalizeAtsText(text);
+    const foundSkills = ATS_SKILL_KEYWORDS.filter(keyword => normalized.includes(keyword));
+    const words = normalized.match(/[a-z][a-z0-9+#.]{2,}/g) || [];
+    const counts = new Map();
+
+    words.forEach(word => {
+        if (ATS_STOP_WORDS.has(word) || /^\d+$/.test(word)) return;
+        counts.set(word, (counts.get(word) || 0) + 1);
+    });
+
+    const frequentWords = [...counts.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 35)
+        .map(([word]) => word);
+
+    return [...new Set([...foundSkills, ...frequentWords])].slice(0, 45);
+}
+
+const formatMarkdownList = (items, fallback) => {
+    if (!items.length) return `- ${fallback}`;
+    return items.map(item => `- ${item}`).join('\n');
+}
+
+const buildLocalAtsReport = ({ resumeText, jobDescription, target_role, experience_level }) => {
+    const normalizedResume = normalizeAtsText(resumeText);
+    const jdKeywords = extractAtsKeywords(jobDescription);
+    const matchedKeywords = jdKeywords.filter(keyword => keywordExists(normalizedResume, keyword));
+    const missingKeywords = jdKeywords.filter(keyword => !keywordExists(normalizedResume, keyword));
+    const roleKeywords = extractAtsKeywords(target_role || '').filter(keyword => !['developer', 'engineer'].includes(keyword));
+    const matchedRoleKeywords = roleKeywords.filter(keyword => keywordExists(normalizedResume, keyword));
+
+    const keywordScore = jdKeywords.length ? Math.round((matchedKeywords.length / jdKeywords.length) * 100) : 60;
+    const roleMatchScore = roleKeywords.length ? Math.round((matchedRoleKeywords.length / roleKeywords.length) * 100) : keywordScore;
+    const sectionChecks = [
+        /education|university|college|bachelor|degree|cgpa|gpa/.test(normalizedResume),
+        /project|projects|github|portfolio/.test(normalizedResume),
+        /skill|skills|technologies|tools/.test(normalizedResume),
+        /experience|intern|developer|engineer|work/.test(normalizedResume),
+        /mail|email|linkedin|phone|\+?\d{7,}/.test(normalizedResume)
+    ];
+    const sectionScore = Math.round((sectionChecks.filter(Boolean).length / sectionChecks.length) * 100);
+    const overallScore = Math.round((keywordScore * 0.55) + (roleMatchScore * 0.25) + (sectionScore * 0.20));
+
+    const weakSections = [];
+    if (!sectionChecks[0]) weakSections.push('Education section is missing or not clearly labeled.');
+    if (!sectionChecks[1]) weakSections.push('Projects/GitHub/portfolio information should be clearer.');
+    if (!sectionChecks[2]) weakSections.push('Technical skills section should be easier for ATS to parse.');
+    if (!sectionChecks[3]) weakSections.push('Experience, internship, or practical work section needs stronger wording.');
+    if (missingKeywords.length > matchedKeywords.length) weakSections.push('Resume is missing several important job-description keywords.');
+
+    const recommendedKeywords = missingKeywords.slice(0, 8);
+    const recommendedPhrases = recommendedKeywords.length
+        ? recommendedKeywords.map(keyword => `Add a bullet showing practical experience with ${keyword}.`)
+        : ['Add measurable outcomes to existing project and experience bullets.'];
+
+    const summarySkills = matchedKeywords.slice(0, 6).join(', ') || 'relevant technical skills';
+
+    return `# ATS Score Report
+
+## Overall ATS Score
+${overallScore}/100
+
+This score is calculated from keyword match, role alignment, and ATS-readable resume sections.
+
+## Keyword Match Score
+${keywordScore}/100
+
+## Role Match Score
+${roleMatchScore}/100
+
+Target Role: ${target_role || 'Software Engineer'}
+Experience Level: ${experience_level || 'Fresher'}
+
+## Matched Keywords
+${formatMarkdownList(matchedKeywords.slice(0, 20), 'No strong job-description keyword matches were found.')}
+
+## Missing Keywords
+${formatMarkdownList(missingKeywords.slice(0, 20), 'No major missing keywords detected from the provided job description.')}
+
+## Weak Sections
+${formatMarkdownList(weakSections, 'No critical section gaps detected. Improve impact metrics and role-specific wording.')}
+
+## Recommended Phrases to Add
+${formatMarkdownList(recommendedPhrases, 'Add concise action-verb bullets with measurable outcomes.')}
+
+## Optimized Resume Summary
+Fresher ${target_role || 'software engineering'} candidate with hands-on experience in ${summarySkills}. Skilled at building practical projects, learning quickly, and translating requirements into clean, maintainable solutions.
+
+## Project Bullet Improvements
+- Built responsive features aligned with user requirements and improved usability across devices.
+- Integrated APIs and managed data flow to support real-world application workflows.
+- Improved code quality by organizing reusable components, validation, and error handling.
+
+## Final Recommendation
+${overallScore >= 75 ? 'You can apply now, but add measurable achievements where possible.' : overallScore >= 55 ? 'Improve missing keywords and strengthen project bullets before applying.' : 'Improve keyword alignment, skills visibility, and project descriptions before applying.'}
+`;
+}
+
 const clampNumber = (value, min, max, fallback) => {
     const number = Number(value);
     if (!Number.isFinite(number)) return fallback;
@@ -1444,22 +1573,39 @@ Rewrite 3 stronger project bullets using action verbs and measurable impact.
 ## Final Recommendation
 Tell the user whether they should apply now or improve first.`;
 
-        const response = await AI.chat.completions.create({
-            model: "gemini-2.0-flash",
-            messages: [{ role: "user", content: prompt }],
-            temperature: 0.7,
-            max_tokens: 3000,
-        });
+        let content;
+        let usedLocalFallback = false;
 
-        const content = response.choices?.[0]?.message?.content;
-        if (!content) throw new Error("AI did not return an ATS score report.");
+        try {
+            const response = await AI.chat.completions.create({
+                model: "gemini-2.0-flash",
+                messages: [{ role: "user", content: prompt }],
+                temperature: 0.7,
+                max_tokens: 3000,
+            });
+
+            content = response.choices?.[0]?.message?.content;
+        } catch (aiError) {
+            usedLocalFallback = true;
+            console.warn('ATS AI unavailable, using local analysis:', aiError.message);
+            content = buildLocalAtsReport({ resumeText: resumeTextForAI, jobDescription: jobDescriptionForAI, target_role, experience_level });
+        }
+
+        if (!content) {
+            usedLocalFallback = true;
+            content = buildLocalAtsReport({ resumeText: resumeTextForAI, jobDescription: jobDescriptionForAI, target_role, experience_level });
+        }
 
         const promptLabel = `ATS score check for ${target_role || 'general'}`;
-        await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${promptLabel}, ${content}, 'ats-score')`;
+        try {
+            await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${promptLabel}, ${content}, 'ats-score')`;
+        } catch (dbError) {
+            console.error('ATS history save failed:', dbError.message);
+        }
 
         cleanupUploadedFile(resume);
 
-        res.json({ success: true, content, message: "ATS score analysis complete" });
+        res.json({ success: true, content, message: usedLocalFallback ? "ATS score analysis complete using local analysis" : "ATS score analysis complete" });
     } catch (error) {
         cleanupUploadedFile(resume);
         console.error('ATS Score Error:', error.message);
