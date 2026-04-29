@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useAuth } from '@clerk/clerk-react';
-import { AlertTriangle, CheckCircle2, Copy, Download, FileText, ListChecks, Loader2, Sparkles, Target, TrendingUp } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Copy, Download, FileText, ListChecks, Loader2, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { api } from '../lib/api';
 
@@ -56,7 +56,7 @@ const ReviewResume = () => {
     <div className='h-full overflow-y-scroll p-4 text-slate-700 dark:text-gray-300 sm:p-6'>
       <div className='mb-6'>
         <h1 className='text-2xl font-bold text-slate-800 dark:text-white'>Resume Review</h1>
-        <p className='mt-1 text-sm text-slate-500 dark:text-gray-400'>Get a structured recruiter-style review with scores, strengths, weaknesses, and an action plan</p>
+        <p className='mt-1 text-sm text-slate-500 dark:text-gray-400'>Get a structured recruiter-style review with strengths, weaknesses, skills, and an action plan</p>
       </div>
 
       <div className='grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(360px,620px)_minmax(420px,1fr)]'>
@@ -153,10 +153,10 @@ const ResumeReviewReportPanel = ({ content, targetRole, experienceLevel }) => {
         </div>
         <h2 className='text-xl font-bold text-slate-900 dark:text-white'>Resume review preview</h2>
         <p className='mx-auto mt-2 max-w-md text-sm text-slate-500 dark:text-gray-400'>
-          Your structured resume review will appear here with score cards, strengths, weaknesses, skills, and a 7-day action plan.
+          Your structured resume review will appear here with strengths, weaknesses, skills, and a 7-day action plan.
         </p>
         <div className='mt-6 grid gap-3 sm:grid-cols-3'>
-          {['Overall Score', 'ATS Score', 'Role Match'].map(item => (
+          {['Strengths', 'Skills', 'Action Plan'].map(item => (
             <div key={item} className='rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-gray-800 dark:bg-[#111827]'>
               <div className='mx-auto mb-3 h-2 w-16 rounded-full bg-slate-200 dark:bg-gray-700' />
               <p className='text-xs font-medium text-slate-500 dark:text-gray-400'>{item}</p>
@@ -188,12 +188,6 @@ const ResumeReviewReportPanel = ({ content, targetRole, experienceLevel }) => {
       </div>
 
       <div className='max-h-none space-y-5 overflow-y-auto p-5 xl:max-h-[calc(100vh-170px)]'>
-        <div className='grid gap-4 md:grid-cols-3'>
-          <ScoreCard label='Overall Score' score={report.scores.overall} Icon={TrendingUp} />
-          <ScoreCard label='ATS Compatibility' score={report.scores.ats} Icon={FileText} />
-          <ScoreCard label='Role Match' score={report.scores.role} Icon={Target} />
-        </div>
-
         <div className='grid gap-3 sm:grid-cols-2'>
           <InfoBadge label='Target Role' value={report.meta.targetRole} />
           <InfoBadge label='Experience Level' value={report.meta.experienceLevel} />
@@ -217,32 +211,6 @@ const ResumeReviewReportPanel = ({ content, targetRole, experienceLevel }) => {
         <ReportSection title='7-Day Action Plan' Icon={ListChecks} items={report.lists.actionPlan} tone='success' />
       </div>
     </aside>
-  )
-}
-
-const ScoreCard = ({ label, score, Icon }) => {
-  const value = Number.isFinite(score) ? Math.max(0, Math.min(100, score)) : null
-  const color = value >= 75 ? '#22c55e' : value >= 55 ? '#f59e0b' : '#ef4444'
-  const tone = value >= 75 ? 'Strong' : value >= 55 ? 'Needs Work' : 'Improve'
-
-  return (
-    <div className='rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-gray-800 dark:bg-[#111827]'>
-      <div className='mb-4 flex items-center justify-between'>
-        <div className='rounded-xl bg-white p-2 text-slate-600 dark:bg-[#0B1120] dark:text-gray-300'>
-          <Icon className='h-4 w-4' />
-        </div>
-        <span className='rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-slate-600 dark:bg-[#0B1120] dark:text-gray-300'>{value === null ? 'Pending' : tone}</span>
-      </div>
-      <div className='flex items-end justify-between gap-3'>
-        <div>
-          <p className='text-xs font-medium text-slate-500 dark:text-gray-400'>{label}</p>
-          <p className='mt-1 text-2xl font-bold text-slate-900 dark:text-white'>{value === null ? '—' : value}<span className='text-sm text-slate-400'>/100</span></p>
-        </div>
-        <div className='h-12 w-12 rounded-full p-1' style={{ background: `conic-gradient(${color} ${(value || 0) * 3.6}deg, rgba(148,163,184,0.22) 0deg)` }}>
-          <div className='h-full w-full rounded-full bg-slate-50 dark:bg-[#111827]' />
-        </div>
-      </div>
-    </div>
   )
 }
 
@@ -334,11 +302,6 @@ const parseResumeReviewReport = (content = '', targetRole, experienceLevel) => {
   const metaExperience = roleSection.match(/Experience Level:\s*([^\n]+)/i)?.[1]?.trim()
 
   return {
-    scores: {
-      overall: extractScore(getSection(sections, 'Overall Score')),
-      ats: extractScore(getSection(sections, 'ATS Compatibility Score')),
-      role: extractScore(roleSection),
-    },
     meta: {
       targetRole: metaTarget || targetRole,
       experienceLevel: metaExperience || experienceLevel,
@@ -373,12 +336,6 @@ const getMarkdownSections = (content) => {
 const getSection = (sections, title) => sections[normalizeHeading(title)] || ''
 
 const normalizeHeading = (value) => value.toLowerCase().replace(/^\d+\s*[.)-]?\s*/, '').replace(/[^a-z0-9]+/g, '')
-
-const extractScore = (text) => {
-  const score = Number(text.match(/(\d{1,3})\s*\/\s*100/)?.[1])
-  if (!Number.isFinite(score)) return null
-  return Math.max(0, Math.min(100, score))
-}
 
 const extractListItems = (text) => text
   .split('\n')
