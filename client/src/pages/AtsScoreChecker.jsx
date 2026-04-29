@@ -36,7 +36,7 @@ const AtsScoreChecker = () => {
       formData.append('experience_level', experienceLevel)
 
       const { data } = await api.post('/api/ai/ats-score', formData, {
-        headers: { Authorization: `Bearer ${await getToken()}`, 'Content-Type': 'multipart/form-data' }
+        headers: { Authorization: `Bearer ${await getToken()}` }
       })
       if (data.success) {
         setResult(data.content)
@@ -45,7 +45,7 @@ const AtsScoreChecker = () => {
         toast.error(data.message)
       }
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error.response?.data?.message || error.message)
     }
     setLoading(false)
   }

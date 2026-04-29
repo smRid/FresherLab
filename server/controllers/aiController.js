@@ -14,6 +14,10 @@ const AI = new OpenAI({
     baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/"
 });
 
+const cleanupUploadedFile = (file) => {
+    if (file?.path) fs.unlink(file.path, () => { });
+}
+
 const clampNumber = (value, min, max, fallback) => {
     const number = Number(value);
     if (!Number.isFinite(number)) return fallback;
@@ -1356,17 +1360,42 @@ export const generateThumbnail = async (req, res) => {
 // ─── FresherLab New AI Tools ─────────────────────────────────────
 
 export const atsScoreChecker = async (req, res) => {
+    const resume = req.file;
     try {
         const { userId } = req.auth();
-        const resume = req.file;
         const { jobDescription, target_role, experience_level } = req.body;
 
         if (!resume) return res.status(400).json({ success: false, message: "Please upload a resume PDF." });
-        if (!jobDescription || !jobDescription.trim()) return res.status(400).json({ success: false, message: "Please provide a job description." });
-        if (resume.size > 5 * 1024 * 1024) return res.status(400).json({ success: false, message: "Resume file size exceeds 5MB." });
+        if (!resume.originalname?.toLowerCase().endsWith('.pdf') && resume.mimetype !== 'application/pdf') {
+            cleanupUploadedFile(resume);
+            return res.status(400).json({ success: false, message: "Only PDF files are accepted." });
+        }
+        if (!jobDescription || !jobDescription.trim()) {
+            cleanupUploadedFile(resume);
+            return res.status(400).json({ success: false, message: "Please provide a job description." });
+        }
+        if (resume.size > 5 * 1024 * 1024) {
+            cleanupUploadedFile(resume);
+            return res.status(400).json({ success: false, message: "Resume file size exceeds 5MB." });
+        }
 
-        const dataBuffer = fs.readFileSync(resume.path);
-        const pdfData = await pdf(dataBuffer);
+        let pdfData;
+        try {
+            const dataBuffer = fs.readFileSync(resume.path);
+            pdfData = await pdf(dataBuffer);
+        } catch (parseError) {
+            cleanupUploadedFile(resume);
+            return res.status(400).json({ success: false, message: `Could not read this PDF. Please upload a text-based resume PDF. (${parseError.message})` });
+        }
+
+        const resumeText = pdfData.text?.trim();
+        if (!resumeText) {
+            cleanupUploadedFile(resume);
+            return res.status(400).json({ success: false, message: "No readable text found in this PDF. Please upload a text-based resume PDF instead of a scanned image." });
+        }
+
+        const resumeTextForAI = resumeText.slice(0, 15000);
+        const jobDescriptionForAI = jobDescription.trim().slice(0, 10000);
 
         const prompt = `You are an ATS optimization expert and technical recruiter.
 
@@ -1376,10 +1405,10 @@ Target Role: ${target_role || 'Software Engineer'}
 Experience Level: ${experience_level || 'Fresher'}
 
 Resume:
-${pdfData.text}
+${resumeTextForAI}
 
 Job Description:
-${jobDescription}
+${jobDescriptionForAI}
 
 Return Markdown with this exact structure:
 
@@ -1422,13 +1451,19 @@ Tell the user whether they should apply now or improve first.`;
             max_tokens: 3000,
         });
 
-        const content = response.choices[0].message.content;
-        await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, 'ATS score check for ${target_role || 'general'}', ${content}, 'ats-score')`;
+        const content = response.choices?.[0]?.message?.content;
+        if (!content) throw new Error("AI did not return an ATS score report.");
+
+        const promptLabel = `ATS score check for ${target_role || 'general'}`;
+        await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${promptLabel}, ${content}, 'ats-score')`;
+
+        cleanupUploadedFile(resume);
 
         res.json({ success: true, content, message: "ATS score analysis complete" });
     } catch (error) {
-        console.log(error.message);
-        res.status(500).json({ success: false, message: error.message });
+        cleanupUploadedFile(resume);
+        console.error('ATS Score Error:', error.message);
+        res.status(500).json({ success: false, message: error.message || "ATS score analysis failed." });
     }
 }
 
