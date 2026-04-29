@@ -53,25 +53,25 @@ const EmailGenerator = () => {
     }
 
     return (
-        <div className='h-full overflow-y-scroll p-6 flex items-start flex-wrap gap-4 text-slate-700'>
-            <form onSubmit={onSubmitHandler} className='w-full max-w-lg p-4 bg-white rounded-lg border border-gray-200 space-y-4'>
+        <div className='h-full overflow-y-scroll p-6 flex items-start flex-wrap gap-4 text-slate-700 dark:text-gray-300'>
+            <form onSubmit={onSubmitHandler} className='w-full max-w-lg p-4 bg-white dark:bg-[#111827] rounded-lg border border-gray-200 dark:border-gray-800 space-y-4'>
                 <div className='flex items-center gap-3'>
                     <Mail className='w-6 text-[#00AD25]' />
-                    <h1 className='text-xl font-semibold'>Smart Job Email Generator</h1>
+                    <h1 className='text-xl font-semibold dark:text-white'>Smart Job Email Generator</h1>
                 </div>
 
                 <div className='grid grid-cols-2 gap-3'>
                     <div>
                         <label className='block text-sm font-medium mb-1'>Email Type</label>
                         <select name='purpose' value={formData.purpose} onChange={handleInputChange}
-                            className='w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25]'>
+                            className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300'>
                             {emailTypes.map(t => <option key={t} value={t}>{t}</option>)}
                         </select>
                     </div>
                     <div>
                         <label className='block text-sm font-medium mb-1'>Tone</label>
                         <select name='tone' value={formData.tone} onChange={handleInputChange}
-                            className='w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25]'>
+                            className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300'>
                             {emailTones.map(t => <option key={t} value={t}>{t}</option>)}
                         </select>
                     </div>
@@ -80,19 +80,19 @@ const EmailGenerator = () => {
                 <div>
                     <label className='block text-sm font-medium mb-1'>Recruiter / Company Name</label>
                     <input type='text' name='recipient' value={formData.recipient} onChange={handleInputChange}
-                        placeholder='e.g., John Doe, HR Manager' className='w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25]' />
+                        placeholder='e.g., John Doe, HR Manager' className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300' />
                 </div>
 
                 <div className='grid grid-cols-2 gap-3'>
                     <div>
                         <label className='block text-sm font-medium mb-1'>Job Role *</label>
                         <input type='text' name='job_role' value={formData.job_role} onChange={handleInputChange}
-                            placeholder='e.g., Frontend Developer' required className='w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25]' />
+                            placeholder='e.g., Frontend Developer' required className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300' />
                     </div>
                     <div>
                         <label className='block text-sm font-medium mb-1'>Company *</label>
                         <input type='text' name='company' value={formData.company} onChange={handleInputChange}
-                            placeholder='e.g., Google' required className='w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25]' />
+                            placeholder='e.g., Google' required className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300' />
                     </div>
                 </div>
 
@@ -100,14 +100,14 @@ const EmailGenerator = () => {
                     <label className='block text-sm font-medium mb-1'>Your Background</label>
                     <textarea name='user_background' value={formData.user_background} onChange={handleInputChange}
                         rows={3} placeholder='Your skills, experience, and why you are a fit...'
-                        className='w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] resize-none' />
+                        className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300 resize-none' />
                 </div>
 
                 <div>
                     <label className='block text-sm font-medium mb-1'>Key Points</label>
                     <textarea name='key_points' value={formData.key_points} onChange={handleInputChange}
                         rows={2} placeholder='Main points to cover in the email'
-                        className='w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] resize-none' />
+                        className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300 resize-none' />
                 </div>
 
                 <button type='submit' disabled={loading || !formData.job_role.trim() || !formData.company.trim()}
@@ -121,7 +121,7 @@ const EmailGenerator = () => {
                 {generatedEmail ? (
                     <GeneratedOutput content={generatedEmail} title='Job Email' filename='job-email' />
                 ) : (
-                    <div className='p-4 bg-white rounded-lg flex flex-col border border-gray-200 min-h-96 items-center justify-center'>
+                    <div className='p-4 bg-white dark:bg-[#111827] rounded-lg flex flex-col border border-gray-200 dark:border-gray-800 min-h-96 items-center justify-center'>
                         <Mail className='w-9 h-9 text-gray-300' />
                         <p className='mt-3 text-sm text-gray-400'>Fill the form and click "Generate Email" to get started</p>
                     </div>

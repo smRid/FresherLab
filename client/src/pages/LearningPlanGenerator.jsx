@@ -29,35 +29,35 @@ const LearningPlanGenerator = () => {
   }
 
   return (
-    <div className='h-full overflow-y-scroll p-6'>
-      <h1 className='text-2xl font-bold text-slate-800 mb-1'>Learning Plan Generator</h1>
-      <p className='text-slate-500 text-sm mb-6'>Get a personalized roadmap with weekly tasks, projects, and resources</p>
+    <div className='h-full overflow-y-scroll p-6 text-slate-700 dark:text-gray-300'>
+      <h1 className='text-2xl font-bold text-slate-800 dark:text-white mb-1'>Learning Plan Generator</h1>
+      <p className='text-slate-500 dark:text-gray-400 text-sm mb-6'>Get a personalized roadmap with weekly tasks, projects, and resources</p>
 
       <form onSubmit={handleSubmit} className='max-w-2xl space-y-5'>
         <div>
-          <label className='block text-sm font-medium text-slate-700 mb-1'>Target Role *</label>
+          <label className='block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1'>Target Role *</label>
           <input type='text' value={targetRole} onChange={(e) => setTargetRole(e.target.value)}
             placeholder='e.g. Frontend Developer, Data Analyst'
-            className='w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none' />
+            className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none' />
         </div>
         <div>
-          <label className='block text-sm font-medium text-slate-700 mb-1'>Current Skills</label>
+          <label className='block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1'>Current Skills</label>
           <textarea value={currentSkills} onChange={(e) => setCurrentSkills(e.target.value)} rows={3}
             placeholder='HTML, CSS, basic JavaScript...'
-            className='w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none' />
+            className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none' />
         </div>
         <div className='grid grid-cols-2 gap-4'>
           <div>
-            <label className='block text-sm font-medium text-slate-700 mb-1'>Duration</label>
+            <label className='block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1'>Duration</label>
             <select value={duration} onChange={(e) => setDuration(e.target.value)}
-              className='w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 outline-none'>
+              className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2.5 text-sm focus:border-blue-500 outline-none'>
               <option>2 weeks</option><option>4 weeks</option><option>8 weeks</option><option>12 weeks</option>
             </select>
           </div>
           <div>
-            <label className='block text-sm font-medium text-slate-700 mb-1'>Hours/Day</label>
+            <label className='block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1'>Hours/Day</label>
             <input type='number' min='1' max='12' value={hoursPerDay} onChange={(e) => setHoursPerDay(e.target.value)}
-              className='w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none' />
+              className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none' />
           </div>
         </div>
 

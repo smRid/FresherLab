@@ -37,17 +37,17 @@ const ResumeBuilder = () => {
 
   const input = (label, key, placeholder, type = 'text') => (
     <div>
-      <label className='block text-sm font-medium text-slate-700 mb-1'>{label}</label>
+      <label className='block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1'>{label}</label>
       <input type={type} value={form[key]} onChange={set(key)} placeholder={placeholder}
-        className='w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none' />
+        className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none' />
     </div>
   )
 
   const textarea = (label, key, placeholder, rows = 3) => (
     <div>
-      <label className='block text-sm font-medium text-slate-700 mb-1'>{label}</label>
+      <label className='block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1'>{label}</label>
       <textarea value={form[key]} onChange={set(key)} placeholder={placeholder} rows={rows}
-        className='w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none' />
+        className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none' />
     </div>
   )
 
@@ -79,15 +79,15 @@ const ResumeBuilder = () => {
   ]
 
   return (
-    <div className='h-full overflow-y-scroll p-6'>
-      <h1 className='text-2xl font-bold text-slate-800 mb-1'>AI Resume Builder</h1>
-      <p className='text-slate-500 text-sm mb-6'>Build an ATS-friendly fresher resume step by step</p>
+    <div className='h-full overflow-y-scroll p-6 text-slate-700 dark:text-gray-300'>
+      <h1 className='text-2xl font-bold text-slate-800 dark:text-white mb-1'>AI Resume Builder</h1>
+      <p className='text-slate-500 dark:text-gray-400 text-sm mb-6'>Build an ATS-friendly fresher resume step by step</p>
 
       {/* Stepper */}
       <div className='mb-8 flex gap-2 max-w-2xl'>
         {STEPS.map((s, i) => (
           <button key={i} type='button' onClick={() => setStep(i)}
-            className={`flex-1 rounded-lg py-2 text-xs font-medium transition ${i === step ? 'bg-blue-600 text-white' : 'bg-gray-100 text-slate-500 hover:bg-gray-200'}`}>
+            className={`flex-1 rounded-lg py-2 text-xs font-medium transition ${i === step ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-slate-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
             {s}
           </button>
         ))}
@@ -99,7 +99,7 @@ const ResumeBuilder = () => {
         <div className='mt-6 flex gap-3'>
           {step > 0 && (
             <button type='button' onClick={() => setStep(step - 1)}
-              className='rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-gray-50'>Back</button>
+              className='rounded-lg border border-gray-300 dark:border-gray-700 px-5 py-2.5 text-sm font-medium text-slate-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'>Back</button>
           )}
           {step < STEPS.length - 1 ? (
             <button type='button' onClick={() => setStep(step + 1)}

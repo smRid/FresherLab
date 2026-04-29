@@ -73,25 +73,25 @@ const GrammarEnhancer = () => {
     const wordCount = formData.text.trim() ? formData.text.trim().split(/\s+/).filter(word => word.length > 0).length : 0
 
     return (
-        <div className='h-full overflow-y-scroll p-6 flex items-start flex-wrap gap-4 text-slate-700'>
-            <form onSubmit={onSubmitHandler} className='w-full max-w-lg p-4 bg-white rounded-lg border border-gray-200 space-y-4'>
+        <div className='h-full overflow-y-scroll p-6 flex items-start flex-wrap gap-4 text-slate-700 dark:text-gray-300'>
+            <form onSubmit={onSubmitHandler} className='w-full max-w-lg p-4 bg-white dark:bg-[#111827] rounded-lg border border-gray-200 dark:border-gray-800 space-y-4'>
                 <div className='flex items-center gap-3'>
                     <CheckCircle className='w-6 text-[#00AD25]' />
-                    <h1 className='text-xl font-semibold'>Grammar Enhancer</h1>
+                    <h1 className='text-xl font-semibold dark:text-white'>Grammar Enhancer</h1>
                 </div>
 
                 <div>
                     <label className='block text-sm font-medium mb-1'>Text to Enhance *</label>
                     <textarea name='text' value={formData.text} onChange={handleInputChange}
                         placeholder='Enter your text here — resume bullets, cover letter, email, LinkedIn summary...'
-                        className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AD25] h-32 resize-none text-sm' required />
+                        className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300 h-32 resize-none text-sm' required />
                     <div className='text-xs text-gray-500 mt-1'>{wordCount} words</div>
                 </div>
 
                 <div>
                     <label className='block text-sm font-medium mb-1'>Purpose</label>
                     <select name='purpose' value={formData.purpose} onChange={handleInputChange}
-                        className='w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25]'>
+                        className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300'>
                         {purposes.map(p => <option key={p} value={p}>{p}</option>)}
                     </select>
                 </div>
@@ -100,14 +100,14 @@ const GrammarEnhancer = () => {
                     <div>
                         <label className='block text-sm font-medium mb-1'>Tone</label>
                         <select name='tone' value={formData.tone} onChange={handleInputChange}
-                            className='w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25]'>
+                            className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300'>
                             {tones.map(t => <option key={t} value={t}>{t}</option>)}
                         </select>
                     </div>
                     <div>
                         <label className='block text-sm font-medium mb-1'>Enhancement Level</label>
                         <select name='enhancement_level' value={formData.enhancement_level} onChange={handleInputChange}
-                            className='w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25]'>
+                            className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300'>
                             {enhancementLevels.map(l => <option key={l} value={l}>{l}</option>)}
                         </select>
                     </div>
@@ -124,7 +124,7 @@ const GrammarEnhancer = () => {
                 {enhancedText ? (
                     <GeneratedOutput content={enhancedText} title='Enhanced Text' filename='enhanced-text' />
                 ) : (
-                    <div className='p-4 bg-white rounded-lg flex flex-col border border-gray-200 min-h-96 items-center justify-center'>
+                    <div className='p-4 bg-white dark:bg-[#111827] rounded-lg flex flex-col border border-gray-200 dark:border-gray-800 min-h-96 items-center justify-center'>
                         <CheckCircle className='w-9 h-9 text-gray-300' />
                         <p className='mt-3 text-sm text-gray-400'>Enter text and click "Enhance Text" to get started</p>
                     </div>

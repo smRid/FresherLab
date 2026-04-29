@@ -6,12 +6,12 @@ import { Loader2, Plus, Trash2, Edit3, X, Search } from 'lucide-react'
 
 const STATUSES = ['Saved', 'Applied', 'Interview', 'Assignment', 'Offer', 'Rejected']
 const STATUS_COLORS = {
-  Saved: 'bg-gray-100 text-gray-700',
-  Applied: 'bg-blue-100 text-blue-700',
-  Interview: 'bg-yellow-100 text-yellow-700',
-  Assignment: 'bg-purple-100 text-purple-700',
-  Offer: 'bg-green-100 text-green-700',
-  Rejected: 'bg-red-100 text-red-700',
+  Saved: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+  Applied: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+  Interview: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300',
+  Assignment: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
+  Offer: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
+  Rejected: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
 }
 
 const emptyForm = { company: '', role: '', status: 'Applied', job_url: '', location: '', salary_range: '', source: '', contact_name: '', contact_email: '', notes: '', follow_up_date: '' }
@@ -93,11 +93,11 @@ const JobTracker = () => {
   const followUpsDue = jobs.filter(j => j.follow_up_date && new Date(j.follow_up_date) <= new Date()).length
 
   return (
-    <div className='h-full overflow-y-scroll p-6'>
+    <div className='h-full overflow-y-scroll p-6 text-slate-700 dark:text-gray-300'>
       <div className='flex flex-wrap items-center justify-between gap-4 mb-4'>
         <div>
-          <h1 className='text-2xl font-bold text-slate-800'>Job Application Tracker</h1>
-          <p className='text-slate-500 text-sm'>Track your job applications in one place</p>
+          <h1 className='text-2xl font-bold text-slate-800 dark:text-white'>Job Application Tracker</h1>
+          <p className='text-slate-500 dark:text-gray-400 text-sm'>Track your job applications in one place</p>
         </div>
         <button onClick={() => { resetForm(); setShowForm(true) }}
           className='inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700'>
@@ -114,7 +114,7 @@ const JobTracker = () => {
           { label: 'Rejected', value: statusCounts.Rejected || 0, color: 'text-red-500' },
           { label: 'Follow-ups Due', value: followUpsDue, color: 'text-orange-500' },
         ].map(c => (
-          <div key={c.label} className='bg-white rounded-xl border border-gray-200 p-3 text-center'>
+          <div key={c.label} className='bg-white dark:bg-[#111827] rounded-xl border border-gray-200 dark:border-gray-800 p-3 text-center'>
             <p className={`text-2xl font-bold ${c.color}`}>{c.value}</p>
             <p className='text-xs text-slate-500 mt-0.5'>{c.label}</p>
           </div>
@@ -126,15 +126,15 @@ const JobTracker = () => {
         <div className='relative'>
           <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder='Search company or role...'
-            className='pl-9 pr-3 py-2 rounded-lg border border-gray-300 text-sm w-56 outline-none focus:border-blue-500' />
+            className='pl-9 pr-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 text-sm w-56 outline-none focus:border-blue-500' />
         </div>
         <button onClick={() => setFilter('All')}
-          className={`rounded-full px-4 py-1.5 text-xs font-medium border transition ${filter === 'All' ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-gray-200 hover:bg-gray-50'}`}>
+          className={`rounded-full px-4 py-1.5 text-xs font-medium border transition ${filter === 'All' ? 'bg-slate-800 dark:bg-white text-white dark:text-slate-800 border-slate-800 dark:border-white' : 'bg-white dark:bg-[#111827] text-slate-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
           All ({jobs.length})
         </button>
         {STATUSES.map(s => (
           <button key={s} onClick={() => setFilter(s)}
-            className={`rounded-full px-4 py-1.5 text-xs font-medium border transition ${filter === s ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-gray-200 hover:bg-gray-50'}`}>
+            className={`rounded-full px-4 py-1.5 text-xs font-medium border transition ${filter === s ? 'bg-slate-800 dark:bg-white text-white dark:text-slate-800 border-slate-800 dark:border-white' : 'bg-white dark:bg-[#111827] text-slate-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
             {s} ({statusCounts[s] || 0})
           </button>
         ))}
@@ -143,77 +143,77 @@ const JobTracker = () => {
       {/* Form modal */}
       {showForm && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4'>
-          <form onSubmit={handleSave} className='w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl space-y-4'>
+          <form onSubmit={handleSave} className='w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white dark:bg-[#111827] p-6 shadow-xl space-y-4'>
             <div className='flex items-center justify-between'>
-              <h2 className='text-lg font-semibold text-slate-800'>{editId ? 'Edit' : 'Add'} Application</h2>
+              <h2 className='text-lg font-semibold text-slate-800 dark:text-white'>{editId ? 'Edit' : 'Add'} Application</h2>
               <button type='button' onClick={resetForm}><X className='h-5 w-5 text-gray-400' /></button>
             </div>
             <div className='grid grid-cols-2 gap-3'>
               <div>
-                <label className='block text-xs font-medium text-slate-600 mb-1'>Company *</label>
+                <label className='block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1'>Company *</label>
                 <input value={form.company} onChange={e => setForm({ ...form, company: e.target.value })} placeholder='Google'
-                  className='w-full rounded-lg border border-gray-300 p-2 text-sm outline-none focus:border-blue-500' />
+                  className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2 text-sm outline-none focus:border-blue-500' />
               </div>
               <div>
-                <label className='block text-xs font-medium text-slate-600 mb-1'>Role *</label>
+                <label className='block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1'>Role *</label>
                 <input value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} placeholder='SDE Intern'
-                  className='w-full rounded-lg border border-gray-300 p-2 text-sm outline-none focus:border-blue-500' />
+                  className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2 text-sm outline-none focus:border-blue-500' />
               </div>
             </div>
             <div className='grid grid-cols-2 gap-3'>
               <div>
-                <label className='block text-xs font-medium text-slate-600 mb-1'>Status</label>
+                <label className='block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1'>Status</label>
                 <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })}
-                  className='w-full rounded-lg border border-gray-300 p-2 text-sm outline-none focus:border-blue-500'>
+                  className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2 text-sm outline-none focus:border-blue-500'>
                   {STATUSES.map(s => <option key={s}>{s}</option>)}
                 </select>
               </div>
               <div>
-                <label className='block text-xs font-medium text-slate-600 mb-1'>Job URL</label>
+                <label className='block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1'>Job URL</label>
                 <input value={form.job_url} onChange={e => setForm({ ...form, job_url: e.target.value })} placeholder='https://...'
-                  className='w-full rounded-lg border border-gray-300 p-2 text-sm outline-none focus:border-blue-500' />
+                  className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2 text-sm outline-none focus:border-blue-500' />
               </div>
             </div>
             <div className='grid grid-cols-2 gap-3'>
               <div>
-                <label className='block text-xs font-medium text-slate-600 mb-1'>Location</label>
+                <label className='block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1'>Location</label>
                 <input value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} placeholder='Remote / Bangalore'
-                  className='w-full rounded-lg border border-gray-300 p-2 text-sm outline-none focus:border-blue-500' />
+                  className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2 text-sm outline-none focus:border-blue-500' />
               </div>
               <div>
-                <label className='block text-xs font-medium text-slate-600 mb-1'>Salary Range</label>
+                <label className='block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1'>Salary Range</label>
                 <input value={form.salary_range} onChange={e => setForm({ ...form, salary_range: e.target.value })} placeholder='3-5 LPA'
-                  className='w-full rounded-lg border border-gray-300 p-2 text-sm outline-none focus:border-blue-500' />
+                  className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2 text-sm outline-none focus:border-blue-500' />
               </div>
             </div>
             <div className='grid grid-cols-2 gap-3'>
               <div>
-                <label className='block text-xs font-medium text-slate-600 mb-1'>Source</label>
+                <label className='block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1'>Source</label>
                 <input value={form.source} onChange={e => setForm({ ...form, source: e.target.value })} placeholder='LinkedIn / Referral'
-                  className='w-full rounded-lg border border-gray-300 p-2 text-sm outline-none focus:border-blue-500' />
+                  className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2 text-sm outline-none focus:border-blue-500' />
               </div>
               <div>
-                <label className='block text-xs font-medium text-slate-600 mb-1'>Follow-up Date</label>
+                <label className='block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1'>Follow-up Date</label>
                 <input type='date' value={form.follow_up_date} onChange={e => setForm({ ...form, follow_up_date: e.target.value })}
-                  className='w-full rounded-lg border border-gray-300 p-2 text-sm outline-none focus:border-blue-500' />
+                  className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2 text-sm outline-none focus:border-blue-500' />
               </div>
             </div>
             <div className='grid grid-cols-2 gap-3'>
               <div>
-                <label className='block text-xs font-medium text-slate-600 mb-1'>Contact Name</label>
+                <label className='block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1'>Contact Name</label>
                 <input value={form.contact_name} onChange={e => setForm({ ...form, contact_name: e.target.value })} placeholder='Jane from HR'
-                  className='w-full rounded-lg border border-gray-300 p-2 text-sm outline-none focus:border-blue-500' />
+                  className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2 text-sm outline-none focus:border-blue-500' />
               </div>
               <div>
-                <label className='block text-xs font-medium text-slate-600 mb-1'>Contact Email</label>
+                <label className='block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1'>Contact Email</label>
                 <input type='email' value={form.contact_email} onChange={e => setForm({ ...form, contact_email: e.target.value })} placeholder='jane@company.com'
-                  className='w-full rounded-lg border border-gray-300 p-2 text-sm outline-none focus:border-blue-500' />
+                  className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2 text-sm outline-none focus:border-blue-500' />
               </div>
             </div>
             <div>
-              <label className='block text-xs font-medium text-slate-600 mb-1'>Notes</label>
+              <label className='block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1'>Notes</label>
               <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={2} placeholder='Any extra notes...'
-                className='w-full rounded-lg border border-gray-300 p-2 text-sm outline-none focus:border-blue-500' />
+                className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2 text-sm outline-none focus:border-blue-500' />
             </div>
             <button type='submit' disabled={saving}
               className='w-full rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50 inline-flex items-center justify-center gap-2'>
@@ -229,13 +229,13 @@ const JobTracker = () => {
           <div className='animate-spin rounded-full h-10 w-10 border-t-3 border-purple-500 border-t-transparent' />
         </div>
       ) : filtered.length === 0 ? (
-        <div className='rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-slate-400'>
+        <div className='rounded-xl border border-dashed border-gray-300 dark:border-gray-700 bg-white dark:bg-[#111827] p-10 text-center text-sm text-slate-400'>
           {jobs.length === 0 ? 'No applications yet. Add your first one!' : 'No applications match this filter.'}
         </div>
       ) : (
-        <div className='overflow-x-auto rounded-xl border border-gray-200 bg-white'>
+        <div className='overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111827]'>
           <table className='min-w-full text-sm'>
-            <thead className='border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-slate-500'>
+            <thead className='border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#0F172A] text-left text-xs font-medium text-slate-500 dark:text-gray-400'>
               <tr>
                 <th className='px-4 py-3'>Company</th>
                 <th className='px-4 py-3'>Role</th>
@@ -246,13 +246,13 @@ const JobTracker = () => {
                 <th className='px-4 py-3 text-right'>Actions</th>
               </tr>
             </thead>
-            <tbody className='divide-y divide-gray-100'>
+            <tbody className='divide-y divide-gray-100 dark:divide-gray-800'>
               {filtered.map(job => (
-                <tr key={job.id} className='hover:bg-gray-50'>
-                  <td className='px-4 py-3 font-medium text-slate-800'>
+                <tr key={job.id} className='hover:bg-gray-50 dark:hover:bg-white/5'>
+                  <td className='px-4 py-3 font-medium text-slate-800 dark:text-white'>
                     {job.job_url ? <a href={job.job_url} target='_blank' rel='noreferrer' className='underline'>{job.company}</a> : job.company}
                   </td>
-                  <td className='px-4 py-3 text-slate-600'>{job.role}</td>
+                  <td className='px-4 py-3 text-slate-600 dark:text-gray-300'>{job.role}</td>
                   <td className='px-4 py-3'>
                     <span className={`inline-block rounded-full px-3 py-0.5 text-xs font-medium ${STATUS_COLORS[job.status] || ''}`}>{job.status}</span>
                   </td>

@@ -62,68 +62,68 @@ const CoverLetterGenerator = () => {
     }
 
     return (
-        <div className='h-full overflow-y-scroll p-6 flex items-start flex-wrap gap-4 text-slate-700'>
-            <form onSubmit={onSubmitHandler} className='w-full max-w-lg p-4 bg-white rounded-lg border border-gray-200 space-y-4'>
+        <div className='h-full overflow-y-scroll p-6 flex items-start flex-wrap gap-4 text-slate-700 dark:text-gray-300'>
+            <form onSubmit={onSubmitHandler} className='w-full max-w-lg p-4 bg-white dark:bg-[#111827] rounded-lg border border-gray-200 dark:border-gray-800 space-y-4'>
                 <div className='flex items-center gap-3'>
                     <Briefcase className='w-6 text-[#00AD25]' />
-                    <h1 className='text-xl font-semibold'>Cover Letter Generator</h1>
+                    <h1 className='text-xl font-semibold dark:text-white'>Cover Letter Generator</h1>
                 </div>
 
                 <div>
                     <label className='block text-sm font-medium mb-1'>Candidate Name</label>
                     <input type='text' name='candidate_name' value={formData.candidate_name} onChange={handleInputChange}
-                        placeholder='Your full name' className='w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25]' />
+                        placeholder='Your full name' className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300' />
                 </div>
 
                 <div className='grid grid-cols-2 gap-3'>
                     <div>
                         <label className='block text-sm font-medium mb-1'>Job Title *</label>
                         <input type='text' name='job_title' value={formData.job_title} onChange={handleInputChange}
-                            placeholder='e.g., Software Engineer' required className='w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25]' />
+                            placeholder='e.g., Software Engineer' required className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300' />
                     </div>
                     <div>
                         <label className='block text-sm font-medium mb-1'>Company Name *</label>
                         <input type='text' name='company_name' value={formData.company_name} onChange={handleInputChange}
-                            placeholder='e.g., Google' required className='w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25]' />
+                            placeholder='e.g., Google' required className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300' />
                     </div>
                 </div>
 
                 <div>
                     <label className='block text-sm font-medium mb-1'>Job Description</label>
                     <textarea name='job_description' value={formData.job_description} onChange={handleInputChange}
-                        rows={3} placeholder='Paste the job description...' className='w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] resize-none' />
+                        rows={3} placeholder='Paste the job description...' className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300 resize-none' />
                 </div>
 
                 <div>
                     <label className='block text-sm font-medium mb-1'>Resume Highlights / Key Skills</label>
                     <textarea name='resume_highlights' value={formData.resume_highlights} onChange={handleInputChange}
-                        rows={3} placeholder='Your relevant skills and experience...' className='w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] resize-none' />
+                        rows={3} placeholder='Your relevant skills and experience...' className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300 resize-none' />
                 </div>
 
                 <div>
                     <label className='block text-sm font-medium mb-1'>Key Achievements</label>
                     <textarea name='key_achievements' value={formData.key_achievements} onChange={handleInputChange}
-                        rows={2} placeholder='Notable achievements, projects, or certifications...' className='w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] resize-none' />
+                        rows={2} placeholder='Notable achievements, projects, or certifications...' className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300 resize-none' />
                 </div>
 
                 <div>
                     <label className='block text-sm font-medium mb-1'>Skills to Emphasize</label>
                     <input type='text' name='skills_to_emphasize' value={formData.skills_to_emphasize} onChange={handleInputChange}
-                        placeholder='e.g., React, Node.js, TypeScript' className='w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25]' />
+                        placeholder='e.g., React, Node.js, TypeScript' className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300' />
                 </div>
 
                 <div className='grid grid-cols-2 gap-3'>
                     <div>
                         <label className='block text-sm font-medium mb-1'>Experience Level</label>
                         <select name='experience_level' value={formData.experience_level} onChange={handleInputChange}
-                            className='w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25]'>
+                            className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300'>
                             {experienceLevels.map(l => <option key={l} value={l}>{l}</option>)}
                         </select>
                     </div>
                     <div>
                         <label className='block text-sm font-medium mb-1'>Tone</label>
                         <select name='tone' value={formData.tone} onChange={handleInputChange}
-                            className='w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25]'>
+                            className='w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00AD25] dark:bg-[#1E293B] dark:text-gray-300'>
                             {tones.map(t => <option key={t} value={t}>{t}</option>)}
                         </select>
                     </div>
@@ -140,7 +140,7 @@ const CoverLetterGenerator = () => {
                 {generatedCoverLetter ? (
                     <GeneratedOutput content={generatedCoverLetter} title='Cover Letter' filename={`${formData.company_name}_cover_letter`} />
                 ) : (
-                    <div className='p-4 bg-white rounded-lg flex flex-col border border-gray-200 min-h-96 items-center justify-center'>
+                    <div className='p-4 bg-white dark:bg-[#111827] rounded-lg flex flex-col border border-gray-200 dark:border-gray-800 min-h-96 items-center justify-center'>
                         <Briefcase className='w-9 h-9 text-gray-300' />
                         <p className='mt-3 text-sm text-gray-400'>Fill the form and click "Generate Cover Letter" to get started</p>
                     </div>

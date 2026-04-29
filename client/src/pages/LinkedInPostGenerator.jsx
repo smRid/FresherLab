@@ -33,28 +33,28 @@ const LinkedInPostGenerator = () => {
   }
 
   return (
-    <div className='h-full overflow-y-scroll p-6'>
-      <h1 className='text-2xl font-bold text-slate-800 mb-1'>LinkedIn Post Generator</h1>
-      <p className='text-slate-500 text-sm mb-6'>Turn your achievements into engaging LinkedIn posts</p>
+    <div className='h-full overflow-y-scroll p-6 text-slate-700 dark:text-gray-300'>
+      <h1 className='text-2xl font-bold text-slate-800 dark:text-white mb-1'>LinkedIn Post Generator</h1>
+      <p className='text-slate-500 dark:text-gray-400 text-sm mb-6'>Turn your achievements into engaging LinkedIn posts</p>
 
       <form onSubmit={handleSubmit} className='max-w-2xl space-y-5'>
         <div>
-          <label className='block text-sm font-medium text-slate-700 mb-1'>Post Type</label>
+          <label className='block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1'>Post Type</label>
           <select value={postType} onChange={(e) => setPostType(e.target.value)}
-            className='w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 outline-none'>
+            className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2.5 text-sm focus:border-blue-500 outline-none'>
             {POST_TYPES.map(t => <option key={t}>{t}</option>)}
           </select>
         </div>
         <div>
-          <label className='block text-sm font-medium text-slate-700 mb-1'>Context / Details *</label>
+          <label className='block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1'>Context / Details *</label>
           <textarea value={context} onChange={(e) => setContext(e.target.value)} rows={5} maxLength={5000}
             placeholder='Describe what you achieved, built, or learned...'
-            className='w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none' />
+            className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none' />
         </div>
         <div>
-          <label className='block text-sm font-medium text-slate-700 mb-1'>Tone</label>
+          <label className='block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1'>Tone</label>
           <select value={tone} onChange={(e) => setTone(e.target.value)}
-            className='w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 outline-none'>
+            className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2.5 text-sm focus:border-blue-500 outline-none'>
             <option value='professional'>Professional</option>
             <option value='casual'>Casual</option>
             <option value='motivational'>Motivational</option>

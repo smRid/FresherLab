@@ -30,29 +30,29 @@ const CodeSnippetGenerator = () => {
   }
 
   return (
-    <div className='h-full overflow-y-scroll p-6'>
-      <h1 className='text-2xl font-bold text-slate-800 mb-1'>Code Snippet Generator</h1>
-      <p className='text-slate-500 text-sm mb-6'>Generate beginner-friendly code with explanations, tests, and common mistakes</p>
+    <div className='h-full overflow-y-scroll p-6 text-slate-700 dark:text-gray-300'>
+      <h1 className='text-2xl font-bold text-slate-800 dark:text-white mb-1'>Code Snippet Generator</h1>
+      <p className='text-slate-500 dark:text-gray-400 text-sm mb-6'>Generate beginner-friendly code with explanations, tests, and common mistakes</p>
 
       <form onSubmit={handleSubmit} className='max-w-2xl space-y-5'>
         <div>
-          <label className='block text-sm font-medium text-slate-700 mb-1'>Topic or Problem *</label>
+          <label className='block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1'>Topic or Problem *</label>
           <textarea value={topic} onChange={(e) => setTopic(e.target.value)} rows={4} maxLength={2000}
             placeholder='e.g. Reverse a linked list, REST API with Express, Binary search...'
-            className='w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none' />
+            className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none' />
         </div>
         <div className='grid grid-cols-2 gap-4'>
           <div>
-            <label className='block text-sm font-medium text-slate-700 mb-1'>Language</label>
+            <label className='block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1'>Language</label>
             <select value={language} onChange={(e) => setLanguage(e.target.value)}
-              className='w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 outline-none'>
+              className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2.5 text-sm focus:border-blue-500 outline-none'>
               {LANGUAGES.map(l => <option key={l}>{l}</option>)}
             </select>
           </div>
           <div>
-            <label className='block text-sm font-medium text-slate-700 mb-1'>Level</label>
+            <label className='block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1'>Level</label>
             <select value={level} onChange={(e) => setLevel(e.target.value)}
-              className='w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 outline-none'>
+              className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-2.5 text-sm focus:border-blue-500 outline-none'>
               <option value='beginner'>Beginner</option>
               <option value='intermediate'>Intermediate</option>
               <option value='advanced'>Advanced</option>

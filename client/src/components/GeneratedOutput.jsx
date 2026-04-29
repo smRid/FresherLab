@@ -37,15 +37,15 @@ const GeneratedOutput = ({ content, title = 'Generated Output', filename = 'fres
   return (
     <div className='space-y-4'>
       <div className='flex flex-wrap items-center justify-between gap-3'>
-        <h2 className='text-lg font-semibold text-slate-800'>{title}</h2>
+        <h2 className='text-lg font-semibold text-slate-800 dark:text-white'>{title}</h2>
         <div className='flex flex-wrap gap-2'>
-          <button type='button' onClick={copyContent} className='inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50'>
+          <button type='button' onClick={copyContent} className='inline-flex items-center gap-2 rounded-lg border border-slate-200 dark:border-gray-700 px-3 py-2 text-xs font-medium text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-800'>
             <Copy className='h-4 w-4' /> Copy
           </button>
-          <button type='button' onClick={() => downloadContent('txt')} className='inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50'>
+          <button type='button' onClick={() => downloadContent('txt')} className='inline-flex items-center gap-2 rounded-lg border border-slate-200 dark:border-gray-700 px-3 py-2 text-xs font-medium text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-800'>
             <Download className='h-4 w-4' /> TXT
           </button>
-          <button type='button' onClick={() => downloadContent('md')} className='inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50'>
+          <button type='button' onClick={() => downloadContent('md')} className='inline-flex items-center gap-2 rounded-lg border border-slate-200 dark:border-gray-700 px-3 py-2 text-xs font-medium text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-800'>
             <Download className='h-4 w-4' /> MD
           </button>
           {showPrint && (
@@ -55,7 +55,7 @@ const GeneratedOutput = ({ content, title = 'Generated Output', filename = 'fres
           )}
         </div>
       </div>
-      <div className='reset-tw max-h-[560px] overflow-y-auto rounded-xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-700'>
+      <div className='reset-tw max-h-[560px] overflow-y-auto rounded-xl border border-slate-200 dark:border-gray-800 bg-slate-50 dark:bg-[#0F172A] p-5 text-sm text-slate-700 dark:text-gray-300'>
         <ReactMarkdown>{content}</ReactMarkdown>
       </div>
     </div>

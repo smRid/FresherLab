@@ -40,14 +40,14 @@ const CreationItem = ({ item }) => {
   }
 
   return (
-    <div className='p-4 max-w-5xl text-sm bg-white border border-gray-200 rounded-lg'>
+    <div className='p-4 max-w-5xl text-sm bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-800 rounded-lg'>
       <div onClick={() => setExpanded(!expanded)} className='flex justify-between items-center gap-4 cursor-pointer'>
         <div className='min-w-0'>
           <h2 className='truncate'>{item.prompt}</h2>
           <p className='text-gray-500'>{label} &middot; {new Date(item.created_at).toLocaleDateString()}</p>
         </div>
         <div className='flex items-center gap-2 shrink-0'>
-          <span className='bg-[#EFF6FF] border border-[#BFDBFE] text-[#1E40AF] px-3 py-0.5 rounded-full text-xs'>{label}</span>
+          <span className='bg-[#EFF6FF] dark:bg-blue-900/30 border border-[#BFDBFE] dark:border-blue-800 text-[#1E40AF] dark:text-blue-300 px-3 py-0.5 rounded-full text-xs'>{label}</span>
           {expanded ? <ChevronUp className='h-4 w-4 text-gray-400' /> : <ChevronDown className='h-4 w-4 text-gray-400' />}
         </div>
       </div>
@@ -58,14 +58,14 @@ const CreationItem = ({ item }) => {
           ) : (
             <>
               <div className='flex gap-2 mb-2'>
-                <button onClick={copyContent} className='inline-flex items-center gap-1 rounded border border-gray-200 px-2.5 py-1 text-xs text-slate-600 hover:bg-slate-50'>
+                <button onClick={copyContent} className='inline-flex items-center gap-1 rounded border border-gray-200 dark:border-gray-700 px-2.5 py-1 text-xs text-slate-600 dark:text-gray-400 hover:bg-slate-50 dark:hover:bg-gray-800'>
                   <Copy className='h-3 w-3' /> Copy
                 </button>
-                <button onClick={downloadContent} className='inline-flex items-center gap-1 rounded border border-gray-200 px-2.5 py-1 text-xs text-slate-600 hover:bg-slate-50'>
+                <button onClick={downloadContent} className='inline-flex items-center gap-1 rounded border border-gray-200 dark:border-gray-700 px-2.5 py-1 text-xs text-slate-600 dark:text-gray-400 hover:bg-slate-50 dark:hover:bg-gray-800'>
                   <Download className='h-3 w-3' /> Download
                 </button>
               </div>
-              <div className='max-h-96 overflow-y-auto text-sm text-slate-700'>
+              <div className='max-h-96 overflow-y-auto text-sm text-slate-700 dark:text-gray-300'>
                 <div className='reset-tw'>
                   <Markdown>{item.content}</Markdown>
                 </div>

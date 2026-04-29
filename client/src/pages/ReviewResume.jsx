@@ -51,12 +51,12 @@ const ReviewResume = () => {
   }
 
   return (
-    <div className='h-full overflow-y-scroll p-6 flex items-start flex-wrap gap-4 text-slate-700'>
+    <div className='h-full overflow-y-scroll p-6 flex items-start flex-wrap gap-4 text-slate-700 dark:text-gray-300'>
       {/* left col */}
-      <form onSubmit={onSubmitHandler} className='w-full max-w-lg p-4 bg-white rounded-lg border border-gray-200 space-y-4'>
+      <form onSubmit={onSubmitHandler} className='w-full max-w-lg p-4 bg-white dark:bg-[#111827] rounded-lg border border-gray-200 dark:border-gray-800 space-y-4'>
         <div className='flex items-center gap-3'>
           <Sparkles className='w-6 text-[#00DA83]' />
-          <h1 className='text-xl font-semibold'>Resume Review</h1>
+          <h1 className='text-xl font-semibold dark:text-white'>Resume Review</h1>
         </div>
 
         <div>
@@ -65,7 +65,7 @@ const ReviewResume = () => {
             onChange={(e) => setFile(e.target.files[0])}
             type="file"
             accept="application/pdf"
-            className='w-full p-2 px-3 outline-none text-sm rounded-md border border-gray-300 text-gray-600'
+            className='w-full p-2 px-3 outline-none text-sm rounded-md border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 dark:bg-[#1E293B]'
             required
           />
           {file && <p className='mt-1 text-xs text-gray-500'>Selected: {file.name}</p>}
@@ -75,7 +75,7 @@ const ReviewResume = () => {
         <div>
           <p className='text-sm font-medium mb-1'>Target Role <span className='text-red-500'>*</span></p>
           <select value={targetRole} onChange={(e) => setTargetRole(e.target.value)}
-            className='w-full p-2 px-3 text-sm rounded-md border border-gray-300 text-gray-600'>
+            className='w-full p-2 px-3 text-sm rounded-md border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 dark:bg-[#1E293B]'>
             {targetRoles.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
         </div>
@@ -83,7 +83,7 @@ const ReviewResume = () => {
         <div>
           <p className='text-sm font-medium mb-1'>Experience Level <span className='text-red-500'>*</span></p>
           <select value={experienceLevel} onChange={(e) => setExperienceLevel(e.target.value)}
-            className='w-full p-2 px-3 text-sm rounded-md border border-gray-300 text-gray-600'>
+            className='w-full p-2 px-3 text-sm rounded-md border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 dark:bg-[#1E293B]'>
             {experienceLevels.map(l => <option key={l} value={l}>{l}</option>)}
           </select>
         </div>
@@ -92,7 +92,7 @@ const ReviewResume = () => {
           <p className='text-sm font-medium mb-1'>Job Description <span className='text-gray-400 font-normal'>(optional)</span></p>
           <textarea value={jobDescription} onChange={(e) => setJobDescription(e.target.value)}
             rows={4} placeholder='Paste the target job description for role-specific feedback...'
-            className='w-full p-2 px-3 text-sm rounded-md border border-gray-300 text-gray-600 resize-none' />
+            className='w-full p-2 px-3 text-sm rounded-md border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 dark:bg-[#1E293B] resize-none' />
         </div>
 
         <button disabled={loading} className='w-full flex justify-center items-center gap-2
@@ -111,7 +111,7 @@ const ReviewResume = () => {
         {content ? (
           <GeneratedOutput content={content} title='Resume Review Report' filename='resume-review' />
         ) : (
-          <div className='p-4 bg-white rounded-lg flex flex-col border border-gray-200 min-h-96 items-center justify-center'>
+          <div className='p-4 bg-white dark:bg-[#111827] rounded-lg flex flex-col border border-gray-200 dark:border-gray-800 min-h-96 items-center justify-center'>
             <FileText className='w-9 h-9 text-gray-300' />
             <p className='mt-3 text-sm text-gray-400'>Upload a resume and click "Review Resume" to get started</p>
           </div>

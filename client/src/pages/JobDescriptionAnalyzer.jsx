@@ -27,22 +27,22 @@ const JobDescriptionAnalyzer = () => {
   }
 
   return (
-    <div className='h-full overflow-y-scroll p-6'>
-      <h1 className='text-2xl font-bold text-slate-800 mb-1'>Job Description Analyzer</h1>
-      <p className='text-slate-500 text-sm mb-6'>Extract skills, ATS keywords, gaps, and project ideas from any JD</p>
+    <div className='h-full overflow-y-scroll p-6 text-slate-700 dark:text-gray-300'>
+      <h1 className='text-2xl font-bold text-slate-800 dark:text-white mb-1'>Job Description Analyzer</h1>
+      <p className='text-slate-500 dark:text-gray-400 text-sm mb-6'>Extract skills, ATS keywords, gaps, and project ideas from any JD</p>
 
       <form onSubmit={handleSubmit} className='max-w-2xl space-y-5'>
         <div>
-          <label className='block text-sm font-medium text-slate-700 mb-1'>Job Description *</label>
+          <label className='block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1'>Job Description *</label>
           <textarea value={jobDescription} onChange={(e) => setJobDescription(e.target.value)}
             rows={8} maxLength={10000} placeholder='Paste the full job description here...'
-            className='w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none' />
+            className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none' />
         </div>
         <div>
-          <label className='block text-sm font-medium text-slate-700 mb-1'>Your Current Skills (optional)</label>
+          <label className='block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1'>Your Current Skills (optional)</label>
           <textarea value={currentSkills} onChange={(e) => setCurrentSkills(e.target.value)}
             rows={3} placeholder='React, Node.js, Python, SQL...'
-            className='w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none' />
+            className='w-full rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-[#1E293B] dark:text-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none' />
         </div>
 
         <button type='submit' disabled={loading}

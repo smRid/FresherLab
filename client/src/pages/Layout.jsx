@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
-import { GraduationCap, Menu, X } from 'lucide-react'
+import { GraduationCap, Menu, Moon, Sun, X } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 import { useClerk, useUser } from '@clerk/clerk-react'
+import { useTheme } from '../context/ThemeContext'
 
 const Layout = () => {
 
@@ -10,6 +11,7 @@ const Layout = () => {
   const [ sidebar, setSidebar ] = useState(false)
   const { isLoaded, user } = useUser()
   const { openSignIn } = useClerk()
+  const { theme, toggleTheme } = useTheme()
 
   const renderAuthGate = (loading = false) => (
     <div className='min-h-screen bg-[#0D0B1E] flex items-center justify-center px-4'>
@@ -45,23 +47,28 @@ const Layout = () => {
 
   return user ? (
       <div className='flex flex-col items-start justify-start h-screen'>
-        <nav className='w-full px-8 min-h-14 flex items-center justify-between border-b border-gray-200'>
+        <nav className='w-full px-8 min-h-14 flex items-center justify-between border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#0F172A] transition-colors'>
           <button className='flex items-center cursor-pointer' onClick={() => navigate('/')}>
-            <div className='flex items-center gap-2 text-slate-900'>
+            <div className='flex items-center gap-2 text-slate-900 dark:text-white'>
               <div className='flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white'>
                 <GraduationCap className='h-5 w-5' />
               </div>
               <span className='text-lg font-bold'>FresherLab</span>
             </div>
           </button>
-          {
-            sidebar ? <X onClick={()=> setSidebar(false)} className='w-6 h-6 text-gray-600 sm:hidden'/>
-            : <Menu onClick={()=> setSidebar(true)} className='w-6 h-6 text-gray-600 sm:hidden'/>
-          }
+          <div className='flex items-center gap-3'>
+            <button onClick={toggleTheme} className='p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors' title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
+              {theme === 'dark' ? <Sun className='w-5 h-5 text-amber-400' /> : <Moon className='w-5 h-5 text-slate-600' />}
+            </button>
+            {sidebar
+              ? <X onClick={() => setSidebar(false)} className='w-6 h-6 text-gray-600 dark:text-gray-400 sm:hidden cursor-pointer' />
+              : <Menu onClick={() => setSidebar(true)} className='w-6 h-6 text-gray-600 dark:text-gray-400 sm:hidden cursor-pointer' />
+            }
+          </div>
         </nav>
         <div className='flex-1 w-full flex h-[calc(100vh-64px)]'>
           <Sidebar sidebar={sidebar} setSidebar={setSidebar}/>
-          <div className='flex-1 bg-[#F4F7FB]'>
+          <div className='flex-1 bg-[#F4F7FB] dark:bg-[#0B1120] transition-colors'>
             <Outlet />
           </div>
         </div>
