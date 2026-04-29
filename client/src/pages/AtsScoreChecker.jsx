@@ -175,9 +175,9 @@ const AtsReportPanel = ({ content, targetRole, experienceLevel }) => {
 
       <div className='max-h-none space-y-5 overflow-y-auto p-5 xl:max-h-[calc(100vh-170px)]'>
         <div className='grid gap-4 md:grid-cols-3'>
-          <ScoreCard label='Overall ATS' score={report.scores.overall} icon={TrendingUp} />
-          <ScoreCard label='Keyword Match' score={report.scores.keyword} icon={Search} />
-          <ScoreCard label='Role Match' score={report.scores.role} icon={Target} />
+          <ScoreCard label='Overall ATS' score={report.scores.overall} Icon={TrendingUp} />
+          <ScoreCard label='Keyword Match' score={report.scores.keyword} Icon={Search} />
+          <ScoreCard label='Role Match' score={report.scores.role} Icon={Target} />
         </div>
 
         <div className='grid gap-3 sm:grid-cols-2'>
@@ -190,17 +190,17 @@ const AtsReportPanel = ({ content, targetRole, experienceLevel }) => {
           <KeywordPanel title='Missing Keywords' items={report.lists.missing} tone='warning' />
         </div>
 
-        <ReportSection title='Weak Sections' icon={AlertTriangle} items={report.lists.weakSections} tone='warning' />
-        <ReportSection title='Recommended Phrases to Add' icon={CheckCircle2} items={report.lists.recommendedPhrases} tone='success' />
+        <ReportSection title='Weak Sections' Icon={AlertTriangle} items={report.lists.weakSections} tone='warning' />
+        <ReportSection title='Recommended Phrases to Add' Icon={CheckCircle2} items={report.lists.recommendedPhrases} tone='success' />
         <TextPanel title='Optimized Resume Summary' text={report.sections.summary} />
-        <ReportSection title='Project Bullet Improvements' icon={CheckCircle2} items={report.lists.projectBullets} tone='neutral' />
+        <ReportSection title='Project Bullet Improvements' Icon={CheckCircle2} items={report.lists.projectBullets} tone='neutral' />
         <TextPanel title='Final Recommendation' text={report.sections.finalRecommendation} highlight />
       </div>
     </aside>
   )
 }
 
-const ScoreCard = ({ label, score, icon: Icon }) => {
+const ScoreCard = ({ label, score, Icon }) => {
   const value = Number.isFinite(score) ? Math.max(0, Math.min(100, score)) : null
   const color = value >= 75 ? '#22c55e' : value >= 55 ? '#f59e0b' : '#ef4444'
   const tone = value >= 75 ? 'Strong' : value >= 55 ? 'Needs Work' : 'Improve'
@@ -252,7 +252,7 @@ const KeywordPanel = ({ title, items, tone }) => {
   )
 }
 
-const ReportSection = ({ title, icon: Icon, items, tone }) => {
+const ReportSection = ({ title, Icon, items, tone }) => {
   const iconClass = tone === 'warning'
     ? 'bg-amber-100 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300'
     : tone === 'success'
