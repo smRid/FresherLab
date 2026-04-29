@@ -1,9 +1,9 @@
-import { FileText, Briefcase } from 'lucide-react'
+import { FileText, Briefcase, Copy, Download } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '@clerk/clerk-react';
+import ReactMarkdown from 'react-markdown';
 import toast from 'react-hot-toast';
 import { api } from '../lib/api';
-import GeneratedOutput from '../components/GeneratedOutput';
 
 const tones = ['Professional', 'Confident', 'Passionate', 'Friendly', 'Short and direct']
 const experienceLevels = ['Fresher', 'Internship', '0-1 Year', '1-2 Years', 'Career Change']
@@ -62,8 +62,10 @@ const CoverLetterGenerator = () => {
     }
 
     return (
-        <div className='h-full overflow-y-scroll p-6 flex items-start flex-wrap gap-4 text-slate-700 dark:text-gray-300'>
-            <form onSubmit={onSubmitHandler} className='w-full max-w-lg p-4 bg-white dark:bg-[#111827] rounded-lg border border-gray-200 dark:border-gray-800 space-y-4'>
+        <div className='h-full overflow-y-auto p-4 text-slate-700 dark:text-gray-300 sm:p-6'>
+            <div className='grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(360px,520px)_minmax(420px,1fr)]'>
+            <form onSubmit={onSubmitHandler} className='w-full rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-[#111827] xl:sticky xl:top-6 xl:max-h-[calc(100vh-96px)] xl:overflow-hidden'>
+                <div className='max-h-none space-y-4 overflow-y-auto pr-1 xl:max-h-[calc(100vh-128px)]'>
                 <div className='flex items-center gap-3'>
                     <Briefcase className='w-6 text-[#00AD25]' />
                     <h1 className='text-xl font-semibold dark:text-white'>Cover Letter Generator</h1>
@@ -134,17 +136,63 @@ const CoverLetterGenerator = () => {
                     {loading ? <><div className='w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin' /> Generating...</>
                         : <><FileText className='w-4 h-4' /> Generate Cover Letter</>}
                 </button>
+                </div>
             </form>
 
-            <div className='w-full max-w-lg'>
+            <div className='w-full min-w-0 rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-[#111827] xl:sticky xl:top-6 xl:h-[calc(100vh-96px)] xl:overflow-hidden'>
                 {generatedCoverLetter ? (
-                    <GeneratedOutput content={generatedCoverLetter} title='Cover Letter' filename={`${formData.company_name}_cover_letter`} />
+                    <CoverLetterOutput content={generatedCoverLetter} filename={`${formData.company_name}_cover_letter`} />
                 ) : (
-                    <div className='p-4 bg-white dark:bg-[#111827] rounded-lg flex flex-col border border-gray-200 dark:border-gray-800 min-h-96 items-center justify-center'>
+                    <div className='m-5 flex min-h-96 flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-slate-50 p-4 dark:border-gray-800 dark:bg-[#0F172A] xl:min-h-[calc(100vh-138px)]'>
                         <Briefcase className='w-9 h-9 text-gray-300' />
                         <p className='mt-3 text-sm text-gray-400'>Fill the form and click "Generate Cover Letter" to get started</p>
                     </div>
                 )}
+            </div>
+            </div>
+        </div>
+    )
+}
+
+const CoverLetterOutput = ({ content, filename }) => {
+    const displayContent = content.replace(/^#\s+Cover Letter\s*/i, '').trim()
+
+    const copyContent = async () => {
+        await navigator.clipboard.writeText(content)
+        toast.success('Copied to clipboard')
+    }
+
+    const downloadContent = (extension) => {
+        const blob = new Blob([content], { type: extension === 'md' ? 'text/markdown' : 'text/plain' })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `${filename}.${extension}`
+        link.click()
+        URL.revokeObjectURL(url)
+        toast.success(`Downloaded .${extension}`)
+    }
+
+    return (
+        <div className='flex h-full min-h-0 flex-col'>
+            <div className='flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 px-5 py-3 dark:border-gray-800'>
+                <h2 className='text-lg font-semibold text-slate-800 dark:text-white'>Cover Letter</h2>
+                <div className='flex flex-wrap gap-2'>
+                    <button type='button' onClick={copyContent} className='inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800'>
+                        <Copy className='h-3.5 w-3.5' /> Copy
+                    </button>
+                    <button type='button' onClick={() => downloadContent('txt')} className='inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800'>
+                        <Download className='h-3.5 w-3.5' /> TXT
+                    </button>
+                    <button type='button' onClick={() => downloadContent('md')} className='inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800'>
+                        <Download className='h-3.5 w-3.5' /> MD
+                    </button>
+                </div>
+            </div>
+            <div className='min-h-0 flex-1 overflow-y-auto px-6 pb-6 pt-5 text-sm leading-7 text-slate-700 dark:text-gray-300'>
+                <div className='prose prose-sm max-w-none prose-headings:mb-3 prose-headings:mt-5 prose-headings:text-slate-900 prose-h2:text-xl prose-p:my-3 prose-ul:my-3 prose-li:my-1 dark:prose-invert dark:prose-headings:text-white'>
+                    <ReactMarkdown>{displayContent}</ReactMarkdown>
+                </div>
             </div>
         </div>
     )
