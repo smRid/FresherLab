@@ -252,6 +252,55 @@ Fresher ${target_role || 'software engineering'} candidate with hands-on project
 `;
 }
 
+const buildLocalCoverLetter = ({
+    job_title,
+    company_name,
+    job_description,
+    resume_highlights,
+    tone,
+    experience_level,
+    candidate_name,
+    key_achievements,
+    skills_to_emphasize
+}) => {
+    const candidateName = candidate_name?.trim() || 'Candidate';
+    const jobTitle = job_title?.trim() || 'the open role';
+    const companyName = company_name?.trim() || 'your company';
+    const selectedTone = tone?.trim() || 'Professional';
+    const experienceLevel = experience_level?.trim() || 'Fresher';
+    const skills = skills_to_emphasize?.trim() || resume_highlights?.trim() || 'relevant technical skills, problem-solving, and quick learning';
+    const highlights = resume_highlights?.trim() || `hands-on ${experienceLevel.toLowerCase()} level experience and practical project work`;
+    const achievements = key_achievements?.trim() || 'building practical projects, learning modern tools, and applying technical concepts to real-world tasks';
+    const jdReference = job_description?.trim()
+        ? 'I reviewed the role requirements and aligned this letter with the responsibilities described in the job posting.'
+        : 'I am especially interested in this opportunity because it matches my current skills and career goals.';
+
+    return `# Cover Letter
+
+## Subject Line
+Application for ${jobTitle} at ${companyName} - ${candidateName}
+
+## Letter Body
+Dear Hiring Manager,
+
+I am writing to apply for the ${jobTitle} position at ${companyName}. As a ${experienceLevel.toLowerCase()} candidate, I am eager to contribute to a team where I can apply my technical knowledge, keep learning, and build meaningful software solutions.
+
+${jdReference} My background includes ${highlights}. I am particularly confident in ${skills}, and I am focused on writing clean, maintainable code while improving my understanding of real production workflows.
+
+One of my key strengths is my ability to learn quickly and turn requirements into practical implementation. My experience includes ${achievements}, which has helped me build problem-solving confidence and a stronger foundation for professional development work.
+
+I would welcome the opportunity to discuss how my skills, motivation, and project experience can support ${companyName}'s goals. Thank you for your time and consideration.
+
+Sincerely,
+${candidateName}
+
+## Key Talking Points
+- Explain how your skills in ${skills} relate directly to the ${jobTitle} role.
+- Highlight practical project work and what problem each project solved.
+- Emphasize your ${selectedTone.toLowerCase()} communication style, learning mindset, and readiness to contribute as a ${experienceLevel.toLowerCase()} candidate.
+`;
+}
+
 const clampNumber = (value, min, max, fallback) => {
     const number = Number(value);
     if (!Number.isFinite(number)) return fallback;
@@ -1165,34 +1214,57 @@ Return in clean Markdown:
 
 Keep it concise (under 400 words), genuine, and ATS-friendly.`
 
-        const response = await AI.chat.completions.create({
-            model: "gemini-2.0-flash",
-            messages: [{
-                role: "user",
-                content: prompt,
-            },
-            ],
-            temperature: 0.7,
-            max_tokens: 1200,
-        });
+        let content;
+        let usedLocalFallback = false;
 
-        const content = response.choices[0].message.content
+        try {
+            const response = await AI.chat.completions.create({
+                model: "gemini-2.0-flash",
+                messages: [{
+                    role: "user",
+                    content: prompt,
+                },
+                ],
+                temperature: 0.7,
+                max_tokens: 1200,
+            });
 
-        await sql` INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${prompt}, ${content}, 'cover-letter');`;
+            content = response.choices?.[0]?.message?.content;
+        } catch (aiError) {
+            usedLocalFallback = true;
+            console.warn('Cover letter AI unavailable, using local generation:', aiError.message);
+            content = buildLocalCoverLetter(req.body);
+        }
 
-        if (plan !== 'premium') {
-            await sql`UPDATE subscriptions SET free_usage = free_usage + 1, updated_at = NOW() WHERE user_id = ${userId}`;
+        if (!content) {
+            usedLocalFallback = true;
+            content = buildLocalCoverLetter(req.body);
+        }
+
+        const promptLabel = `Cover letter for ${job_title} at ${company_name}`;
+        try {
+            await sql` INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${promptLabel}, ${content}, 'cover-letter');`;
+        } catch (dbError) {
+            console.error('Cover letter history save failed:', dbError.message);
+        }
+
+        try {
+            if (plan !== 'premium') {
+                await sql`UPDATE subscriptions SET free_usage = free_usage + 1, updated_at = NOW() WHERE user_id = ${userId}`;
+            }
+        } catch (usageError) {
+            console.error('Cover letter usage update failed:', usageError.message);
         }
 
         res.json({
             success: true,
-            message: "Cover letter generated successfully",
+            message: usedLocalFallback ? "Cover letter generated using local fallback" : "Cover letter generated successfully",
             content: content,
             usage: plan !== 'premium' ? free_usage + 1 : 'unlimited'
         });
 
     } catch (error) {
-        console.log(error.message)
+        console.log('Cover Letter Error:', error.message)
         res.status(500).json({ success: false, message: error.message })
     }
 }
