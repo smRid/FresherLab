@@ -3,7 +3,7 @@ import { useAuth } from '@clerk/clerk-react'
 import { api } from '../lib/api'
 import toast from 'react-hot-toast'
 import GeneratedOutput from '../components/GeneratedOutput'
-import { Loader2, Plus, Trash2 } from 'lucide-react'
+import { Download, Loader2, Plus, Trash2 } from 'lucide-react'
 
 const STEPS = ['Personal', 'Experience', 'Skills', 'Projects', 'Certifications', 'Education', 'Research']
 
@@ -61,6 +61,23 @@ const ResumeBuilder = () => {
       else toast.error(data.message)
     } catch (error) { toast.error(error.message) }
     setLoading(false)
+  }
+
+  const handleDownloadPdf = () => {
+    if (!personal.fullName.trim()) return toast.error('Full name is required')
+
+    const pdfWindow = window.open('', '_blank')
+    if (!pdfWindow) return toast.error('Please allow popups to download PDF')
+
+    const html = buildResumeHtml({ personal, experiences, skills, projects, certifications, educations, research })
+    pdfWindow.document.open()
+    pdfWindow.document.write(html)
+    pdfWindow.document.close()
+    pdfWindow.focus()
+
+    setTimeout(() => {
+      pdfWindow.print()
+    }, 500)
   }
 
   // Personal step
@@ -196,10 +213,16 @@ const ResumeBuilder = () => {
             <button type='button' onClick={() => setStep(step + 1)}
               className='rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700'>Next</button>
           ) : (
-            <button type='submit' disabled={loading}
-              className='inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg hover:opacity-90 disabled:opacity-50'>
-              {loading ? <><Loader2 className='h-4 w-4 animate-spin' /> Building LaTeX...</> : 'Generate LaTeX Resume'}
-            </button>
+            <>
+              <button type='submit' disabled={loading}
+                className='inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg hover:opacity-90 disabled:opacity-50'>
+                {loading ? <><Loader2 className='h-4 w-4 animate-spin' /> Building LaTeX...</> : 'Generate LaTeX Resume'}
+              </button>
+              <button type='button' onClick={handleDownloadPdf}
+                className='inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg hover:opacity-90'>
+                <Download className='h-4 w-4' /> Download PDF
+              </button>
+            </>
           )}
         </div>
       </form>
@@ -214,6 +237,168 @@ const ResumeBuilder = () => {
       )}
     </div>
   )
+}
+
+const escapeHtml = (value) => String(value || '')
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#039;')
+
+const splitLines = (value) => String(value || '')
+  .split(/\r?\n/)
+  .map(line => line.replace(/^\s*[-•*]\s*/, '').trim())
+  .filter(Boolean)
+
+const hasAnyValue = (item, keys) => keys.some(key => String(item?.[key] || '').trim())
+
+const renderExternalLink = (url, label) => {
+  if (!url || !String(url).trim()) return ''
+  const safeUrl = escapeHtml(String(url).trim())
+  return `<a href="${safeUrl}">${escapeHtml(label)}</a>`
+}
+
+const renderSection = (title, content) => content ? `
+  <section class="section">
+    <div class="section-title">${escapeHtml(title)}</div>
+    ${content}
+  </section>
+` : ''
+
+const renderBullets = (bullets) => {
+  const items = splitLines(bullets)
+  if (!items.length) return ''
+  return `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
+}
+
+const buildResumeHtml = ({ personal = {}, experiences = [], skills = {}, projects = [], certifications = [], educations = [], research = {} }) => {
+  const contact = [
+    personal.phone && `<a href="tel:${escapeHtml(personal.phone)}">${escapeHtml(personal.phone)}</a>`,
+    personal.email && `<a href="mailto:${escapeHtml(personal.email)}">${escapeHtml(personal.email)}</a>`,
+    personal.location && escapeHtml(personal.location),
+  ].filter(Boolean).join(' &nbsp;|&nbsp; ')
+
+  const links = [
+    renderExternalLink(personal.linkedinUrl, 'LinkedIn'),
+    renderExternalLink(personal.portfolioUrl, 'Portfolio'),
+    renderExternalLink(personal.githubUrl, 'GitHub'),
+  ].filter(Boolean).join(' &nbsp;|&nbsp; ')
+
+  const experienceContent = (experiences || [])
+    .filter(item => hasAnyValue(item, ['company', 'role', 'bullets']))
+    .map(item => `
+      <div class="entry">
+        <div class="row">
+          <strong>${item.companyUrl ? renderExternalLink(item.companyUrl, item.company) : escapeHtml(item.company)}</strong>
+          <span>${escapeHtml(item.dates)}</span>
+        </div>
+        <div class="row muted">
+          <span>${escapeHtml(item.role)}</span>
+          <span>${escapeHtml(item.location)}</span>
+        </div>
+        ${renderBullets(item.bullets)}
+      </div>
+    `).join('')
+
+  const skillItems = [
+    skills.languages && ['Programming Languages', skills.languages],
+    skills.frameworks && ['Framework', skills.frameworks],
+    skills.databases && ['Database', skills.databases],
+    skills.tools && ['Tools & Others', skills.tools],
+  ].filter(Boolean)
+  const skillsContent = skillItems.length ? `<ul class="compact-list">${skillItems.map(([label, value]) => `<li><strong>${escapeHtml(label)}:</strong> ${escapeHtml(value)}</li>`).join('')}</ul>` : ''
+
+  const projectContent = (projects || [])
+    .filter(item => hasAnyValue(item, ['name', 'stack', 'bullets']))
+    .map(item => {
+      const projectLinks = [
+        renderExternalLink(item.githubUrl, 'Github'),
+        renderExternalLink(item.liveUrl, 'Live link'),
+      ].filter(Boolean).join(' | ')
+      return `
+        <div class="entry">
+          <div class="row">
+            <div><strong>${escapeHtml(item.name)}</strong>${item.stack ? ` <span>|</span> <em>${escapeHtml(item.stack)}</em>` : ''}</div>
+            <span>${projectLinks}</span>
+          </div>
+          ${renderBullets(item.bullets)}
+        </div>
+      `
+    }).join('')
+
+  const certificationContent = (certifications || [])
+    .filter(item => hasAnyValue(item, ['institution', 'course']))
+    .map(item => `
+      <p class="line-item"><strong>${escapeHtml(item.institution)}</strong>${item.certificateUrl ? ` ${renderExternalLink(item.certificateUrl, '(Certificate)')}` : ''} -- ${escapeHtml(item.course)}</p>
+    `).join('')
+
+  const educationContent = (educations || [])
+    .filter(item => hasAnyValue(item, ['institution', 'degree']))
+    .map(item => `
+      <div class="entry">
+        <div class="row">
+          <strong>${escapeHtml(item.institution)}</strong>
+          <span>${escapeHtml(item.dates)}</span>
+        </div>
+        <div class="row muted">
+          <span>${escapeHtml(item.degree)}</span>
+          <span>${escapeHtml(item.grade)}</span>
+        </div>
+      </div>
+    `).join('')
+
+  const researchContent = hasAnyValue(research, ['title', 'stack'])
+    ? `<p class="line-item"><strong>${escapeHtml(research.title)}</strong>${research.stack ? ` <span>|</span> <em>${escapeHtml(research.stack)}</em>` : ''}</p>`
+    : ''
+
+  return `<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>${escapeHtml(personal.fullName || 'Resume')}</title>
+  <style>
+    @page { size: A4; margin: 0.55in 0.7in; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #ffffff; color: #111827; font-family: "Trebuchet MS", Arial, sans-serif; font-size: 10.3pt; line-height: 1.28; }
+    .resume { max-width: 8.27in; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 12px; }
+    h1 { margin: 0; font-size: 21pt; line-height: 1.1; }
+    .target-role { margin-top: 3px; font-size: 11pt; color: #374151; font-weight: 700; }
+    .contact, .links { margin-top: 4px; font-size: 9.7pt; }
+    a { color: #003f91; text-decoration: none; }
+    .section { margin-top: 9px; }
+    .section-title { border-bottom: 1px solid #111827; color: #111827; font-size: 11pt; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 5px; padding-bottom: 2px; text-transform: uppercase; }
+    .entry { margin-bottom: 6px; }
+    .row { display: flex; justify-content: space-between; gap: 16px; width: 100%; }
+    .row > span:last-child { text-align: right; white-space: nowrap; }
+    .muted { color: #374151; }
+    ul { margin: 3px 0 6px 18px; padding: 0; }
+    li { margin-bottom: 2px; }
+    .compact-list { margin-top: 2px; }
+    .line-item { margin: 4px 0; }
+    @media print {
+      body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <main class="resume">
+    <header class="header">
+      <h1>${escapeHtml(personal.fullName)}</h1>
+      ${personal.targetRole ? `<div class="target-role">${escapeHtml(personal.targetRole)}</div>` : ''}
+      ${contact ? `<div class="contact">${contact}</div>` : ''}
+      ${links ? `<div class="links">${links}</div>` : ''}
+    </header>
+    ${renderSection('Work Experience', experienceContent)}
+    ${renderSection('Technical Skills', skillsContent)}
+    ${renderSection('Personal Projects', projectContent)}
+    ${renderSection('Training Certification', certificationContent)}
+    ${renderSection('Education', educationContent)}
+    ${renderSection('Research Experience', researchContent)}
+  </main>
+</body>
+</html>`
 }
 
 const Field = ({ label, value, onChange, placeholder, type = 'text' }) => (
