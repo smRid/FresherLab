@@ -517,14 +517,14 @@ const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills
   const contact = [
     personal.phone && `<a href="tel:${escapeHtml(personal.phone)}">${escapeHtml(personal.phone)}</a>`,
     personal.email && `<a href="mailto:${escapeHtml(personal.email)}">${escapeHtml(personal.email)}</a>`,
-  ].filter(Boolean).join(' &nbsp;|&nbsp; ')
+  ].filter(Boolean).join(' &nbsp;⋄&nbsp; ')
   const location = escapeHtml(personal.location || '')
 
   const links = [
     renderExternalLink(personal.linkedinUrl, 'LinkedIn'),
     renderExternalLink(personal.portfolioUrl, 'Portfolio'),
     renderExternalLink(personal.githubUrl, 'GitHub'),
-  ].filter(Boolean).join(' &nbsp;|&nbsp; ')
+  ].filter(Boolean).join(' &nbsp;⋄&nbsp; ')
 
   const summaryContent = String(summary || '').trim()
     ? `<p class="summary">${escapeHtml(summary).replace(/\r?\n/g, '<br />')}</p>`
@@ -655,16 +655,17 @@ const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills
   <style>
     @page { size: A4; margin: 0.55in 0.7in; }
     * { box-sizing: border-box; }
-    body { margin: 0; background: #ffffff; color: #111827; font-family: "Trebuchet MS", Arial, sans-serif; font-size: 10.3pt; line-height: 1.28; }
+    body { margin: 0; background: #ffffff; color: #111827; font-family: "Trebuchet MS", Arial, sans-serif; font-size: 11.3pt; line-height: 1.28; }
     .resume { max-width: 8.27in; margin: 0 auto; }
     .header { text-align: center; margin-bottom: 12px; }
     h1 { margin: 0; font-size: 21pt; line-height: 1.1; }
-    .target-role { margin-top: 3px; font-size: 11pt; color: #374151; font-weight: 700; }
-    .contact, .links, .location { margin-top: 4px; font-size: 9.7pt; }
+    .target-role { margin-top: 2px; font-size: 12pt; color: #374151; font-weight: 700; }
+    .contact, .links, .location { margin-top: 2px; font-size: 10.7pt; }
     a { color: #003f91; text-decoration: none; }
+    .contact a { color: #111827; }
     .section { margin-top: 9px; }
-    .section-title { border-bottom: 1px solid #111827; color: #111827; font-size: 11pt; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 5px; padding-bottom: 2px; text-transform: uppercase; }
-    .summary { margin: 4px 0; text-align: left; }
+    .section-title { border-bottom: 1px solid #111827; color: #111827; font-size: 12pt; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 5px; padding-bottom: 2px; text-transform: uppercase; }
+    .summary { margin: 4px 0; text-align: justify; text-align-last: left; }
     .entry { margin-bottom: 6px; }
     .row { display: flex; justify-content: space-between; gap: 16px; width: 100%; }
     .row > span:last-child { text-align: right; white-space: nowrap; }
@@ -685,8 +686,8 @@ const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills
     <header class="header">
       <h1>${escapeHtml(personal.fullName)}</h1>
       ${personal.targetRole ? `<div class="target-role">${escapeHtml(personal.targetRole)}</div>` : ''}
-      ${contact ? `<div class="contact">${contact}</div>` : ''}
       ${links ? `<div class="links">${links}</div>` : ''}
+      ${contact ? `<div class="contact">${contact}</div>` : ''}
       ${location ? `<div class="location">${location}</div>` : ''}
     </header>
     ${orderedSections}

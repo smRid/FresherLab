@@ -62,8 +62,8 @@ const renderHeader = (data) => {
     if (github) linksParts.push(`\\href{${github}}{GitHub}`)
 
     let header = `\\name{${name}}\n`
-    if (contactLine1Parts.length) header += `\\address{${contactLine1Parts.join(' \\\\ ')}}\n`
-    if (linksParts.length) header += `\\address{\\textcolor{cobalt}{${linksParts.join(' \\\\ ')}}}\n`
+    if (linksParts.length) header += `\\address{\\textcolor{cobalt}{${linksParts.join(' $\\diamond$ ')}}}\n`
+    if (contactLine1Parts.length) header += `\\address{\\textcolor{black}{${contactLine1Parts.join(' $\\diamond$ ')}}}\n`
     if (location) header += `\\address{${location}}\n`
     return header
 }
@@ -74,6 +74,7 @@ const renderProfessionalSummary = (summary = '') => {
 
     return `\\vspace{-0.18cm}
 \\begin{rSection}{Professional Summary}
+\\justifying
 ${text}
 \\end{rSection}
 \\vspace{-0.18cm}
@@ -246,6 +247,7 @@ export const buildResumeLatex = (data = {}) => {
 \\usepackage{enumitem}
 \\usepackage{hyperref}
 \\usepackage{xcolor}
+\\usepackage{ragged2e}
 
 \\definecolor{blue(pigment)}{rgb}{0.2, 0.2, 0.6}
 \\definecolor{blue(ncs)}{rgb}{0.0, 0.53, 0.74}
@@ -275,6 +277,7 @@ export const buildResumeLatex = (data = {}) => {
     return `${preamble}
 ${header}
 \\begin{document}
+\\fontsize{11pt}{13pt}\\selectfont
 
 \\vspace{-0.15cm}
 
