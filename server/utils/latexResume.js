@@ -210,6 +210,18 @@ ${headerParts.join(' $|$ ')}
 `
 }
 
+const renderBulletSection = (title, text = '') => {
+    const bullets = renderBullets(splitBullets(text))
+    if (!bullets) return ''
+
+    return `\\vspace{-0.18cm}
+\\begin{rSection}{${title}}
+${bullets}
+\\end{rSection}
+\\vspace{-0.18cm}
+`
+}
+
 export const buildResumeLatex = (data = {}) => {
     const preamble = `\\documentclass{resume}
 
@@ -239,6 +251,9 @@ export const buildResumeLatex = (data = {}) => {
         renderCertifications(data.certifications),
         renderEducation(data.educations),
         renderResearch(data.research),
+        renderBulletSection('Achievements', data.achievements),
+        renderBulletSection('Soft Skills', data.softSkills),
+        renderBulletSection('Languages', data.languages),
     ].filter(Boolean).join('\n')
 
     return `${preamble}

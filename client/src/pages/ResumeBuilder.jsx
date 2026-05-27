@@ -5,7 +5,7 @@ import toast from 'react-hot-toast'
 import GeneratedOutput from '../components/GeneratedOutput'
 import { Download, Loader2, Plus, Trash2 } from 'lucide-react'
 
-const STEPS = ['Personal', 'Professional Summary', 'Experience', 'Skills', 'Projects', 'Certifications', 'Education', 'Research']
+const STEPS = ['Personal', 'Professional Summary', 'Experience', 'Skills', 'Projects', 'Certifications', 'Education', 'Research', 'Achievements', 'Soft Skills', 'Languages']
 
 const emptyExperience = { company: '', companyUrl: '', role: '', dates: '', location: '', bullets: '' }
 const emptyProject = { name: '', stack: '', githubUrl: '', liveUrl: '', bullets: '' }
@@ -32,6 +32,9 @@ const ResumeBuilder = () => {
   const [certifications, setCertifications] = useState([{ ...emptyCertification }])
   const [educations, setEducations] = useState([{ ...emptyEducation }])
   const [research, setResearch] = useState({ title: '', stack: '' })
+  const [achievements, setAchievements] = useState('')
+  const [softSkills, setSoftSkills] = useState('')
+  const [languages, setLanguages] = useState('')
 
   const updateArrayItem = (setter) => (index, key, value) => {
     setter(prev => prev.map((item, i) => i === index ? { ...item, [key]: value } : item))
@@ -55,6 +58,9 @@ const ResumeBuilder = () => {
         certifications,
         educations,
         research,
+        achievements,
+        softSkills,
+        languages,
       }
       const { data } = await api.post('/api/ai/resume-builder', payload, {
         headers: { Authorization: `Bearer ${await getToken()}` }
@@ -71,7 +77,7 @@ const ResumeBuilder = () => {
     const pdfWindow = window.open('', '_blank')
     if (!pdfWindow) return toast.error('Please allow popups to download PDF')
 
-    const html = buildResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research })
+    const html = buildResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages })
     pdfWindow.document.open()
     pdfWindow.document.write(html)
     pdfWindow.document.close()
@@ -201,14 +207,44 @@ const ResumeBuilder = () => {
     </div>
   )
 
-  const stepContent = [personalStep, summaryStep, experienceStep, skillsStep, projectsStep, certificationsStep, educationStep, researchStep]
+  // Achievements step
+  const achievementsStep = (
+    <BulletTextareaStep
+      label='Achievements'
+      value={achievements}
+      onChange={setAchievements}
+      placeholder={'Won 1st place in university hackathon\nCompleted 100+ DSA problems on LeetCode\nSelected as team lead for final-year project'}
+    />
+  )
+
+  // Soft Skills step
+  const softSkillsStep = (
+    <BulletTextareaStep
+      label='Soft Skills'
+      value={softSkills}
+      onChange={setSoftSkills}
+      placeholder={'Communication\nTeam collaboration\nProblem solving\nTime management'}
+    />
+  )
+
+  // Languages step
+  const languagesStep = (
+    <BulletTextareaStep
+      label='Languages'
+      value={languages}
+      onChange={setLanguages}
+      placeholder={'English - Professional working proficiency\nBangla - Native\nHindi - Conversational'}
+    />
+  )
+
+  const stepContent = [personalStep, summaryStep, experienceStep, skillsStep, projectsStep, certificationsStep, educationStep, researchStep, achievementsStep, softSkillsStep, languagesStep]
 
   return (
     <div className='h-full overflow-y-scroll p-6 text-slate-700 dark:text-gray-300'>
       <h1 className='text-2xl font-bold text-slate-800 dark:text-white mb-1'>AI Resume Builder</h1>
       <p className='text-slate-500 dark:text-gray-400 text-sm mb-6'>Generate a clean LaTeX resume in the Trey-Hunner <code>resume.cls</code> format used by top freshers.</p>
 
-      <div className='mb-8 flex flex-wrap gap-2 max-w-3xl'>
+      <div className='mb-8 flex flex-wrap gap-2 max-w-4xl'>
         {STEPS.map((s, i) => (
           <button key={i} type='button' onClick={() => setStep(i)}
             className={`rounded-lg px-3 py-2 text-xs font-medium transition ${i === step ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-slate-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
@@ -288,7 +324,7 @@ const renderBullets = (bullets) => {
   return `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
 }
 
-const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills = {}, projects = [], certifications = [], educations = [], research = {} }) => {
+const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills = {}, projects = [], certifications = [], educations = [], research = {}, achievements = '', softSkills = '', languages = '' }) => {
   const contact = [
     personal.phone && `<a href="tel:${escapeHtml(personal.phone)}">${escapeHtml(personal.phone)}</a>`,
     personal.email && `<a href="mailto:${escapeHtml(personal.email)}">${escapeHtml(personal.email)}</a>`,
@@ -371,6 +407,9 @@ const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills
   const researchContent = hasAnyValue(research, ['title', 'stack'])
     ? `<p class="line-item"><strong>${escapeHtml(research.title)}</strong>${research.stack ? ` <span>|</span> <em>${escapeHtml(research.stack)}</em>` : ''}</p>`
     : ''
+  const achievementsContent = renderBullets(achievements)
+  const softSkillsContent = renderBullets(softSkills)
+  const languagesContent = renderBullets(languages)
 
   return `<!doctype html>
 <html>
@@ -418,6 +457,9 @@ const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills
     ${renderSection('Training Certification', certificationContent)}
     ${renderSection('Education', educationContent)}
     ${renderSection('Research Experience', researchContent)}
+    ${renderSection('Achievements', achievementsContent)}
+    ${renderSection('Soft Skills', softSkillsContent)}
+    ${renderSection('Languages', languagesContent)}
   </main>
 </body>
 </html>`
@@ -434,6 +476,19 @@ const TextareaField = ({ label, value, onChange, placeholder, rows = 3 }) => (
   <div>
     <label className={labelClass}>{label}</label>
     <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={rows} className={`${inputClass} resize-y`} />
+  </div>
+)
+
+const BulletTextareaStep = ({ label, value, onChange, placeholder }) => (
+  <div className='space-y-4'>
+    <TextareaField
+      label={`${label} (one per line)`}
+      value={value}
+      onChange={onChange}
+      rows={6}
+      placeholder={placeholder}
+    />
+    <p className='text-xs text-gray-500 dark:text-gray-400'>Each line will automatically become a bullet point in the resume. Leave blank to omit this section.</p>
   </div>
 )
 

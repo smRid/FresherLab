@@ -1844,6 +1844,7 @@ export const resumeBuilder = async (req, res) => {
             summary = '',
             experiences = [], skills = {}, projects = [],
             certifications = [], educations = [], research = {},
+            achievements = '', softSkills = '', languages = '',
             targetRole = '',
         } = req.body;
 
@@ -1863,6 +1864,9 @@ export const resumeBuilder = async (req, res) => {
             certifications,
             educations,
             research,
+            achievements,
+            softSkills,
+            languages,
         };
 
         const content = buildResumeLatex(data);
