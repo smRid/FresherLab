@@ -22,6 +22,7 @@ const SECTION_DEFINITIONS = [
 const DEFAULT_SECTION_ORDER = SECTION_DEFINITIONS.map(section => section.key)
 const SECTION_LABELS = SECTION_DEFINITIONS.reduce((labels, section) => ({ ...labels, [section.key]: section.label }), {})
 const BUILD_STEP_KEY = 'build'
+const FIXED_STEP_KEYS = new Set(['personal', BUILD_STEP_KEY])
 const STEP_LABELS = { ...SECTION_LABELS, [BUILD_STEP_KEY]: 'Build' }
 const STEP_NAV_LABELS = {
   ...STEP_LABELS,
@@ -71,6 +72,7 @@ const ResumeBuilder = () => {
   }
   const moveSection = (sourceKey, targetKey) => {
     if (!sourceKey || !targetKey || sourceKey === targetKey) return
+    if (FIXED_STEP_KEYS.has(sourceKey) || FIXED_STEP_KEYS.has(targetKey)) return
 
     setSectionOrder(prev => {
       const fromIndex = prev.indexOf(sourceKey)
@@ -292,11 +294,6 @@ const ResumeBuilder = () => {
     { key: 'softSkills', label: 'Soft Skills', done: Boolean(softSkills.trim()) },
     { key: 'languages', label: 'Languages', done: Boolean(languages.trim()) },
   ]
-  const completedBuildSections = buildChecks.filter(section => section.done).length
-  const buildProfileSummary = [personal.fullName, personal.targetRole]
-    .map(value => String(value || '').trim())
-    .filter(Boolean)
-    .join(' - ') || 'Resume details ready for final build'
   const resumePreviewHtml = buildResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionOrder, preview: true })
 
   const buildStep = (
@@ -310,21 +307,17 @@ const ResumeBuilder = () => {
             <div>
               <p className='text-xs font-semibold uppercase text-blue-600 dark:text-blue-300'>Final Step</p>
               <h2 className='mt-1 text-xl font-semibold text-slate-900 dark:text-white'>Build your resume</h2>
-              <p className='mt-1 text-sm text-slate-500 dark:text-gray-400'>{buildProfileSummary}</p>
             </div>
-          </div>
-          <div className='rounded-xl border border-slate-200 px-4 py-3 text-left dark:border-gray-700'>
-            <span className='block text-2xl font-bold text-slate-900 dark:text-white'>{completedBuildSections}/{buildChecks.length}</span>
-            <span className='text-xs font-medium text-slate-500 dark:text-gray-400'>sections with content</span>
           </div>
         </div>
 
         <div className='mt-5 grid gap-2 sm:grid-cols-2 2xl:grid-cols-3'>
           {buildChecks.map(section => (
-            <div key={section.key} className='flex min-h-10 items-center gap-2 rounded-lg bg-slate-50 px-3 text-sm text-slate-600 dark:bg-[#0B1120] dark:text-gray-300'>
+            <button key={section.key} type='button' onClick={() => setActiveSection(section.key)}
+              className='flex min-h-10 items-center gap-2 rounded-lg bg-slate-50 px-3 text-left text-sm text-slate-600 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#0B1120] dark:text-gray-300 dark:hover:bg-slate-900'>
               <CheckCircle2 className={`h-4 w-4 shrink-0 ${section.done ? 'text-emerald-500' : 'text-slate-400 dark:text-gray-600'}`} />
               <span className='min-w-0 truncate'>{section.label}</span>
-            </div>
+            </button>
           ))}
         </div>
 
@@ -404,30 +397,30 @@ const ResumeBuilder = () => {
           <div className='mb-7 grid w-full grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6'>
             {stepOrder.map((sectionKey, i) => {
               const isActive = sectionKey === activeSection
-              const isBuildTab = sectionKey === BUILD_STEP_KEY
+              const isFixedTab = FIXED_STEP_KEYS.has(sectionKey)
               return (
-                <button key={sectionKey} type='button' draggable={!isBuildTab} onClick={() => setActiveSection(sectionKey)}
-                  onDragStart={isBuildTab ? undefined : (e) => {
+                <button key={sectionKey} type='button' draggable={!isFixedTab} onClick={() => setActiveSection(sectionKey)}
+                  onDragStart={isFixedTab ? undefined : (e) => {
                     e.dataTransfer.effectAllowed = 'move'
                     e.dataTransfer.setData('text/plain', sectionKey)
                     setDraggingSection(sectionKey)
                   }}
-                  onDragEnd={isBuildTab ? undefined : () => setDraggingSection('')}
-                  onDragOver={isBuildTab ? undefined : (e) => {
+                  onDragEnd={isFixedTab ? undefined : () => setDraggingSection('')}
+                  onDragOver={isFixedTab ? undefined : (e) => {
                     e.preventDefault()
                     e.dataTransfer.dropEffect = 'move'
                   }}
-                  onDrop={isBuildTab ? undefined : (e) => {
+                  onDrop={isFixedTab ? undefined : (e) => {
                     e.preventDefault()
                     moveSection(e.dataTransfer.getData('text/plain') || draggingSection, sectionKey)
                     setDraggingSection('')
                   }}
-                  title={isBuildTab ? 'Build resume' : 'Drag to reorder'}
-                  className={`flex min-h-11 w-full items-center gap-1.5 rounded-xl border px-2.5 py-2 text-left text-[11px] font-medium leading-snug shadow-sm transition sm:text-xs ${isBuildTab ? '!cursor-pointer' : '!cursor-grab active:!cursor-grabbing'} ${isActive
+                  title={isFixedTab ? (sectionKey === BUILD_STEP_KEY ? 'Build resume' : 'Personal section stays first') : 'Drag to reorder'}
+                  className={`flex min-h-11 w-full items-center gap-1.5 rounded-xl border px-2.5 py-2 text-left text-[11px] font-medium leading-snug shadow-sm transition sm:text-xs ${isFixedTab ? '!cursor-pointer' : '!cursor-grab active:!cursor-grabbing'} ${isActive
                     ? 'border-blue-500 bg-blue-600 text-white shadow-blue-600/20'
                     : 'border-slate-200 bg-white text-slate-600 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-blue-500/60 dark:hover:bg-gray-700'
                     } ${draggingSection === sectionKey ? 'opacity-50 ring-2 ring-blue-400' : ''}`}>
-                  {isBuildTab ? <FileText className='h-3.5 w-3.5 shrink-0 opacity-80' /> : <GripVertical className='h-3.5 w-3.5 shrink-0 opacity-70' />}
+                  {sectionKey === BUILD_STEP_KEY ? <FileText className='h-3.5 w-3.5 shrink-0 opacity-80' /> : <GripVertical className={`h-3.5 w-3.5 shrink-0 opacity-70 ${isFixedTab ? 'opacity-40' : ''}`} />}
                   <span className='min-w-0 truncate'>{i + 1}. {STEP_NAV_LABELS[sectionKey]}</span>
                 </button>
               )
@@ -671,9 +664,9 @@ const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills
     .row > span:last-child { text-align: right; white-space: nowrap; }
     .muted { color: #374151; }
     ul { margin: 3px 0 6px 18px; padding: 0; }
-    li { margin-bottom: 2px; }
+    li { margin-bottom: 2px; text-align: justify; text-align-last: left; }
     .compact-list { margin-top: 2px; }
-    .line-item { margin: 4px 0; }
+    .line-item { margin: 4px 0; text-align: justify; text-align-last: left; }
     ${previewStyles}
     @media print {
       body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }

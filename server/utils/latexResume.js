@@ -37,6 +37,7 @@ const renderBullets = (bullets, itemSep = '-0.15cm', topVspace = '-0.2cm') => {
         .map(b => `        \\item ${escapeLatex(b)}`)
         .join('\n')
     return `    \\begin{itemize}[leftmargin=0.4cm, label={\\Large \\textbullet}]
+    \\justifying
     \\setlength\\itemsep{${itemSep}}
     \\vspace{${topVspace}}
 ${items}
@@ -125,6 +126,7 @@ const renderSkills = (skills = {}) => {
     return `\\vspace{-0.18cm}
 \\begin{rSection}{Technical Skills}
 \\begin{itemize}[leftmargin=0.4cm, label={\\Large \\textbullet}]
+    \\justifying
     \\setlength\\itemsep{-0.15cm}
 ${lines}
 \\end{itemize}
