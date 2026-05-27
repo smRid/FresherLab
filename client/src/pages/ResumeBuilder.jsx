@@ -290,7 +290,7 @@ const ResumeBuilder = () => {
       <h1 className='text-2xl font-bold text-slate-800 dark:text-white mb-1'>AI Resume Builder</h1>
       <p className='text-slate-500 dark:text-gray-400 text-sm mb-6'>Generate a clean LaTeX resume in the Trey-Hunner <code>resume.cls</code> format used by top freshers.</p>
 
-      <div className='mb-8 flex max-w-4xl flex-wrap gap-2'>
+      <div className='mb-8 flex max-w-3xl flex-wrap gap-2'>
         {sectionOrder.map((sectionKey, i) => {
           const isActive = sectionKey === activeSection
           return (
