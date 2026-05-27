@@ -26,10 +26,17 @@ const quickLinks = [
   { to: '/ai/cover-letter', label: 'Cover Letter', desc: 'Generate tailored cover letters', Icon: Mail, gradient: 'from-indigo-500 to-blue-500' },
 ]
 
+const StatValueLoader = () => (
+  <div className='h-8 flex items-center' aria-label='Loading stat value'>
+    <div className='h-6 w-14 rounded-md bg-slate-200 dark:bg-slate-700/80 animate-pulse'></div>
+  </div>
+)
+
 const Dashboard = () => {
 
   const [creations, setCreations] = useState([])
   const [loading, setLoading] = useState(true)
+  const [extraLoading, setExtraLoading] = useState(true)
   const { getToken } = useAuth()
   const { user } = useUser()
 
@@ -53,8 +60,8 @@ const Dashboard = () => {
     getDashboardData()
   }, [getDashboardData])
 
-  const [jobCount, setJobCount] = useState(0)
-  const [plan, setPlan] = useState('free')
+  const [jobCount, setJobCount] = useState(null)
+  const [plan, setPlan] = useState(null)
 
   useEffect(() => {
     const fetchExtra = async () => {
@@ -65,9 +72,14 @@ const Dashboard = () => {
           api.get('/api/user/job-applications', { headers }),
           api.get('/api/stripe/subscription-status', { headers }),
         ])
-        if (jobRes.data.success) setJobCount(jobRes.data.jobs.length)
-        if (planRes.data.success) setPlan(planRes.data.plan)
-      } catch { /* silent */ }
+        setJobCount(jobRes.data.success && Array.isArray(jobRes.data.jobs) ? jobRes.data.jobs.length : 0)
+        setPlan(planRes.data.success ? planRes.data.plan : 'free')
+      } catch {
+        setJobCount(0)
+        setPlan('free')
+      } finally {
+        setExtraLoading(false)
+      }
     }
     fetchExtra()
   }, [getToken])
@@ -84,6 +96,11 @@ const Dashboard = () => {
       case 'plan': return plan === 'premium' ? 'Pro' : 'Free'
       default: return 0
     }
+  }
+
+  const isStatLoading = (key) => {
+    if (['total', 'resume', 'cover'].includes(key)) return loading
+    return extraLoading
   }
 
   const firstName = user?.firstName || 'there'
@@ -111,7 +128,11 @@ const Dashboard = () => {
             <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-3 shadow-lg`}>
               <StatIcon className='w-5 h-5 text-white' />
             </div>
-            <h3 className='text-2xl font-bold text-slate-900 dark:text-white'>{getStatValue(key)}</h3>
+            {isStatLoading(key) ? (
+              <StatValueLoader />
+            ) : (
+              <h3 className='h-8 text-2xl font-bold leading-8 text-slate-900 dark:text-white'>{getStatValue(key)}</h3>
+            )}
             <p className='text-xs text-slate-500 dark:text-gray-400 mt-0.5'>{label}</p>
           </div>
         ))}
