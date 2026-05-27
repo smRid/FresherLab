@@ -11,7 +11,7 @@ const SECTION_DEFINITIONS = [
   { key: 'experience', label: 'Experience' },
   { key: 'skills', label: 'Skills' },
   { key: 'projects', label: 'Projects' },
-  { key: 'certifications', label: 'Certifications' },
+  { key: 'certifications', label: 'Training & Certification' },
   { key: 'education', label: 'Education' },
   { key: 'research', label: 'Research' },
   { key: 'achievements', label: 'Achievements' },
@@ -202,7 +202,7 @@ const ResumeBuilder = () => {
 
   // Certifications step
   const certificationsStep = (
-    <ArraySection title='Training Certifications' items={certifications} onAdd={addArrayItem(setCertifications, emptyCertification)} onRemove={removeArrayItem(setCertifications)} renderItem={(c, idx) => (
+    <ArraySection title='Training & Certification' items={certifications} onAdd={addArrayItem(setCertifications, emptyCertification)} onRemove={removeArrayItem(setCertifications)} renderItem={(c, idx) => (
       <>
         <div className='grid grid-cols-2 gap-3'>
           <Field label='Institution' value={c.institution} onChange={v => updateArrayItem(setCertifications)(idx, 'institution', v)} placeholder='Coursera' />
@@ -484,7 +484,7 @@ const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills
     experience: renderSection('Work Experience', experienceContent),
     skills: renderSection('Technical Skills', skillsContent),
     projects: renderSection('Personal Projects', projectContent),
-    certifications: renderSection('Training Certification', certificationContent),
+    certifications: renderSection('Training & Certification', certificationContent),
     education: renderSection('Education', educationContent),
     research: renderSection('Research Experience', researchContent),
     achievements: renderSection('Achievements', achievementsContent),

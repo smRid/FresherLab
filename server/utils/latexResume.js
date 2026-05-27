@@ -181,7 +181,7 @@ const renderCertifications = (certs = []) => {
     }).join('\n\n')
 
     return `\\vspace{-0.18cm}
-\\begin{rSection}{Training Certification}
+\\begin{rSection}{Training \\& Certification}
 ${lines}
 \\end{rSection}
 \\vspace{-0.18cm}
