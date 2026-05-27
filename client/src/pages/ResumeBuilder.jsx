@@ -324,10 +324,6 @@ const ResumeBuilder = () => {
         <div className='mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap'>
           <button type='button' onClick={() => setActiveSection(sectionOrder[sectionOrder.length - 1])}
             className='rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800'>Back</button>
-          <button type='submit' disabled={loading}
-            className='inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg hover:opacity-90 disabled:opacity-50'>
-            {loading ? <><Loader2 className='h-4 w-4 animate-spin' /> Building LaTeX...</> : <><FileText className='h-4 w-4' /> Generate LaTeX Resume</>}
-          </button>
           <button type='button' onClick={handleDownloadPdf}
             className='inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg hover:opacity-90'>
             <Download className='h-4 w-4' /> Download PDF
