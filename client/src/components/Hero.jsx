@@ -33,10 +33,6 @@ const Hero = () => {
                             Become Job-Ready Faster with AI
                         </h1>
 
-                        <p className='mt-6 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg'>
-                            FresherLab helps freshers improve resumes, optimize for ATS, generate cover letters, write job emails, build GitHub READMEs, create learning plans, and track job applications from one powerful workspace.
-                        </p>
-
                         <div className='mt-8 flex flex-col gap-3 sm:flex-row'>
                             <button
                                 onClick={() => navigate('/ai')}
@@ -54,11 +50,11 @@ const Hero = () => {
                             </a>
                         </div>
 
-                        <div className='mt-9 grid gap-3 text-sm text-slate-300 sm:grid-cols-3'>
+                        <div className='mt-9 flex flex-col gap-3 text-sm text-slate-300 sm:flex-row sm:flex-wrap sm:gap-x-6 sm:gap-y-3 lg:flex-nowrap'>
                             {features.map((feature) => (
                                 <div key={feature} className='flex items-center gap-2'>
                                     <CheckCircle2 className='h-4 w-4 shrink-0 text-lime-300' />
-                                    <span>{feature}</span>
+                                    <span className='lg:whitespace-nowrap'>{feature}</span>
                                 </div>
                             ))}
                         </div>

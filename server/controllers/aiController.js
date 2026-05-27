@@ -1841,6 +1841,7 @@ export const resumeBuilder = async (req, res) => {
         const {
             fullName, email, phone, location,
             linkedinUrl, portfolioUrl, githubUrl,
+            summary = '',
             experiences = [], skills = {}, projects = [],
             certifications = [], educations = [], research = {},
             targetRole = '',
@@ -1855,6 +1856,7 @@ export const resumeBuilder = async (req, res) => {
         const data = {
             fullName, email, phone, location,
             linkedinUrl, portfolioUrl, githubUrl,
+            summary,
             experiences: polished.experiences,
             skills,
             projects: polished.projects,

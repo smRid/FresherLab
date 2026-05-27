@@ -5,7 +5,7 @@ import toast from 'react-hot-toast'
 import GeneratedOutput from '../components/GeneratedOutput'
 import { Download, Loader2, Plus, Trash2 } from 'lucide-react'
 
-const STEPS = ['Personal', 'Experience', 'Skills', 'Projects', 'Certifications', 'Education', 'Research']
+const STEPS = ['Personal', 'Professional Summary', 'Experience', 'Skills', 'Projects', 'Certifications', 'Education', 'Research']
 
 const emptyExperience = { company: '', companyUrl: '', role: '', dates: '', location: '', bullets: '' }
 const emptyProject = { name: '', stack: '', githubUrl: '', liveUrl: '', bullets: '' }
@@ -25,6 +25,7 @@ const ResumeBuilder = () => {
     fullName: '', email: '', phone: '', location: '',
     linkedinUrl: '', portfolioUrl: '', githubUrl: '', targetRole: '',
   })
+  const [summary, setSummary] = useState('')
   const [experiences, setExperiences] = useState([{ ...emptyExperience }])
   const [skills, setSkills] = useState({ languages: '', frameworks: '', databases: '', tools: '' })
   const [projects, setProjects] = useState([{ ...emptyProject }])
@@ -47,6 +48,7 @@ const ResumeBuilder = () => {
     try {
       const payload = {
         ...personal,
+        summary,
         experiences,
         skills,
         projects,
@@ -69,7 +71,7 @@ const ResumeBuilder = () => {
     const pdfWindow = window.open('', '_blank')
     if (!pdfWindow) return toast.error('Please allow popups to download PDF')
 
-    const html = buildResumeHtml({ personal, experiences, skills, projects, certifications, educations, research })
+    const html = buildResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research })
     pdfWindow.document.open()
     pdfWindow.document.write(html)
     pdfWindow.document.close()
@@ -95,6 +97,20 @@ const ResumeBuilder = () => {
       <Field label='LinkedIn URL' value={personal.linkedinUrl} onChange={v => setPersonal({ ...personal, linkedinUrl: v })} placeholder='https://linkedin.com/in/alex-carter' />
       <Field label='Portfolio URL' value={personal.portfolioUrl} onChange={v => setPersonal({ ...personal, portfolioUrl: v })} placeholder='https://alexcarter.dev' />
       <Field label='GitHub URL' value={personal.githubUrl} onChange={v => setPersonal({ ...personal, githubUrl: v })} placeholder='https://github.com/alexcarter' />
+    </div>
+  )
+
+  // Professional Summary step
+  const summaryStep = (
+    <div className='space-y-4'>
+      <TextareaField
+        label='Professional Summary'
+        value={summary}
+        onChange={setSummary}
+        rows={5}
+        placeholder='Junior Software Engineer with hands-on experience building responsive React applications, REST APIs, and database-backed projects. Strong problem-solver with a focus on clean code, collaboration, and continuous learning.'
+      />
+      <p className='text-xs text-gray-500 dark:text-gray-400'>Add 2-3 concise sentences tailored to your target role. Leave blank to omit this section.</p>
     </div>
   )
 
@@ -185,7 +201,7 @@ const ResumeBuilder = () => {
     </div>
   )
 
-  const stepContent = [personalStep, experienceStep, skillsStep, projectsStep, certificationsStep, educationStep, researchStep]
+  const stepContent = [personalStep, summaryStep, experienceStep, skillsStep, projectsStep, certificationsStep, educationStep, researchStep]
 
   return (
     <div className='h-full overflow-y-scroll p-6 text-slate-700 dark:text-gray-300'>
@@ -272,7 +288,7 @@ const renderBullets = (bullets) => {
   return `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
 }
 
-const buildResumeHtml = ({ personal = {}, experiences = [], skills = {}, projects = [], certifications = [], educations = [], research = {} }) => {
+const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills = {}, projects = [], certifications = [], educations = [], research = {} }) => {
   const contact = [
     personal.phone && `<a href="tel:${escapeHtml(personal.phone)}">${escapeHtml(personal.phone)}</a>`,
     personal.email && `<a href="mailto:${escapeHtml(personal.email)}">${escapeHtml(personal.email)}</a>`,
@@ -284,6 +300,10 @@ const buildResumeHtml = ({ personal = {}, experiences = [], skills = {}, project
     renderExternalLink(personal.portfolioUrl, 'Portfolio'),
     renderExternalLink(personal.githubUrl, 'GitHub'),
   ].filter(Boolean).join(' &nbsp;|&nbsp; ')
+
+  const summaryContent = String(summary || '').trim()
+    ? `<p class="summary">${escapeHtml(summary).replace(/\r?\n/g, '<br />')}</p>`
+    : ''
 
   const experienceContent = (experiences || [])
     .filter(item => hasAnyValue(item, ['company', 'role', 'bullets']))
@@ -369,6 +389,7 @@ const buildResumeHtml = ({ personal = {}, experiences = [], skills = {}, project
     a { color: #003f91; text-decoration: none; }
     .section { margin-top: 9px; }
     .section-title { border-bottom: 1px solid #111827; color: #111827; font-size: 11pt; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 5px; padding-bottom: 2px; text-transform: uppercase; }
+    .summary { margin: 4px 0; text-align: left; }
     .entry { margin-bottom: 6px; }
     .row { display: flex; justify-content: space-between; gap: 16px; width: 100%; }
     .row > span:last-child { text-align: right; white-space: nowrap; }
@@ -390,6 +411,7 @@ const buildResumeHtml = ({ personal = {}, experiences = [], skills = {}, project
       ${contact ? `<div class="contact">${contact}</div>` : ''}
       ${links ? `<div class="links">${links}</div>` : ''}
     </header>
+    ${renderSection('Professional Summary', summaryContent)}
     ${renderSection('Work Experience', experienceContent)}
     ${renderSection('Technical Skills', skillsContent)}
     ${renderSection('Personal Projects', projectContent)}

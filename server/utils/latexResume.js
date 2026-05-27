@@ -55,6 +55,18 @@ const renderHeader = (data) => {
     return header
 }
 
+const renderProfessionalSummary = (summary = '') => {
+    const text = escapeLatex(String(summary || '').trim())
+    if (!text) return ''
+
+    return `\\vspace{-0.18cm}
+\\begin{rSection}{Professional Summary}
+${text}
+\\end{rSection}
+\\vspace{-0.18cm}
+`
+}
+
 const renderWorkExperience = (entries = []) => {
     const valid = entries.filter(e => e && (e.company || e.role))
     if (!valid.length) return ''
@@ -220,6 +232,7 @@ export const buildResumeLatex = (data = {}) => {
 
     const header = renderHeader(data)
     const body = [
+        renderProfessionalSummary(data.summary || ''),
         renderWorkExperience(data.experiences),
         renderSkills(data.skills),
         renderProjects(data.projects),
