@@ -10,6 +10,19 @@ const escapeLatex = (input) => {
 
 const sanitizeUrl = (url) => (url || '').toString().trim()
 
+const DEFAULT_SECTION_ORDER = [
+    'summary',
+    'experience',
+    'skills',
+    'projects',
+    'certifications',
+    'education',
+    'research',
+    'achievements',
+    'softSkills',
+    'languages',
+]
+
 const splitBullets = (text) => {
     if (!text) return []
     return text
@@ -243,18 +256,21 @@ export const buildResumeLatex = (data = {}) => {
 `
 
     const header = renderHeader(data)
-    const body = [
-        renderProfessionalSummary(data.summary || ''),
-        renderWorkExperience(data.experiences),
-        renderSkills(data.skills),
-        renderProjects(data.projects),
-        renderCertifications(data.certifications),
-        renderEducation(data.educations),
-        renderResearch(data.research),
-        renderBulletSection('Achievements', data.achievements),
-        renderBulletSection('Soft Skills', data.softSkills),
-        renderBulletSection('Languages', data.languages),
-    ].filter(Boolean).join('\n')
+    const sections = {
+        summary: renderProfessionalSummary(data.summary || ''),
+        experience: renderWorkExperience(data.experiences),
+        skills: renderSkills(data.skills),
+        projects: renderProjects(data.projects),
+        certifications: renderCertifications(data.certifications),
+        education: renderEducation(data.educations),
+        research: renderResearch(data.research),
+        achievements: renderBulletSection('Achievements', data.achievements),
+        softSkills: renderBulletSection('Soft Skills', data.softSkills),
+        languages: renderBulletSection('Languages', data.languages),
+    }
+    const requestedOrder = Array.isArray(data.sectionOrder) && data.sectionOrder.length ? data.sectionOrder : DEFAULT_SECTION_ORDER
+    const orderedSections = [...requestedOrder, ...DEFAULT_SECTION_ORDER.filter(key => !requestedOrder.includes(key))]
+    const body = orderedSections.map(key => sections[key]).filter(Boolean).join('\n')
 
     return `${preamble}
 ${header}

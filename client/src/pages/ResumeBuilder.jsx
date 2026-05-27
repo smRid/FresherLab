@@ -3,9 +3,24 @@ import { useAuth } from '@clerk/clerk-react'
 import { api } from '../lib/api'
 import toast from 'react-hot-toast'
 import GeneratedOutput from '../components/GeneratedOutput'
-import { Download, Loader2, Plus, Trash2 } from 'lucide-react'
+import { Download, GripVertical, Loader2, Plus, Trash2 } from 'lucide-react'
 
-const STEPS = ['Personal', 'Professional Summary', 'Experience', 'Skills', 'Projects', 'Certifications', 'Education', 'Research', 'Achievements', 'Soft Skills', 'Languages']
+const SECTION_DEFINITIONS = [
+  { key: 'personal', label: 'Personal' },
+  { key: 'summary', label: 'Professional Summary' },
+  { key: 'experience', label: 'Experience' },
+  { key: 'skills', label: 'Skills' },
+  { key: 'projects', label: 'Projects' },
+  { key: 'certifications', label: 'Certifications' },
+  { key: 'education', label: 'Education' },
+  { key: 'research', label: 'Research' },
+  { key: 'achievements', label: 'Achievements' },
+  { key: 'softSkills', label: 'Soft Skills' },
+  { key: 'languages', label: 'Languages' },
+]
+
+const DEFAULT_SECTION_ORDER = SECTION_DEFINITIONS.map(section => section.key)
+const SECTION_LABELS = SECTION_DEFINITIONS.reduce((labels, section) => ({ ...labels, [section.key]: section.label }), {})
 
 const emptyExperience = { company: '', companyUrl: '', role: '', dates: '', location: '', bullets: '' }
 const emptyProject = { name: '', stack: '', githubUrl: '', liveUrl: '', bullets: '' }
@@ -16,7 +31,9 @@ const inputClass = 'w-full rounded-lg border border-gray-300 dark:border-gray-70
 const labelClass = 'block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1'
 
 const ResumeBuilder = () => {
-  const [step, setStep] = useState(0)
+  const [activeSection, setActiveSection] = useState(DEFAULT_SECTION_ORDER[0])
+  const [sectionOrder, setSectionOrder] = useState(DEFAULT_SECTION_ORDER)
+  const [draggingSection, setDraggingSection] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState('')
   const { getToken } = useAuth()
@@ -43,6 +60,21 @@ const ResumeBuilder = () => {
   const removeArrayItem = (setter) => (index) => {
     setter(prev => prev.length === 1 ? prev : prev.filter((_, i) => i !== index))
   }
+  const moveSection = (sourceKey, targetKey) => {
+    if (!sourceKey || !targetKey || sourceKey === targetKey) return
+
+    setSectionOrder(prev => {
+      const fromIndex = prev.indexOf(sourceKey)
+      const toIndex = prev.indexOf(targetKey)
+      if (fromIndex === -1 || toIndex === -1) return prev
+
+      const next = [...prev]
+      const [movedSection] = next.splice(fromIndex, 1)
+      next.splice(toIndex, 0, movedSection)
+      return next
+    })
+    setActiveSection(sourceKey)
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -61,6 +93,7 @@ const ResumeBuilder = () => {
         achievements,
         softSkills,
         languages,
+        sectionOrder,
       }
       const { data } = await api.post('/api/ai/resume-builder', payload, {
         headers: { Authorization: `Bearer ${await getToken()}` }
@@ -77,7 +110,7 @@ const ResumeBuilder = () => {
     const pdfWindow = window.open('', '_blank')
     if (!pdfWindow) return toast.error('Please allow popups to download PDF')
 
-    const html = buildResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages })
+    const html = buildResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionOrder })
     pdfWindow.document.open()
     pdfWindow.document.write(html)
     pdfWindow.document.close()
@@ -237,32 +270,68 @@ const ResumeBuilder = () => {
     />
   )
 
-  const stepContent = [personalStep, summaryStep, experienceStep, skillsStep, projectsStep, certificationsStep, educationStep, researchStep, achievementsStep, softSkillsStep, languagesStep]
+  const stepContent = {
+    personal: personalStep,
+    summary: summaryStep,
+    experience: experienceStep,
+    skills: skillsStep,
+    projects: projectsStep,
+    certifications: certificationsStep,
+    education: educationStep,
+    research: researchStep,
+    achievements: achievementsStep,
+    softSkills: softSkillsStep,
+    languages: languagesStep,
+  }
+  const activeIndex = sectionOrder.indexOf(activeSection)
 
   return (
     <div className='h-full overflow-y-scroll p-6 text-slate-700 dark:text-gray-300'>
       <h1 className='text-2xl font-bold text-slate-800 dark:text-white mb-1'>AI Resume Builder</h1>
       <p className='text-slate-500 dark:text-gray-400 text-sm mb-6'>Generate a clean LaTeX resume in the Trey-Hunner <code>resume.cls</code> format used by top freshers.</p>
 
-      <div className='mb-8 flex flex-wrap gap-2 max-w-4xl'>
-        {STEPS.map((s, i) => (
-          <button key={i} type='button' onClick={() => setStep(i)}
-            className={`rounded-lg px-3 py-2 text-xs font-medium transition ${i === step ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-slate-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
-            {i + 1}. {s}
-          </button>
-        ))}
+      <div className='mb-8 flex max-w-4xl flex-wrap gap-2'>
+        {sectionOrder.map((sectionKey, i) => {
+          const isActive = sectionKey === activeSection
+          return (
+            <button key={sectionKey} type='button' draggable onClick={() => setActiveSection(sectionKey)}
+              onDragStart={(e) => {
+                e.dataTransfer.effectAllowed = 'move'
+                e.dataTransfer.setData('text/plain', sectionKey)
+                setDraggingSection(sectionKey)
+              }}
+              onDragEnd={() => setDraggingSection('')}
+              onDragOver={(e) => {
+                e.preventDefault()
+                e.dataTransfer.dropEffect = 'move'
+              }}
+              onDrop={(e) => {
+                e.preventDefault()
+                moveSection(e.dataTransfer.getData('text/plain') || draggingSection, sectionKey)
+                setDraggingSection('')
+              }}
+              title='Drag to reorder'
+              className={`inline-flex !cursor-grab items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-medium shadow-sm transition active:!cursor-grabbing ${isActive
+                ? 'border-blue-500 bg-blue-600 text-white shadow-blue-600/20'
+                : 'border-slate-200 bg-white text-slate-600 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-blue-500/60 dark:hover:bg-gray-700'
+                } ${draggingSection === sectionKey ? 'opacity-50 ring-2 ring-blue-400' : ''}`}>
+              <GripVertical className='h-3.5 w-3.5 shrink-0 opacity-70' />
+              <span>{i + 1}. {SECTION_LABELS[sectionKey]}</span>
+            </button>
+          )
+        })}
       </div>
 
       <form onSubmit={handleSubmit} className='max-w-3xl'>
-        {stepContent[step]}
+        {stepContent[activeSection]}
 
         <div className='mt-6 flex gap-3'>
-          {step > 0 && (
-            <button type='button' onClick={() => setStep(step - 1)}
+          {activeIndex > 0 && (
+            <button type='button' onClick={() => setActiveSection(sectionOrder[activeIndex - 1])}
               className='rounded-lg border border-gray-300 dark:border-gray-700 px-5 py-2.5 text-sm font-medium text-slate-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'>Back</button>
           )}
-          {step < STEPS.length - 1 ? (
-            <button type='button' onClick={() => setStep(step + 1)}
+          {activeIndex < sectionOrder.length - 1 ? (
+            <button type='button' onClick={() => setActiveSection(sectionOrder[activeIndex + 1])}
               className='rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700'>Next</button>
           ) : (
             <>
@@ -324,7 +393,7 @@ const renderBullets = (bullets) => {
   return `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
 }
 
-const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills = {}, projects = [], certifications = [], educations = [], research = {}, achievements = '', softSkills = '', languages = '' }) => {
+const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills = {}, projects = [], certifications = [], educations = [], research = {}, achievements = '', softSkills = '', languages = '', sectionOrder = DEFAULT_SECTION_ORDER }) => {
   const contact = [
     personal.phone && `<a href="tel:${escapeHtml(personal.phone)}">${escapeHtml(personal.phone)}</a>`,
     personal.email && `<a href="mailto:${escapeHtml(personal.email)}">${escapeHtml(personal.email)}</a>`,
@@ -410,6 +479,23 @@ const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills
   const achievementsContent = renderBullets(achievements)
   const softSkillsContent = renderBullets(softSkills)
   const languagesContent = renderBullets(languages)
+  const resumeSections = {
+    summary: renderSection('Professional Summary', summaryContent),
+    experience: renderSection('Work Experience', experienceContent),
+    skills: renderSection('Technical Skills', skillsContent),
+    projects: renderSection('Personal Projects', projectContent),
+    certifications: renderSection('Training Certification', certificationContent),
+    education: renderSection('Education', educationContent),
+    research: renderSection('Research Experience', researchContent),
+    achievements: renderSection('Achievements', achievementsContent),
+    softSkills: renderSection('Soft Skills', softSkillsContent),
+    languages: renderSection('Languages', languagesContent),
+  }
+  const requestedOrder = Array.isArray(sectionOrder) && sectionOrder.length ? sectionOrder : DEFAULT_SECTION_ORDER
+  const orderedSections = [...requestedOrder, ...DEFAULT_SECTION_ORDER.filter(key => !requestedOrder.includes(key))]
+    .map(key => resumeSections[key])
+    .filter(Boolean)
+    .join('')
 
   return `<!doctype html>
 <html>
@@ -450,16 +536,7 @@ const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills
       ${contact ? `<div class="contact">${contact}</div>` : ''}
       ${links ? `<div class="links">${links}</div>` : ''}
     </header>
-    ${renderSection('Professional Summary', summaryContent)}
-    ${renderSection('Work Experience', experienceContent)}
-    ${renderSection('Technical Skills', skillsContent)}
-    ${renderSection('Personal Projects', projectContent)}
-    ${renderSection('Training Certification', certificationContent)}
-    ${renderSection('Education', educationContent)}
-    ${renderSection('Research Experience', researchContent)}
-    ${renderSection('Achievements', achievementsContent)}
-    ${renderSection('Soft Skills', softSkillsContent)}
-    ${renderSection('Languages', languagesContent)}
+    ${orderedSections}
   </main>
 </body>
 </html>`
