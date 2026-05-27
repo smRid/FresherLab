@@ -133,7 +133,7 @@ const ResumeBuilder = () => {
           <Field label='Dates' value={exp.dates} onChange={v => updateArrayItem(setExperiences)(idx, 'dates', v)} placeholder='June 2024 – August 2024' />
         </div>
         <Field label='Location' value={exp.location} onChange={v => updateArrayItem(setExperiences)(idx, 'location', v)} placeholder='Remote' />
-        <TextareaField label='Bullets (one per line)' value={exp.bullets} onChange={v => updateArrayItem(setExperiences)(idx, 'bullets', v)} rows={4}
+        <TextareaField label='Bullets' value={exp.bullets} onChange={v => updateArrayItem(setExperiences)(idx, 'bullets', v)} rows={4}
           placeholder={'Built reusable React components for customer dashboard\nIntegrated REST APIs and handled client-side validation\nImproved page load performance by optimizing assets'} />
       </>
     )} />
@@ -161,7 +161,7 @@ const ResumeBuilder = () => {
           <Field label='GitHub URL' value={p.githubUrl} onChange={v => updateArrayItem(setProjects)(idx, 'githubUrl', v)} placeholder='https://github.com/alexcarter/task-manager' />
           <Field label='Live URL' value={p.liveUrl} onChange={v => updateArrayItem(setProjects)(idx, 'liveUrl', v)} placeholder='https://task-manager-demo.vercel.app' />
         </div>
-        <TextareaField label='Bullets (one per line)' value={p.bullets} onChange={v => updateArrayItem(setProjects)(idx, 'bullets', v)} rows={3}
+        <TextareaField label='Bullets' value={p.bullets} onChange={v => updateArrayItem(setProjects)(idx, 'bullets', v)} rows={3}
           placeholder={'Created task boards with drag-and-drop workflow\nImplemented JWT authentication and protected API routes\nDesigned responsive UI for desktop and mobile users'} />
       </>
     )} />
@@ -482,7 +482,7 @@ const TextareaField = ({ label, value, onChange, placeholder, rows = 3 }) => (
 const BulletTextareaStep = ({ label, value, onChange, placeholder }) => (
   <div className='space-y-4'>
     <TextareaField
-      label={`${label} (one per line)`}
+      label={label}
       value={value}
       onChange={onChange}
       rows={6}
