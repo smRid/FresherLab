@@ -397,8 +397,8 @@ const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills
   const contact = [
     personal.phone && `<a href="tel:${escapeHtml(personal.phone)}">${escapeHtml(personal.phone)}</a>`,
     personal.email && `<a href="mailto:${escapeHtml(personal.email)}">${escapeHtml(personal.email)}</a>`,
-    personal.location && escapeHtml(personal.location),
   ].filter(Boolean).join(' &nbsp;|&nbsp; ')
+  const location = escapeHtml(personal.location || '')
 
   const links = [
     renderExternalLink(personal.linkedinUrl, 'LinkedIn'),
@@ -510,7 +510,7 @@ const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills
     .header { text-align: center; margin-bottom: 12px; }
     h1 { margin: 0; font-size: 21pt; line-height: 1.1; }
     .target-role { margin-top: 3px; font-size: 11pt; color: #374151; font-weight: 700; }
-    .contact, .links { margin-top: 4px; font-size: 9.7pt; }
+    .contact, .links, .location { margin-top: 4px; font-size: 9.7pt; }
     a { color: #003f91; text-decoration: none; }
     .section { margin-top: 9px; }
     .section-title { border-bottom: 1px solid #111827; color: #111827; font-size: 11pt; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 5px; padding-bottom: 2px; text-transform: uppercase; }
@@ -535,6 +535,7 @@ const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills
       ${personal.targetRole ? `<div class="target-role">${escapeHtml(personal.targetRole)}</div>` : ''}
       ${contact ? `<div class="contact">${contact}</div>` : ''}
       ${links ? `<div class="links">${links}</div>` : ''}
+      ${location ? `<div class="location">${location}</div>` : ''}
     </header>
     ${orderedSections}
   </main>

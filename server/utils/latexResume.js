@@ -63,8 +63,8 @@ const renderHeader = (data) => {
 
     let header = `\\name{${name}}\n`
     if (contactLine1Parts.length) header += `\\address{${contactLine1Parts.join(' \\\\ ')}}\n`
-    if (location) header += `\\address{${location}}\n`
     if (linksParts.length) header += `\\address{\\textcolor{cobalt}{${linksParts.join(' \\\\ ')}}}\n`
+    if (location) header += `\\address{${location}}\n`
     return header
 }
 
