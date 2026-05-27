@@ -43,8 +43,8 @@ const CreationItem = ({ item }) => {
     <div className='p-4 max-w-5xl text-sm bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-800 rounded-lg'>
       <div onClick={() => setExpanded(!expanded)} className='flex justify-between items-center gap-4 cursor-pointer'>
         <div className='min-w-0'>
-          <h2 className='truncate'>{item.prompt}</h2>
-          <p className='text-gray-500'>{label} &middot; {new Date(item.created_at).toLocaleDateString()}</p>
+          <h2 className='truncate font-medium text-slate-900 dark:text-white'>{item.prompt}</h2>
+          <p className='text-gray-500 dark:text-gray-400'>{label} &middot; {new Date(item.created_at).toLocaleDateString()}</p>
         </div>
         <div className='flex items-center gap-2 shrink-0'>
           <span className='bg-[#EFF6FF] dark:bg-blue-900/30 border border-[#BFDBFE] dark:border-blue-800 text-[#1E40AF] dark:text-blue-300 px-3 py-0.5 rounded-full text-xs'>{label}</span>
