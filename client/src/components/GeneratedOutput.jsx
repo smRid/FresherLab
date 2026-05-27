@@ -43,8 +43,8 @@ const GeneratedOutput = ({ content, title = 'Generated Output', filename = 'fres
   }
 
   return (
-    <div className='space-y-4'>
-      <div className='flex flex-wrap items-center justify-between gap-3'>
+    <section className='overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-gray-800 dark:bg-[#0B1120]'>
+      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-[#111827]/80 sm:px-5'>
         <h2 className='text-lg font-semibold text-slate-800 dark:text-white'>{title}</h2>
         <div className='flex flex-wrap gap-2'>
           <button type='button' onClick={copyContent} className='inline-flex items-center gap-2 rounded-lg border border-slate-200 dark:border-gray-700 px-3 py-2 text-xs font-medium text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-800'>
@@ -63,14 +63,20 @@ const GeneratedOutput = ({ content, title = 'Generated Output', filename = 'fres
           )}
         </div>
       </div>
-      <div className='reset-tw max-h-[560px] overflow-y-auto rounded-xl border border-slate-200 dark:border-gray-800 bg-slate-50 dark:bg-[#0F172A] p-5 text-sm text-slate-700 dark:text-gray-300'>
+      <div className='bg-slate-50 dark:bg-[#0F172A]'>
         {isLatex ? (
-          <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{content}</pre>
+          <pre className='max-h-[310px] overflow-auto whitespace-pre-wrap break-words p-4 font-mono text-xs leading-6 text-slate-800 dark:text-slate-100 sm:p-5 sm:text-sm'>
+            <code>{content}</code>
+          </pre>
         ) : (
-          <ReactMarkdown>{content}</ReactMarkdown>
+          <div className='max-h-[560px] overflow-y-auto p-5 text-sm text-slate-700 dark:text-gray-300'>
+            <div className='reset-tw'>
+              <ReactMarkdown>{content}</ReactMarkdown>
+            </div>
+          </div>
         )}
       </div>
-    </div>
+    </section>
   );
 };
 
