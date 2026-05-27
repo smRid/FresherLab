@@ -177,7 +177,7 @@ const renderCertifications = (certs = []) => {
         const course = escapeLatex(c.course || '')
         const url = sanitizeUrl(c.certificateUrl)
         const certBadge = url ? ` \\href{${url}}{\\textbf{(Certificate)}}` : ''
-        return `    {\\bf ${institution}}${certBadge} -- ${course}.`
+        return `    {\\bf ${institution}}${certBadge} - ${course}.`
     }).join('\n\n')
 
     return `\\vspace{-0.18cm}

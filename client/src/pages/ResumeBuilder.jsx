@@ -3,7 +3,7 @@ import { useAuth } from '@clerk/clerk-react'
 import { api } from '../lib/api'
 import toast from 'react-hot-toast'
 import GeneratedOutput from '../components/GeneratedOutput'
-import { Download, GripVertical, Loader2, Plus, Trash2 } from 'lucide-react'
+import { CheckCircle2, Download, Eye, FileText, GripVertical, Loader2, Plus, Trash2, X } from 'lucide-react'
 
 const SECTION_DEFINITIONS = [
   { key: 'personal', label: 'Personal' },
@@ -21,6 +21,14 @@ const SECTION_DEFINITIONS = [
 
 const DEFAULT_SECTION_ORDER = SECTION_DEFINITIONS.map(section => section.key)
 const SECTION_LABELS = SECTION_DEFINITIONS.reduce((labels, section) => ({ ...labels, [section.key]: section.label }), {})
+const BUILD_STEP_KEY = 'build'
+const STEP_LABELS = { ...SECTION_LABELS, [BUILD_STEP_KEY]: 'Build' }
+const STEP_NAV_LABELS = {
+  ...STEP_LABELS,
+  summary: 'Summary',
+  certifications: 'Training & Cert.',
+  achievements: 'Achievements',
+}
 
 const emptyExperience = { company: '', companyUrl: '', role: '', dates: '', location: '', bullets: '' }
 const emptyProject = { name: '', stack: '', githubUrl: '', liveUrl: '', bullets: '' }
@@ -36,6 +44,7 @@ const ResumeBuilder = () => {
   const [draggingSection, setDraggingSection] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState('')
+  const [previewOpen, setPreviewOpen] = useState(false)
   const { getToken } = useAuth()
 
   const [personal, setPersonal] = useState({
@@ -270,6 +279,80 @@ const ResumeBuilder = () => {
     />
   )
 
+  const buildChecks = [
+    { key: 'personal', label: 'Personal', done: Boolean(personal.fullName.trim()) },
+    { key: 'summary', label: 'Professional Summary', done: Boolean(summary.trim()) },
+    { key: 'experience', label: 'Experience', done: experiences.some(item => hasAnyValue(item, ['company', 'role', 'bullets'])) },
+    { key: 'skills', label: 'Skills', done: Object.values(skills).some(value => String(value || '').trim()) },
+    { key: 'projects', label: 'Projects', done: projects.some(item => hasAnyValue(item, ['name', 'stack', 'bullets'])) },
+    { key: 'certifications', label: 'Training & Certification', done: certifications.some(item => hasAnyValue(item, ['institution', 'course'])) },
+    { key: 'education', label: 'Education', done: educations.some(item => hasAnyValue(item, ['institution', 'degree'])) },
+    { key: 'research', label: 'Research', done: hasAnyValue(research, ['title', 'stack']) },
+    { key: 'achievements', label: 'Achievements', done: Boolean(achievements.trim()) },
+    { key: 'softSkills', label: 'Soft Skills', done: Boolean(softSkills.trim()) },
+    { key: 'languages', label: 'Languages', done: Boolean(languages.trim()) },
+  ]
+  const completedBuildSections = buildChecks.filter(section => section.done).length
+  const buildProfileSummary = [personal.fullName, personal.targetRole]
+    .map(value => String(value || '').trim())
+    .filter(Boolean)
+    .join(' - ') || 'Resume details ready for final build'
+  const resumePreviewHtml = buildResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionOrder, preview: true })
+
+  const buildStep = (
+    <div className='space-y-5'>
+      <div className='rounded-xl border border-slate-200 bg-white p-5 dark:border-gray-800 dark:bg-[#111827]'>
+        <div className='flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between'>
+          <div className='flex items-start gap-3'>
+            <span className='mt-1 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-600/10 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300'>
+              <FileText className='h-5 w-5' />
+            </span>
+            <div>
+              <p className='text-xs font-semibold uppercase text-blue-600 dark:text-blue-300'>Final Step</p>
+              <h2 className='mt-1 text-xl font-semibold text-slate-900 dark:text-white'>Build your resume</h2>
+              <p className='mt-1 text-sm text-slate-500 dark:text-gray-400'>{buildProfileSummary}</p>
+            </div>
+          </div>
+          <div className='rounded-xl border border-slate-200 px-4 py-3 text-left dark:border-gray-700'>
+            <span className='block text-2xl font-bold text-slate-900 dark:text-white'>{completedBuildSections}/{buildChecks.length}</span>
+            <span className='text-xs font-medium text-slate-500 dark:text-gray-400'>sections with content</span>
+          </div>
+        </div>
+
+        <div className='mt-5 grid gap-2 sm:grid-cols-2 2xl:grid-cols-3'>
+          {buildChecks.map(section => (
+            <div key={section.key} className='flex min-h-10 items-center gap-2 rounded-lg bg-slate-50 px-3 text-sm text-slate-600 dark:bg-[#0B1120] dark:text-gray-300'>
+              <CheckCircle2 className={`h-4 w-4 shrink-0 ${section.done ? 'text-emerald-500' : 'text-slate-400 dark:text-gray-600'}`} />
+              <span className='min-w-0 truncate'>{section.label}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className='mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap'>
+          <button type='button' onClick={() => setActiveSection(sectionOrder[sectionOrder.length - 1])}
+            className='rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800'>Back</button>
+          <button type='submit' disabled={loading}
+            className='inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg hover:opacity-90 disabled:opacity-50'>
+            {loading ? <><Loader2 className='h-4 w-4 animate-spin' /> Building LaTeX...</> : <><FileText className='h-4 w-4' /> Generate LaTeX Resume</>}
+          </button>
+          <button type='button' onClick={handleDownloadPdf}
+            className='inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg hover:opacity-90'>
+            <Download className='h-4 w-4' /> Download PDF
+          </button>
+        </div>
+      </div>
+
+      {result && (
+        <div>
+          <GeneratedOutput content={result} title='Your LaTeX Resume' filename={`${(personal.fullName || 'fresherlab').replace(/\s+/g, '_')}_resume`} language='latex' />
+          <p className='mt-3 text-xs text-gray-500 dark:text-gray-400'>
+            Compile with XeLaTeX in <a className='text-blue-500 underline' href='https://www.overleaf.com/' target='_blank' rel='noreferrer'>Overleaf</a>. Requires the <code>resume.cls</code> class file (Trey Hunner template).
+          </p>
+        </div>
+      )}
+    </div>
+  )
+
   const stepContent = {
     personal: personalStep,
     summary: summaryStep,
@@ -282,78 +365,115 @@ const ResumeBuilder = () => {
     achievements: achievementsStep,
     softSkills: softSkillsStep,
     languages: languagesStep,
+    [BUILD_STEP_KEY]: buildStep,
   }
-  const activeIndex = sectionOrder.indexOf(activeSection)
+  const stepOrder = [...sectionOrder, BUILD_STEP_KEY]
+  const activeIndex = stepOrder.indexOf(activeSection)
+  const isBuildStep = activeSection === BUILD_STEP_KEY
+  const resumePreviewPanel = (
+    <aside className='overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-gray-800 dark:bg-[#111827] xl:sticky xl:top-6 xl:self-start'>
+      <div className='flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-gray-800'>
+        <div>
+          <h3 className='text-sm font-semibold text-slate-900 dark:text-white'>Resume Preview</h3>
+          <p className='text-xs text-slate-500 dark:text-gray-400'>Updates from your inputs</p>
+        </div>
+        <button type='button' onClick={() => setPreviewOpen(true)}
+          className='inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-blue-700'>
+          <Eye className='h-3.5 w-3.5' /> View
+        </button>
+      </div>
+      <div className='bg-slate-100 p-2.5 dark:bg-[#0B1120]'>
+        <div className='aspect-[210/297] overflow-hidden rounded-lg border border-slate-200 bg-slate-200 dark:border-gray-700 dark:bg-[#020617]'>
+          <iframe
+            title='Resume preview'
+            srcDoc={resumePreviewHtml}
+            className='h-full w-full border-0 bg-slate-100'
+          />
+        </div>
+      </div>
+    </aside>
+  )
 
   return (
     <div className='h-full overflow-y-scroll p-6 text-slate-700 dark:text-gray-300'>
-      <h1 className='text-2xl font-bold text-slate-800 dark:text-white mb-1'>AI Resume Builder</h1>
-      <p className='text-slate-500 dark:text-gray-400 text-sm mb-6'>Generate a clean LaTeX resume in the Trey-Hunner <code>resume.cls</code> format used by top freshers.</p>
+      <div className='grid w-full gap-5 xl:grid-cols-[minmax(0,1fr)_300px] 2xl:grid-cols-[minmax(0,1fr)_330px]'>
+        <div className='min-w-0'>
+          <h1 className='mb-1 text-2xl font-bold text-slate-800 dark:text-white'>AI Resume Builder</h1>
+          <p className='mb-6 text-sm text-slate-500 dark:text-gray-400'>Generate a clean LaTeX resume in the Trey-Hunner <code>resume.cls</code> format used by top freshers.</p>
 
-      <div className='mb-8 flex w-full max-w-4xl flex-wrap gap-2'>
-        {sectionOrder.map((sectionKey, i) => {
-          const isActive = sectionKey === activeSection
-          return (
-            <button key={sectionKey} type='button' draggable onClick={() => setActiveSection(sectionKey)}
-              onDragStart={(e) => {
-                e.dataTransfer.effectAllowed = 'move'
-                e.dataTransfer.setData('text/plain', sectionKey)
-                setDraggingSection(sectionKey)
-              }}
-              onDragEnd={() => setDraggingSection('')}
-              onDragOver={(e) => {
-                e.preventDefault()
-                e.dataTransfer.dropEffect = 'move'
-              }}
-              onDrop={(e) => {
-                e.preventDefault()
-                moveSection(e.dataTransfer.getData('text/plain') || draggingSection, sectionKey)
-                setDraggingSection('')
-              }}
-              title='Drag to reorder'
-              className={`inline-flex !cursor-grab items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-medium shadow-sm transition active:!cursor-grabbing ${isActive
-                ? 'border-blue-500 bg-blue-600 text-white shadow-blue-600/20'
-                : 'border-slate-200 bg-white text-slate-600 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-blue-500/60 dark:hover:bg-gray-700'
-                } ${draggingSection === sectionKey ? 'opacity-50 ring-2 ring-blue-400' : ''}`}>
-              <GripVertical className='h-3.5 w-3.5 shrink-0 opacity-70' />
-              <span>{i + 1}. {SECTION_LABELS[sectionKey]}</span>
-            </button>
-          )
-        })}
+          <div className='mb-7 grid w-full grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6'>
+            {stepOrder.map((sectionKey, i) => {
+              const isActive = sectionKey === activeSection
+              const isBuildTab = sectionKey === BUILD_STEP_KEY
+              return (
+                <button key={sectionKey} type='button' draggable={!isBuildTab} onClick={() => setActiveSection(sectionKey)}
+                  onDragStart={isBuildTab ? undefined : (e) => {
+                    e.dataTransfer.effectAllowed = 'move'
+                    e.dataTransfer.setData('text/plain', sectionKey)
+                    setDraggingSection(sectionKey)
+                  }}
+                  onDragEnd={isBuildTab ? undefined : () => setDraggingSection('')}
+                  onDragOver={isBuildTab ? undefined : (e) => {
+                    e.preventDefault()
+                    e.dataTransfer.dropEffect = 'move'
+                  }}
+                  onDrop={isBuildTab ? undefined : (e) => {
+                    e.preventDefault()
+                    moveSection(e.dataTransfer.getData('text/plain') || draggingSection, sectionKey)
+                    setDraggingSection('')
+                  }}
+                  title={isBuildTab ? 'Build resume' : 'Drag to reorder'}
+                  className={`flex min-h-11 w-full items-center gap-1.5 rounded-xl border px-2.5 py-2 text-left text-[11px] font-medium leading-snug shadow-sm transition sm:text-xs ${isBuildTab ? '!cursor-pointer' : '!cursor-grab active:!cursor-grabbing'} ${isActive
+                    ? 'border-blue-500 bg-blue-600 text-white shadow-blue-600/20'
+                    : 'border-slate-200 bg-white text-slate-600 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-blue-500/60 dark:hover:bg-gray-700'
+                    } ${draggingSection === sectionKey ? 'opacity-50 ring-2 ring-blue-400' : ''}`}>
+                  {isBuildTab ? <FileText className='h-3.5 w-3.5 shrink-0 opacity-80' /> : <GripVertical className='h-3.5 w-3.5 shrink-0 opacity-70' />}
+                  <span className='min-w-0 truncate'>{i + 1}. {STEP_NAV_LABELS[sectionKey]}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          <form onSubmit={handleSubmit} className='w-full'>
+            {stepContent[activeSection]}
+
+            {!isBuildStep && <div className='mt-6 flex gap-3'>
+              {activeIndex > 0 && (
+                <button type='button' onClick={() => setActiveSection(stepOrder[activeIndex - 1])}
+                  className='rounded-lg border border-gray-300 dark:border-gray-700 px-5 py-2.5 text-sm font-medium text-slate-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'>Back</button>
+              )}
+              {activeIndex < stepOrder.length - 1 && (
+                <button type='button' onClick={() => setActiveSection(stepOrder[activeIndex + 1])}
+                  className='rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700'>Next</button>
+              )}
+            </div>}
+          </form>
+        </div>
+
+        {resumePreviewPanel}
       </div>
 
-      <form onSubmit={handleSubmit} className='w-full max-w-4xl'>
-        {stepContent[activeSection]}
-
-        <div className='mt-6 flex gap-3'>
-          {activeIndex > 0 && (
-            <button type='button' onClick={() => setActiveSection(sectionOrder[activeIndex - 1])}
-              className='rounded-lg border border-gray-300 dark:border-gray-700 px-5 py-2.5 text-sm font-medium text-slate-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'>Back</button>
-          )}
-          {activeIndex < sectionOrder.length - 1 ? (
-            <button type='button' onClick={() => setActiveSection(sectionOrder[activeIndex + 1])}
-              className='rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700'>Next</button>
-          ) : (
-            <>
-              <button type='submit' disabled={loading}
-                className='inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg hover:opacity-90 disabled:opacity-50'>
-                {loading ? <><Loader2 className='h-4 w-4 animate-spin' /> Building LaTeX...</> : 'Generate LaTeX Resume'}
+      {previewOpen && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 p-4 backdrop-blur-sm' onClick={() => setPreviewOpen(false)}>
+          <div className='flex h-[92vh] w-full max-w-[40rem] flex-col overflow-hidden rounded-2xl border border-slate-700 bg-[#0B1120] shadow-2xl' onClick={e => e.stopPropagation()}>
+            <div className='flex items-center justify-between border-b border-slate-800 px-5 py-4'>
+              <div>
+                <h2 className='text-lg font-semibold text-white'>Resume Preview</h2>
+              </div>
+              <button type='button' onClick={() => setPreviewOpen(false)}
+                className='inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white'
+                aria-label='Close preview'>
+                <X className='h-4 w-4' />
               </button>
-              <button type='button' onClick={handleDownloadPdf}
-                className='inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg hover:opacity-90'>
-                <Download className='h-4 w-4' /> Download PDF
-              </button>
-            </>
-          )}
-        </div>
-      </form>
-
-      {result && (
-        <div className='mt-8 max-w-4xl'>
-          <GeneratedOutput content={result} title='Your LaTeX Resume' filename={`${(personal.fullName || 'fresherlab').replace(/\s+/g, '_')}_resume`} language='latex' />
-          <p className='mt-3 text-xs text-gray-500 dark:text-gray-400'>
-            Compile with XeLaTeX in <a className='text-blue-500 underline' href='https://www.overleaf.com/' target='_blank' rel='noreferrer'>Overleaf</a>. Requires the <code>resume.cls</code> class file (Trey Hunner template).
-          </p>
+            </div>
+            <div className='min-h-0 flex-1 overflow-y-auto bg-slate-200 p-4 dark:bg-[#020617]'>
+              <iframe
+                title='Large resume preview'
+                srcDoc={buildResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionOrder, preview: true, previewFit: 'width' })}
+                className='aspect-[210/297] w-full rounded-xl border-0 bg-slate-100'
+              />
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -393,7 +513,7 @@ const renderBullets = (bullets) => {
   return `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
 }
 
-const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills = {}, projects = [], certifications = [], educations = [], research = {}, achievements = '', softSkills = '', languages = '', sectionOrder = DEFAULT_SECTION_ORDER }) => {
+const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills = {}, projects = [], certifications = [], educations = [], research = {}, achievements = '', softSkills = '', languages = '', sectionOrder = DEFAULT_SECTION_ORDER, preview = false, previewFit = 'contain' }) => {
   const contact = [
     personal.phone && `<a href="tel:${escapeHtml(personal.phone)}">${escapeHtml(personal.phone)}</a>`,
     personal.email && `<a href="mailto:${escapeHtml(personal.email)}">${escapeHtml(personal.email)}</a>`,
@@ -455,7 +575,7 @@ const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills
   const certificationContent = (certifications || [])
     .filter(item => hasAnyValue(item, ['institution', 'course']))
     .map(item => `
-      <p class="line-item"><strong>${escapeHtml(item.institution)}</strong>${item.certificateUrl ? ` ${renderExternalLink(item.certificateUrl, '(Certificate)')}` : ''} -- ${escapeHtml(item.course)}</p>
+      <p class="line-item"><strong>${escapeHtml(item.institution)}</strong>${item.certificateUrl ? ` ${renderExternalLink(item.certificateUrl, '(Certificate)')}` : ''} - ${escapeHtml(item.course)}</p>
     `).join('')
 
   const educationContent = (educations || [])
@@ -496,6 +616,36 @@ const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills
     .map(key => resumeSections[key])
     .filter(Boolean)
     .join('')
+  const isWidthFitPreview = previewFit === 'width'
+  const previewStyles = preview ? `
+    html, body.preview-body { height: 100%; }
+    body.preview-body { align-items: ${isWidthFitPreview ? 'flex-start' : 'center'}; background: #e2e8f0; display: flex; justify-content: center; overflow: hidden; padding: 10px; }
+    body.preview-body .pdf-viewport { height: 100%; position: relative; width: 100%; }
+    body.preview-body .pdf-shell { height: 11.69in; left: 50%; position: absolute; top: ${isWidthFitPreview ? '0' : '50%'}; transform-origin: ${isWidthFitPreview ? 'top center' : 'center center'}; width: 8.27in; }
+    body.preview-body .resume { background: #ffffff; box-shadow: 0 14px 30px rgba(15, 23, 42, 0.24); height: 11.69in; margin: 0; max-width: none; overflow: hidden; padding: 0.55in 0.7in; width: 8.27in; }
+  ` : ''
+  const previewScript = preview ? `
+  <script>
+    const fitResumePage = () => {
+      const viewport = document.querySelector('.pdf-viewport');
+      const shell = document.querySelector('.pdf-shell');
+      if (!viewport || !shell) return;
+
+      const pageWidth = 8.27 * 96;
+      const pageHeight = 11.69 * 96;
+      const availableWidth = Math.max(220, document.documentElement.clientWidth - 20);
+      const availableHeight = Math.max(300, document.documentElement.clientHeight - 20);
+      const scale = ${isWidthFitPreview ? 'Math.min(1, availableWidth / pageWidth)' : 'Math.min(availableWidth / pageWidth, availableHeight / pageHeight)'};
+
+      shell.style.transform = '${isWidthFitPreview ? 'translateX(-50%)' : 'translate(-50%, -50%)'} scale(' + scale + ')';
+      viewport.style.height = Math.ceil(pageHeight * scale) + 'px';
+    };
+
+    window.addEventListener('load', fitResumePage);
+    window.addEventListener('resize', fitResumePage);
+    requestAnimationFrame(fitResumePage);
+  </script>
+  ` : ''
 
   return `<!doctype html>
 <html>
@@ -523,12 +673,14 @@ const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills
     li { margin-bottom: 2px; }
     .compact-list { margin-top: 2px; }
     .line-item { margin: 4px 0; }
+    ${previewStyles}
     @media print {
       body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
     }
   </style>
 </head>
-<body>
+<body${preview ? ' class="preview-body"' : ''}>
+  ${preview ? '<div class="pdf-viewport"><div class="pdf-shell">' : ''}
   <main class="resume">
     <header class="header">
       <h1>${escapeHtml(personal.fullName)}</h1>
@@ -539,6 +691,8 @@ const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills
     </header>
     ${orderedSections}
   </main>
+  ${preview ? '</div></div>' : ''}
+  ${previewScript}
 </body>
 </html>`
 }
