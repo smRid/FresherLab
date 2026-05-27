@@ -41,13 +41,14 @@ const Hero = () => {
                                 Start Free
                                 <ArrowRight className='h-4 w-4' />
                             </button>
-                            <a
-                                href="#tools"
+                            <button
+                                type="button"
+                                onClick={() => navigate('/ai')}
                                 className='inline-flex items-center justify-center gap-2 rounded-xl border border-white/[0.15] bg-white/[0.08] px-6 py-3.5 text-sm font-semibold text-white backdrop-blur transition hover:-translate-y-0.5 hover:border-cyan-300/50 hover:bg-white/[0.12]'
                             >
                                 <BriefcaseBusiness className='h-4 w-4' />
                                 Open Dashboard
-                            </a>
+                            </button>
                         </div>
 
                         <div className='mt-9 flex flex-col gap-3 text-sm text-slate-300 sm:flex-row sm:flex-wrap sm:gap-x-6 sm:gap-y-3 lg:flex-nowrap'>
