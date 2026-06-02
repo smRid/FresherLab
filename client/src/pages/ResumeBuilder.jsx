@@ -112,6 +112,76 @@ const DUMMY_RESUME_PREVIEW_DATA = {
   sectionOrder: ['summary', 'experience', 'skills', 'projects', 'education', 'certifications', 'achievements', 'softSkills', 'languages'],
 }
 
+const getTemplatePreviewData = (templateId) => {
+  const base = {
+    ...DUMMY_RESUME_PREVIEW_DATA,
+    projects: DUMMY_RESUME_PREVIEW_DATA.projects.map(project => ({ ...project })),
+    certifications: DUMMY_RESUME_PREVIEW_DATA.certifications.map(certification => ({ ...certification })),
+    educations: DUMMY_RESUME_PREVIEW_DATA.educations.map(education => ({ ...education })),
+  }
+
+  if (templateId === 'classic') return { ...base, softSkills: '' }
+
+  if (templateId === 'sample3') {
+    return {
+      ...base,
+      experiences: [
+        ...base.experiences,
+        {
+          company: 'PeoplePerHour',
+          role: 'Freelance Web Developer',
+          dates: 'January 2024 - Present',
+          location: 'Remote',
+          bullets: 'Delivered CMS and frontend customization projects for international clients.\nOptimized responsive layouts, SEO basics, and website performance for small businesses.',
+        },
+      ],
+      projects: [
+        ...base.projects,
+        {
+          name: 'QuietHub Workspace',
+          stack: 'Next.js, Express.js, MongoDB, JWT',
+          liveUrl: 'https://quiethub.example.com',
+          githubUrl: 'https://github.com/alexrahman/quiethub',
+          bullets: 'Built workspace search, booking, and host listing features.\nPrevented overlapping bookings with real-time validation and protected routes.',
+        },
+      ],
+      achievements: 'Delivered 12 client-ready web projects\nMaintained a full-stack portfolio with live demos\nImproved API integration and deployment workflows',
+    }
+  }
+
+  if (templateId === 'sample4') {
+    return {
+      ...base,
+      summary: 'Result-oriented junior developer with strong programming and problem-solving skills, seeking to apply practical React, Node.js, database, and deployment knowledge to build reliable software products while continuing to grow in the software engineering domain.',
+      projects: [
+        ...base.projects,
+        {
+          name: 'Expense Tracker System',
+          stack: 'MERN, Chart.js, JWT',
+          liveUrl: 'https://expense-tracker.example.com',
+          githubUrl: 'https://github.com/alexrahman/expense-tracker',
+          bullets: 'Developed a MERN-based system for tracking income, expenses, categories, and monthly summaries with clean dashboard charts.',
+        },
+        {
+          name: 'Restaurant Booking App',
+          stack: 'React, Firebase, Tailwind CSS',
+          liveUrl: 'https://restaurant-booking.example.com',
+          githubUrl: 'https://github.com/alexrahman/restaurant-booking',
+          bullets: 'Created a responsive restaurant app with menu browsing, table booking, customer reviews, and Firebase-powered updates.',
+        },
+      ],
+      educations: [
+        ...base.educations,
+        { institution: 'City Science College', degree: 'Higher Secondary Certificate', dates: '2018 - 2020', grade: 'GPA 5.00 / 5.00' },
+        { institution: 'Model School and College', degree: 'Secondary School Certificate', dates: '2016 - 2018', grade: 'GPA 5.00 / 5.00' },
+      ],
+      research: { title: 'Skin Cancer Classification Using Dermoscopic Images with Explainable AI', stack: 'Deep Learning, CNN, Explainable AI' },
+    }
+  }
+
+  return base
+}
+
 const emptyExperience = { company: '', companyUrl: '', role: '', dates: '', location: '', bullets: '' }
 const emptyProject = { name: '', stack: '', githubUrl: '', liveUrl: '', bullets: '' }
 const emptyCertification = { institution: '', course: '', certificateUrl: '' }
@@ -232,8 +302,7 @@ const ResumeBuilder = () => {
                   <iframe
                     title={`${template.name} preview`}
                     srcDoc={buildResumeHtml({
-                      ...DUMMY_RESUME_PREVIEW_DATA,
-                      softSkills: template.id === 'classic' ? '' : DUMMY_RESUME_PREVIEW_DATA.softSkills,
+                      ...getTemplatePreviewData(template.id),
                       template: template.id,
                       preview: true,
                     })}
@@ -1220,10 +1289,9 @@ const buildSample4ResumeHtml = ({ personal = {}, summary = '', experiences = [],
     [renderExternalLink(personal.linkedinUrl, 'LinkedIn'), renderExternalLink(personal.githubUrl, 'GitHub')].filter(Boolean).join(' <span>|</span> '),
   ].filter(Boolean).map(item => item.startsWith('<p') ? item : `<p>${item}</p>`).join('')
 
-  const objectiveText = String(summary || '').trim()
-    ? summary
-    : `${personal.targetRole || 'Result-oriented developer'} with good programming and problem-solving skills, eager to acquire additional knowledge and utilize technical strengths to explore the software engineering domain successfully.`
-  const objectiveContent = `<p class="s4-paragraph">${escapeHtml(objectiveText).replace(/\r?\n/g, '<br />')}</p>`
+  const objectiveContent = String(summary || '').trim()
+    ? `<p class="s4-paragraph">${escapeHtml(summary).replace(/\r?\n/g, '<br />')}</p>`
+    : ''
 
   const skillItems = [
     skills.languages && ['Programming Languages', skills.languages],
@@ -1302,7 +1370,7 @@ const buildSample4ResumeHtml = ({ personal = {}, summary = '', experiences = [],
   <style>
     @page { size: A4; margin: 0.45in 0.5in; }
     * { box-sizing: border-box; }
-    body { margin: 0; background: #ffffff; color: #111827; font-family: Calibri, Arial, sans-serif; font-size: 10.2pt; line-height: 1.28; }
+    body { margin: 0; background: #ffffff; color: #111827; font-family: Calibri, Arial, sans-serif; font-size: 9.6pt; line-height: 1.22; }
     .resume { max-width: 8.27in; margin: 0 auto; }
     .s4-header { display: grid; grid-template-columns: minmax(0, 1fr) 2.3in; gap: 18px; margin-bottom: 10px; }
     .s4-header h1 { color: #473a92; font-size: 21pt; line-height: 1.1; margin: 0; }
@@ -1310,11 +1378,11 @@ const buildSample4ResumeHtml = ({ personal = {}, summary = '', experiences = [],
     .s4-contact p { margin: 2px 0; }
     .s4-contact span { color: #4f46e5; padding: 0 4px; }
     a { color: #2563eb; text-decoration: none; }
-    .s4-section { margin-top: 11px; }
-    .s4-section h2 { color: #548dd4; font-size: 13pt; line-height: 1.1; margin: 0 0 5px; text-transform: capitalize; }
-    .s4-paragraph, .s4-project, .s4-line, .s4-skills p { margin: 4px 0; text-align: justify; text-align-last: left; }
+    .s4-section { margin-top: 8px; }
+    .s4-section h2 { color: #548dd4; font-size: 12pt; line-height: 1.1; margin: 0 0 4px; text-transform: capitalize; }
+    .s4-paragraph, .s4-project, .s4-line, .s4-skills p { margin: 3px 0; text-align: justify; text-align-last: left; }
     .s4-project strong { font-weight: 700; }
-    .s4-education { margin-bottom: 7px; position: relative; }
+    .s4-education { margin-bottom: 5px; position: relative; }
     .s4-education strong { display: inline-block; }
     .s4-education span { float: right; }
     .s4-education p { clear: both; margin: 2px 0 0; }
