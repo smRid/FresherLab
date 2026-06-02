@@ -179,6 +179,16 @@ const ResumeBuilder = () => {
   const removeArrayItem = (setter) => (index) => {
     setter(prev => prev.length === 1 ? prev : prev.filter((_, i) => i !== index))
   }
+  const sectionHeaderEditor = (sectionKey) => (
+    <div className='rounded-xl border border-slate-200 bg-white p-4 dark:border-gray-800 dark:bg-[#111827]'>
+      <Field
+        label='Section Header'
+        value={sectionTitles[sectionKey] || ''}
+        onChange={value => setSectionTitles(prev => ({ ...prev, [sectionKey]: value }))}
+        placeholder={DEFAULT_RESUME_SECTION_TITLES[sectionKey] || SECTION_LABELS[sectionKey]}
+      />
+    </div>
+  )
   const moveSection = (sourceKey, targetKey) => {
     if (!sourceKey || !targetKey || sourceKey === targetKey) return
     if (FIXED_STEP_KEYS.has(sourceKey) || FIXED_STEP_KEYS.has(targetKey)) return
@@ -355,8 +365,9 @@ const ResumeBuilder = () => {
   // Professional Summary step
   const summaryStep = (
     <div className='space-y-4'>
+      {sectionHeaderEditor('summary')}
       <TextareaField
-        label='Professional Summary'
+        label='Content'
         value={summary}
         onChange={setSummary}
         rows={5}
@@ -368,7 +379,9 @@ const ResumeBuilder = () => {
 
   // Experience step
   const experienceStep = (
-    <ArraySection title='Work Experience' items={experiences} onAdd={addArrayItem(setExperiences, emptyExperience)} onRemove={removeArrayItem(setExperiences)} renderItem={(exp, idx) => (
+    <div className='space-y-4'>
+      {sectionHeaderEditor('experience')}
+      <ArraySection title={sectionTitles.experience || DEFAULT_RESUME_SECTION_TITLES.experience} items={experiences} onAdd={addArrayItem(setExperiences, emptyExperience)} onRemove={removeArrayItem(setExperiences)} renderItem={(exp, idx) => (
       <>
         <div className='grid grid-cols-2 gap-3'>
           <Field label='Company *' value={exp.company} onChange={v => updateArrayItem(setExperiences)(idx, 'company', v)} placeholder='TechNova Solutions' />
@@ -382,12 +395,14 @@ const ResumeBuilder = () => {
         <TextareaField label='Bullets' value={exp.bullets} onChange={v => updateArrayItem(setExperiences)(idx, 'bullets', v)} rows={4}
           placeholder={'Built reusable React components for customer dashboard\nIntegrated REST APIs and handled client-side validation\nImproved page load performance by optimizing assets'} />
       </>
-    )} />
+      )} />
+    </div>
   )
 
   // Skills step
   const skillsStep = (
     <div className='space-y-4'>
+      {sectionHeaderEditor('skills')}
       <Field label='Programming Languages' value={skills.languages} onChange={v => setSkills({ ...skills, languages: v })} placeholder='JavaScript, TypeScript, Python, SQL' />
       <Field label='Frameworks' value={skills.frameworks} onChange={v => setSkills({ ...skills, frameworks: v })} placeholder='React, Express.js, Next.js, Tailwind CSS' />
       <Field label='Databases' value={skills.databases} onChange={v => setSkills({ ...skills, databases: v })} placeholder='PostgreSQL, MongoDB, Firebase' />
@@ -397,7 +412,9 @@ const ResumeBuilder = () => {
 
   // Projects step
   const projectsStep = (
-    <ArraySection title='Personal Projects' items={projects} onAdd={addArrayItem(setProjects, emptyProject)} onRemove={removeArrayItem(setProjects)} renderItem={(p, idx) => (
+    <div className='space-y-4'>
+      {sectionHeaderEditor('projects')}
+      <ArraySection title={sectionTitles.projects || DEFAULT_RESUME_SECTION_TITLES.projects} items={projects} onAdd={addArrayItem(setProjects, emptyProject)} onRemove={removeArrayItem(setProjects)} renderItem={(p, idx) => (
       <>
         <div className='grid grid-cols-2 gap-3'>
           <Field label='Project Name *' value={p.name} onChange={v => updateArrayItem(setProjects)(idx, 'name', v)} placeholder='Task Management Platform' />
@@ -410,12 +427,15 @@ const ResumeBuilder = () => {
         <TextareaField label='Bullets' value={p.bullets} onChange={v => updateArrayItem(setProjects)(idx, 'bullets', v)} rows={3}
           placeholder={'Created task boards with drag-and-drop workflow\nImplemented JWT authentication and protected API routes\nDesigned responsive UI for desktop and mobile users'} />
       </>
-    )} />
+      )} />
+    </div>
   )
 
   // Certifications step
   const certificationsStep = (
-    <ArraySection title='Training & Certification' items={certifications} onAdd={addArrayItem(setCertifications, emptyCertification)} onRemove={removeArrayItem(setCertifications)} renderItem={(c, idx) => (
+    <div className='space-y-4'>
+      {sectionHeaderEditor('certifications')}
+      <ArraySection title={sectionTitles.certifications || DEFAULT_RESUME_SECTION_TITLES.certifications} items={certifications} onAdd={addArrayItem(setCertifications, emptyCertification)} onRemove={removeArrayItem(setCertifications)} renderItem={(c, idx) => (
       <>
         <div className='grid grid-cols-2 gap-3'>
           <Field label='Institution' value={c.institution} onChange={v => updateArrayItem(setCertifications)(idx, 'institution', v)} placeholder='Coursera' />
@@ -423,12 +443,15 @@ const ResumeBuilder = () => {
         </div>
         <Field label='Certificate URL' value={c.certificateUrl} onChange={v => updateArrayItem(setCertifications)(idx, 'certificateUrl', v)} placeholder='https://coursera.org/verify/example-id' />
       </>
-    )} />
+      )} />
+    </div>
   )
 
   // Education step
   const educationStep = (
-    <ArraySection title='Education' items={educations} onAdd={addArrayItem(setEducations, emptyEducation)} onRemove={removeArrayItem(setEducations)} renderItem={(e, idx) => (
+    <div className='space-y-4'>
+      {sectionHeaderEditor('education')}
+      <ArraySection title={sectionTitles.education || DEFAULT_RESUME_SECTION_TITLES.education} items={educations} onAdd={addArrayItem(setEducations, emptyEducation)} onRemove={removeArrayItem(setEducations)} renderItem={(e, idx) => (
       <>
         <div className='grid grid-cols-2 gap-3'>
           <Field label='Institution' value={e.institution} onChange={v => updateArrayItem(setEducations)(idx, 'institution', v)} placeholder='State University' />
@@ -439,12 +462,14 @@ const ResumeBuilder = () => {
           <Field label='Grade (CGPA/GPA)' value={e.grade} onChange={v => updateArrayItem(setEducations)(idx, 'grade', v)} placeholder='GPA 3.7 / 4.0' />
         </div>
       </>
-    )} />
+      )} />
+    </div>
   )
 
   // Research step
   const researchStep = (
     <div className='space-y-4'>
+      {sectionHeaderEditor('research')}
       <Field label='Research Title (optional)' value={research.title} onChange={v => setResearch({ ...research, title: v })}
         placeholder='Optimizing Neural Networks for Real-Time Image Classification' />
       <Field label='Tech / Methods (optional)' value={research.stack} onChange={v => setResearch({ ...research, stack: v })}
@@ -455,32 +480,41 @@ const ResumeBuilder = () => {
 
   // Achievements step
   const achievementsStep = (
-    <BulletTextareaStep
-      label='Achievements'
-      value={achievements}
-      onChange={setAchievements}
-      placeholder={'Won 1st place in university hackathon\nCompleted 100+ DSA problems on LeetCode\nSelected as team lead for final-year project'}
-    />
+    <div className='space-y-4'>
+      {sectionHeaderEditor('achievements')}
+      <BulletTextareaStep
+        label='Items'
+        value={achievements}
+        onChange={setAchievements}
+        placeholder={'Won 1st place in university hackathon\nCompleted 100+ DSA problems on LeetCode\nSelected as team lead for final-year project'}
+      />
+    </div>
   )
 
   // Soft Skills step
   const softSkillsStep = (
-    <BulletTextareaStep
-      label='Soft Skills'
-      value={softSkills}
-      onChange={setSoftSkills}
-      placeholder={'Communication\nTeam collaboration\nProblem solving\nTime management'}
-    />
+    <div className='space-y-4'>
+      {sectionHeaderEditor('softSkills')}
+      <BulletTextareaStep
+        label='Items'
+        value={softSkills}
+        onChange={setSoftSkills}
+        placeholder={'Communication\nTeam collaboration\nProblem solving\nTime management'}
+      />
+    </div>
   )
 
   // Languages step
   const languagesStep = (
-    <BulletTextareaStep
-      label='Languages'
-      value={languages}
-      onChange={setLanguages}
-      placeholder={'English - Professional working proficiency\nBangla - Native\nHindi - Conversational'}
-    />
+    <div className='space-y-4'>
+      {sectionHeaderEditor('languages')}
+      <BulletTextareaStep
+        label='Items'
+        value={languages}
+        onChange={setLanguages}
+        placeholder={'English - Professional working proficiency\nBangla - Native\nHindi - Conversational'}
+      />
+    </div>
   )
 
   const buildChecks = [
