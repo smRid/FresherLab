@@ -34,18 +34,15 @@ const STEP_NAV_LABELS = {
 const RESUME_TEMPLATES = [
   {
     id: 'classic',
-    name: 'Classic ATS',
-    description: 'Clean single-page style with centered header and traditional section rules.',
+    name: 'Resume Sample 1',
   },
   {
     id: 'sample2',
-    name: 'Sample 2',
-    description: 'Compact teal-heading resume inspired by RESUME_Sample_2.pdf.',
+    name: 'Resume Sample 2',
   },
   {
     id: 'sample3',
-    name: 'Sample 3',
-    description: 'Google Docs-style full-stack resume inspired by RESUME_Sample_3.pdf.',
+    name: 'Resume Sample 3',
   },
 ]
 
@@ -230,7 +227,12 @@ const ResumeBuilder = () => {
                 <div className='mx-auto aspect-[210/297] h-[21rem] max-w-full overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-gray-700'>
                   <iframe
                     title={`${template.name} preview`}
-                    srcDoc={buildResumeHtml({ ...DUMMY_RESUME_PREVIEW_DATA, template: template.id, preview: true })}
+                    srcDoc={buildResumeHtml({
+                      ...DUMMY_RESUME_PREVIEW_DATA,
+                      softSkills: template.id === 'classic' ? '' : DUMMY_RESUME_PREVIEW_DATA.softSkills,
+                      template: template.id,
+                      preview: true,
+                    })}
                     className='h-full w-full border-0 bg-white'
                   />
                 </div>
@@ -239,7 +241,6 @@ const ResumeBuilder = () => {
                 <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
                   <div>
                     <h2 className='text-lg font-semibold text-slate-900 dark:text-white'>{template.name}</h2>
-                    <p className='mt-1 text-sm text-slate-500 dark:text-gray-400'>{template.description}</p>
                   </div>
                   <button type='button' onClick={() => setSelectedTemplate(template.id)}
                     className='shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700'>
