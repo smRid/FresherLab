@@ -21,6 +21,18 @@ const SECTION_DEFINITIONS = [
 
 const DEFAULT_SECTION_ORDER = SECTION_DEFINITIONS.map(section => section.key)
 const SECTION_LABELS = SECTION_DEFINITIONS.reduce((labels, section) => ({ ...labels, [section.key]: section.label }), {})
+const DEFAULT_RESUME_SECTION_TITLES = {
+  summary: 'Professional Summary',
+  experience: 'Work Experience',
+  skills: 'Skills',
+  projects: 'Projects',
+  certifications: 'Training & Certification',
+  education: 'Education',
+  research: 'Research Experience',
+  achievements: 'Achievements',
+  softSkills: 'Soft Skills',
+  languages: 'Languages',
+}
 const BUILD_STEP_KEY = 'build'
 const FIXED_STEP_KEYS = new Set(['personal', BUILD_STEP_KEY])
 const STEP_LABELS = { ...SECTION_LABELS, [BUILD_STEP_KEY]: 'Build' }
@@ -136,6 +148,7 @@ const ResumeBuilder = () => {
   const [selectedTemplate, setSelectedTemplate] = useState('')
   const [activeSection, setActiveSection] = useState(DEFAULT_SECTION_ORDER[0])
   const [sectionOrder, setSectionOrder] = useState(DEFAULT_SECTION_ORDER)
+  const [sectionTitles, setSectionTitles] = useState(DEFAULT_RESUME_SECTION_TITLES)
   const [draggingSection, setDraggingSection] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState('')
@@ -201,6 +214,7 @@ const ResumeBuilder = () => {
         softSkills,
         languages,
         sectionOrder,
+        sectionTitles,
         template: selectedTemplate,
       }
       const { data } = await api.post('/api/ai/resume-builder', payload, {
@@ -218,7 +232,7 @@ const ResumeBuilder = () => {
     const pdfWindow = window.open('', '_blank')
     if (!pdfWindow) return toast.error('Please allow popups to download PDF')
 
-    const html = buildResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionOrder, template: selectedTemplate })
+    const html = buildResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionOrder, sectionTitles, template: selectedTemplate })
     pdfWindow.document.open()
     pdfWindow.document.write(html)
     pdfWindow.document.close()
@@ -482,7 +496,7 @@ const ResumeBuilder = () => {
     { key: 'softSkills', label: 'Soft Skills', done: Boolean(softSkills.trim()) },
     { key: 'languages', label: 'Languages', done: Boolean(languages.trim()) },
   ]
-  const resumePreviewHtml = buildResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionOrder, template: selectedTemplate, preview: true })
+  const resumePreviewHtml = buildResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionOrder, sectionTitles, template: selectedTemplate, preview: true })
 
   const buildStep = (
     <div className='space-y-5'>
@@ -507,6 +521,21 @@ const ResumeBuilder = () => {
               <span className='min-w-0 truncate'>{section.label}</span>
             </button>
           ))}
+        </div>
+
+        <div className='mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-gray-800 dark:bg-[#0B1120]'>
+          <h3 className='mb-3 text-sm font-semibold text-slate-800 dark:text-white'>Edit section headers</h3>
+          <div className='grid gap-3 sm:grid-cols-2 xl:grid-cols-3'>
+            {DEFAULT_SECTION_ORDER.filter(sectionKey => sectionKey !== 'personal').map(sectionKey => (
+              <Field
+                key={sectionKey}
+                label={STEP_NAV_LABELS[sectionKey]}
+                value={sectionTitles[sectionKey] || ''}
+                onChange={value => setSectionTitles(prev => ({ ...prev, [sectionKey]: value }))}
+                placeholder={DEFAULT_RESUME_SECTION_TITLES[sectionKey] || SECTION_LABELS[sectionKey]}
+              />
+            ))}
+          </div>
         </div>
 
         <div className='mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap'>
@@ -654,7 +683,7 @@ const ResumeBuilder = () => {
             <div className='min-h-0 flex-1 overflow-y-auto bg-slate-200 p-4 dark:bg-[#020617]'>
               <iframe
                 title='Large resume preview'
-                srcDoc={buildResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionOrder, template: selectedTemplate, preview: true, previewFit: 'width' })}
+                srcDoc={buildResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionOrder, sectionTitles, template: selectedTemplate, preview: true, previewFit: 'width' })}
                 className='aspect-[210/297] w-full rounded-xl border-0 bg-slate-100'
               />
             </div>
@@ -692,21 +721,26 @@ const renderSection = (title, content) => content ? `
   </section>
 ` : ''
 
+const sectionTitle = (sectionTitles = {}, key, fallback) => {
+  const customTitle = String(sectionTitles?.[key] || '').trim()
+  return customTitle || fallback
+}
+
 const renderBullets = (bullets) => {
   const items = splitLines(bullets)
   if (!items.length) return ''
   return `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
 }
 
-const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills = {}, projects = [], certifications = [], educations = [], research = {}, achievements = '', softSkills = '', languages = '', sectionOrder = DEFAULT_SECTION_ORDER, template = 'classic', preview = false, previewFit = 'contain' }) => {
+const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills = {}, projects = [], certifications = [], educations = [], research = {}, achievements = '', softSkills = '', languages = '', sectionOrder = DEFAULT_SECTION_ORDER, sectionTitles = DEFAULT_RESUME_SECTION_TITLES, template = 'classic', preview = false, previewFit = 'contain' }) => {
   if (template === 'sample2') {
-    return buildSample2ResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionOrder, preview, previewFit })
+    return buildSample2ResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionOrder, sectionTitles, preview, previewFit })
   }
   if (template === 'sample3') {
-    return buildSample3ResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, preview, previewFit })
+    return buildSample3ResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionTitles, preview, previewFit })
   }
   if (template === 'sample4') {
-    return buildSample4ResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, preview, previewFit })
+    return buildSample4ResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, sectionTitles, preview, previewFit })
   }
 
   const contact = [
@@ -795,16 +829,16 @@ const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills
   const softSkillsContent = renderBullets(softSkills)
   const languagesContent = renderBullets(languages)
   const resumeSections = {
-    summary: renderSection('Professional Summary', summaryContent),
-    experience: renderSection('Work Experience', experienceContent),
-    skills: renderSection('Technical Skills', skillsContent),
-    projects: renderSection('Personal Projects', projectContent),
-    certifications: renderSection('Training & Certification', certificationContent),
-    education: renderSection('Education', educationContent),
-    research: renderSection('Research Experience', researchContent),
-    achievements: renderSection('Achievements', achievementsContent),
-    softSkills: renderSection('Soft Skills', softSkillsContent),
-    languages: renderSection('Languages', languagesContent),
+    summary: renderSection(sectionTitle(sectionTitles, 'summary', 'Professional Summary'), summaryContent),
+    experience: renderSection(sectionTitle(sectionTitles, 'experience', 'Work Experience'), experienceContent),
+    skills: renderSection(sectionTitle(sectionTitles, 'skills', 'Technical Skills'), skillsContent),
+    projects: renderSection(sectionTitle(sectionTitles, 'projects', 'Personal Projects'), projectContent),
+    certifications: renderSection(sectionTitle(sectionTitles, 'certifications', 'Training & Certification'), certificationContent),
+    education: renderSection(sectionTitle(sectionTitles, 'education', 'Education'), educationContent),
+    research: renderSection(sectionTitle(sectionTitles, 'research', 'Research Experience'), researchContent),
+    achievements: renderSection(sectionTitle(sectionTitles, 'achievements', 'Achievements'), achievementsContent),
+    softSkills: renderSection(sectionTitle(sectionTitles, 'softSkills', 'Soft Skills'), softSkillsContent),
+    languages: renderSection(sectionTitle(sectionTitles, 'languages', 'Languages'), languagesContent),
   }
   const requestedOrder = Array.isArray(sectionOrder) && sectionOrder.length ? sectionOrder : DEFAULT_SECTION_ORDER
   const orderedSections = [...requestedOrder, ...DEFAULT_SECTION_ORDER.filter(key => !requestedOrder.includes(key))]
@@ -900,7 +934,7 @@ const renderSample2Section = (title, content) => content ? `
   </section>
 ` : ''
 
-const buildSample2ResumeHtml = ({ personal = {}, summary = '', experiences = [], skills = {}, projects = [], certifications = [], educations = [], research = {}, achievements = '', softSkills = '', languages = '', sectionOrder = DEFAULT_SECTION_ORDER, preview = false, previewFit = 'contain' }) => {
+const buildSample2ResumeHtml = ({ personal = {}, summary = '', experiences = [], skills = {}, projects = [], certifications = [], educations = [], research = {}, achievements = '', softSkills = '', languages = '', sectionOrder = DEFAULT_SECTION_ORDER, sectionTitles = DEFAULT_RESUME_SECTION_TITLES, preview = false, previewFit = 'contain' }) => {
   const contactRows = [
     personal.email && `<div><strong>Gmail :</strong> <a class="email-link" href="mailto:${escapeHtml(personal.email)}">${escapeHtml(personal.email)}</a></div>`,
     personal.phone && `<div><strong>Phone :</strong> ${escapeHtml(personal.phone)}</div>`,
@@ -983,16 +1017,16 @@ const buildSample2ResumeHtml = ({ personal = {}, summary = '', experiences = [],
   const softSkillsContent = renderBullets(softSkills)
   const languagesContent = renderBullets(languages)
   const resumeSections = {
-    summary: renderSample2Section('Professional Summary', summaryContent),
-    experience: renderSample2Section('Work Experience', experienceContent),
-    skills: renderSample2Section('Skills', skillsContent),
-    projects: renderSample2Section('Projects', projectContent),
-    education: renderSample2Section('Educational Qualification', educationContent),
-    certifications: renderSample2Section('Training & Certification', certificationContent),
-    research: renderSample2Section('Research Experience', researchContent),
-    achievements: renderSample2Section('Achievements', achievementsContent),
-    softSkills: renderSample2Section('Soft Skills', softSkillsContent),
-    languages: renderSample2Section('Languages', languagesContent),
+    summary: renderSample2Section(sectionTitle(sectionTitles, 'summary', 'Professional Summary'), summaryContent),
+    experience: renderSample2Section(sectionTitle(sectionTitles, 'experience', 'Work Experience'), experienceContent),
+    skills: renderSample2Section(sectionTitle(sectionTitles, 'skills', 'Skills'), skillsContent),
+    projects: renderSample2Section(sectionTitle(sectionTitles, 'projects', 'Projects'), projectContent),
+    education: renderSample2Section(sectionTitle(sectionTitles, 'education', 'Educational Qualification'), educationContent),
+    certifications: renderSample2Section(sectionTitle(sectionTitles, 'certifications', 'Training & Certification'), certificationContent),
+    research: renderSample2Section(sectionTitle(sectionTitles, 'research', 'Research Experience'), researchContent),
+    achievements: renderSample2Section(sectionTitle(sectionTitles, 'achievements', 'Achievements'), achievementsContent),
+    softSkills: renderSample2Section(sectionTitle(sectionTitles, 'softSkills', 'Soft Skills'), softSkillsContent),
+    languages: renderSample2Section(sectionTitle(sectionTitles, 'languages', 'Languages'), languagesContent),
   }
   const requestedOrder = Array.isArray(sectionOrder) && sectionOrder.length ? sectionOrder : DEFAULT_SECTION_ORDER
   const orderedSections = [...requestedOrder, ...DEFAULT_SECTION_ORDER.filter(key => !requestedOrder.includes(key))]
@@ -1091,7 +1125,7 @@ const renderSample3Section = (title, content) => content ? `
   </section>
 ` : ''
 
-const buildSample3ResumeHtml = ({ personal = {}, summary = '', experiences = [], skills = {}, projects = [], certifications = [], educations = [], achievements = '', softSkills = '', languages = '', preview = false, previewFit = 'contain' }) => {
+const buildSample3ResumeHtml = ({ personal = {}, summary = '', experiences = [], skills = {}, projects = [], certifications = [], educations = [], achievements = '', softSkills = '', languages = '', sectionTitles = DEFAULT_RESUME_SECTION_TITLES, preview = false, previewFit = 'contain' }) => {
   const contact = [
     personal.phone && `Phone: ${escapeHtml(personal.phone)}`,
     personal.email && `Email: <a href="mailto:${escapeHtml(personal.email)}">${escapeHtml(personal.email)}</a>`,
@@ -1159,12 +1193,6 @@ const buildSample3ResumeHtml = ({ personal = {}, summary = '', experiences = [],
         <span>${escapeHtml(item.institution)}${item.dates ? ` (${escapeHtml(item.dates)})` : ''}${item.grade ? ` | ${escapeHtml(item.grade)}` : ''}</span>
       </div>
     `).join('')
-
-  const extraContent = [
-    achievements && `<p><strong>Achievements:</strong> ${splitLines(achievements).map(escapeHtml).join('; ')}</p>`,
-    softSkills && `<p><strong>Soft Skills:</strong> ${splitLines(softSkills).map(escapeHtml).join(', ')}</p>`,
-    languages && `<p><strong>Languages:</strong> ${splitLines(languages).map(escapeHtml).join(', ')}</p>`,
-  ].filter(Boolean).join('')
 
   const isWidthFitPreview = previewFit === 'width'
   const previewStyles = preview ? `
@@ -1241,13 +1269,14 @@ const buildSample3ResumeHtml = ({ personal = {}, summary = '', experiences = [],
       ${contact ? `<div class="s3-contact">${contact}</div>` : ''}
     </header>
     ${summaryContent}
-    ${renderSample3Section('Skills', skillsContent)}
-    ${renderSample3Section('Experience', experienceContent)}
-    ${renderSample3Section('Projects', projectContent)}
-    ${renderSample3Section('Certificate', certificateContent)}
-    ${renderSample3Section('Education', educationContent)}
-    ${renderSample3Section('Achievements', renderBullets(achievements))}
-    ${renderSample3Section('Additional', extraContent)}
+    ${renderSample3Section(sectionTitle(sectionTitles, 'skills', 'Skills'), skillsContent)}
+    ${renderSample3Section(sectionTitle(sectionTitles, 'experience', 'Experience'), experienceContent)}
+    ${renderSample3Section(sectionTitle(sectionTitles, 'projects', 'Projects'), projectContent)}
+    ${renderSample3Section(sectionTitle(sectionTitles, 'certifications', 'Certificate'), certificateContent)}
+    ${renderSample3Section(sectionTitle(sectionTitles, 'education', 'Education'), educationContent)}
+    ${renderSample3Section(sectionTitle(sectionTitles, 'achievements', 'Achievements'), renderBullets(achievements))}
+    ${renderSample3Section(sectionTitle(sectionTitles, 'softSkills', 'Soft Skills'), softSkills ? renderBullets(softSkills) : '')}
+    ${renderSample3Section(sectionTitle(sectionTitles, 'languages', 'Languages'), languages ? renderBullets(languages) : '')}
   </main>
   ${preview ? '</div></div>' : ''}
   ${previewScript}
@@ -1262,7 +1291,7 @@ const renderSample4Section = (title, content) => content ? `
   </section>
 ` : ''
 
-const buildSample4ResumeHtml = ({ personal = {}, summary = '', experiences = [], skills = {}, projects = [], certifications = [], educations = [], research = {}, achievements = '', preview = false, previewFit = 'contain' }) => {
+const buildSample4ResumeHtml = ({ personal = {}, summary = '', experiences = [], skills = {}, projects = [], certifications = [], educations = [], research = {}, achievements = '', sectionTitles = DEFAULT_RESUME_SECTION_TITLES, preview = false, previewFit = 'contain' }) => {
   const contactBlock = [
     personal.email && `<p><strong>Email:</strong> <a href="mailto:${escapeHtml(personal.email)}">${escapeHtml(personal.email)}</a></p>`,
     personal.phone && `<p><strong>Phone:</strong> ${escapeHtml(personal.phone)}</p>`,
@@ -1408,14 +1437,14 @@ const buildSample4ResumeHtml = ({ personal = {}, summary = '', experiences = [],
       </div>
       <div class="s4-contact">${contactBlock}</div>
     </header>
-    ${renderSample4Section('Career Objective', objectiveContent)}
-    ${renderSample4Section('Skills', skillsContent)}
-    ${renderSample4Section('Work Experience', experienceContent)}
-    ${renderSample4Section('Projects', projectContent)}
-    ${renderSample4Section('Training & Certification', certificationContent)}
-    ${renderSample4Section('Research Experience', researchContent)}
-    ${renderSample4Section('Educational Qualification', educationContent)}
-    ${renderSample4Section('Achievements', achievementsContent)}
+    ${renderSample4Section(sectionTitle(sectionTitles, 'summary', 'Career Objective'), objectiveContent)}
+    ${renderSample4Section(sectionTitle(sectionTitles, 'skills', 'Skills'), skillsContent)}
+    ${renderSample4Section(sectionTitle(sectionTitles, 'experience', 'Work Experience'), experienceContent)}
+    ${renderSample4Section(sectionTitle(sectionTitles, 'projects', 'Projects'), projectContent)}
+    ${renderSample4Section(sectionTitle(sectionTitles, 'certifications', 'Training & Certification'), certificationContent)}
+    ${renderSample4Section(sectionTitle(sectionTitles, 'research', 'Research Experience'), researchContent)}
+    ${renderSample4Section(sectionTitle(sectionTitles, 'education', 'Educational Qualification'), educationContent)}
+    ${renderSample4Section(sectionTitle(sectionTitles, 'achievements', 'Achievements'), achievementsContent)}
   </main>
   ${preview ? '</div></div>' : ''}
   ${previewScript}
