@@ -42,6 +42,11 @@ const RESUME_TEMPLATES = [
     name: 'Sample 2',
     description: 'Compact teal-heading resume inspired by RESUME_Sample_2.pdf.',
   },
+  {
+    id: 'sample3',
+    name: 'Sample 3',
+    description: 'Google Docs-style full-stack resume inspired by RESUME_Sample_3.pdf.',
+  },
 ]
 
 const DUMMY_RESUME_PREVIEW_DATA = {
@@ -60,7 +65,7 @@ const DUMMY_RESUME_PREVIEW_DATA = {
     maritalStatus: 'Single',
     presentAddress: 'Mirpur, Dhaka - 1216',
   },
-  summary: 'Junior frontend developer with hands-on experience building responsive React applications and API-driven dashboards.',
+  summary: 'Junior frontend developer with hands-on experience building responsive React applications, API-driven dashboards, and reusable UI components. Skilled in JavaScript, Tailwind CSS, REST API integration, and Git workflows, with strong attention to accessibility, performance, clean code, and collaborative product delivery.',
   experiences: [
     {
       company: 'BrightApps Studio',
@@ -218,7 +223,7 @@ const ResumeBuilder = () => {
           <p className='text-sm text-slate-500 dark:text-gray-400'>Select one template to continue building your resume.</p>
         </div>
 
-        <div className='grid gap-5 md:grid-cols-2'>
+        <div className='grid gap-5 md:grid-cols-2 xl:grid-cols-3'>
           {RESUME_TEMPLATES.map(template => (
             <div key={template.id} className='overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-blue-400 hover:shadow-lg dark:border-gray-800 dark:bg-[#111827]'>
               <div className='bg-slate-100 p-3 dark:bg-[#0B1120]'>
@@ -643,6 +648,9 @@ const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills
   if (template === 'sample2') {
     return buildSample2ResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionOrder, preview, previewFit })
   }
+  if (template === 'sample3') {
+    return buildSample3ResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, preview, previewFit })
+  }
 
   const contact = [
     personal.phone && `<a href="tel:${escapeHtml(personal.phone)}">${escapeHtml(personal.phone)}</a>`,
@@ -883,9 +891,9 @@ const buildSample2ResumeHtml = ({ personal = {}, summary = '', experiences = [],
       ].filter(Boolean).join(' | ')
       return `
         <div class="s2-entry">
-          <div class="s2-project-title">
+          <div class="s2-project-header">
             <strong>${escapeHtml(item.name)}</strong>
-            ${projectLinks ? `<span>: ${projectLinks}</span>` : ''}
+            ${projectLinks ? `<span>${projectLinks}</span>` : ''}
           </div>
           ${item.stack ? `<p class="s2-tech"><strong>Tech :</strong> ${escapeHtml(item.stack)}</p>` : ''}
           ${renderBullets(item.bullets)}
@@ -917,17 +925,6 @@ const buildSample2ResumeHtml = ({ personal = {}, summary = '', experiences = [],
   const achievementsContent = renderBullets(achievements)
   const softSkillsContent = renderBullets(softSkills)
   const languagesContent = renderBullets(languages)
-  const personalInfoRows = [
-    personal.nationality && ['Nationality', personal.nationality],
-    personal.dob && ['Date of Birth', personal.dob],
-    personal.nid && ['NID', personal.nid],
-    personal.maritalStatus && ['Marital Status', personal.maritalStatus],
-    (personal.presentAddress || personal.location) && ['Present Address', personal.presentAddress || personal.location],
-  ].filter(Boolean)
-  const personalInfoContent = personalInfoRows.length
-    ? `<div class="s2-personal-info">${personalInfoRows.map(([label, value]) => `<p><strong>${escapeHtml(label)} :</strong> ${escapeHtml(value)}</p>`).join('')}</div>`
-    : ''
-
   const resumeSections = {
     summary: renderSample2Section('Professional Summary', summaryContent),
     experience: renderSample2Section('Work Experience', experienceContent),
@@ -984,28 +981,30 @@ const buildSample2ResumeHtml = ({ personal = {}, summary = '', experiences = [],
   <style>
     @page { size: Letter; margin: 0.22in 0.3in; }
     * { box-sizing: border-box; }
-    body { margin: 0; background: #ffffff; color: #20252a; font-family: Arial, Helvetica, sans-serif; font-size: 11.4pt; line-height: 1.25; }
+    body { margin: 0; background: #ffffff; color: #20252a; font-family: Arial, Helvetica, sans-serif; font-size: 9.4pt; line-height: 1.18; }
     .resume { max-width: 8.5in; margin: 0 auto; }
-    .s2-header { margin-bottom: 12px; }
-    .s2-header h1 { margin: 0 0 7px; color: #20252a; font-size: 21.5pt; font-weight: 700; line-height: 1.05; }
-    .s2-contact { display: grid; gap: 8px; font-size: 11.2pt; }
-    .s2-links { font-size: 11.4pt; margin-top: 8px; }
+    .s2-header { margin-bottom: 8px; }
+    .s2-header h1 { margin: 0 0 5px; color: #20252a; font-size: 17.5pt; font-weight: 700; line-height: 1.05; }
+    .s2-contact { display: grid; gap: 4px; font-size: 8.7pt; }
+    .s2-links { font-size: 8.8pt; margin-top: 5px; }
     a { color: #00aeea; text-decoration: none; }
     .s2-links a:nth-child(5) { color: #804080; }
     .email-link { color: #00aeea; border-bottom: 1px solid #00aeea; }
     .link-divider { color: #007bff; padding: 0 4px; }
-    .s2-section { border-top: 1.5px solid #20252a; margin-top: 10px; padding-top: 5px; }
-    .s2-section h2 { color: #33786f; font-size: 14.8pt; letter-spacing: 0; line-height: 1; margin: 0 0 9px; text-transform: uppercase; }
-    .s2-entry { margin-bottom: 8px; }
-    .s2-entry-title, .s2-project-title { color: #20252a; font-size: 13.5pt; margin-bottom: 4px; }
-    .s2-meta { color: #666666; font-size: 11.2pt; margin-bottom: 4px; }
-    .s2-tech, .s2-line, .s2-paragraph, .s2-skill-list p, .s2-personal-info p { margin: 4px 0; }
-    .s2-education { align-items: flex-start; display: flex; gap: 14px; justify-content: space-between; margin-bottom: 10px; }
-    .s2-education strong { font-size: 13.5pt; }
-    .s2-education p { margin: 4px 0 0; }
+    .s2-section { border-top: 1.25px solid #20252a; margin-top: 10px; padding-top: 5px; }
+    .s2-section h2 { color: #33786f; font-size: 10.4pt; letter-spacing: 0; line-height: 1; margin: 0 0 7px; text-transform: uppercase; }
+    .s2-entry { margin-bottom: 5px; }
+    .s2-entry-title { color: #20252a; font-size: 9.7pt; margin-bottom: 2px; }
+    .s2-project-header { align-items: center; color: #20252a; display: flex; font-size: 11.4pt; gap: 12px; justify-content: space-between; margin-bottom: 3px; }
+    .s2-project-header > span { font-size: 9.4pt; font-weight: 400; white-space: nowrap; }
+    .s2-meta { color: #666666; font-size: 8.6pt; margin-bottom: 2px; }
+    .s2-tech, .s2-line, .s2-paragraph, .s2-skill-list p, .s2-personal-info p { margin: 3px 0; }
+    .s2-education { align-items: flex-start; display: flex; gap: 14px; justify-content: space-between; margin-bottom: 12px; }
+    .s2-education strong { font-size: 9.7pt; }
+    .s2-education p { margin: 2px 0 0; }
     .s2-education > span { color: #666666; white-space: nowrap; }
-    ul { margin: 3px 0 7px 18px; padding: 0; }
-    li { margin-bottom: 3px; text-align: justify; text-align-last: left; }
+    ul { margin: 3px 0 8px 30px; padding: 0; }
+    li { margin-bottom: 3px; padding-left: 2px; text-align: justify; text-align-last: left; }
     ${previewStyles}
     @media print {
       body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
@@ -1021,7 +1020,177 @@ const buildSample2ResumeHtml = ({ personal = {}, summary = '', experiences = [],
       ${profileLinks ? `<div class="s2-links">${profileLinks}</div>` : ''}
     </header>
     ${orderedSections}
-    ${renderSample2Section('Personal Information', personalInfoContent)}
+  </main>
+  ${preview ? '</div></div>' : ''}
+  ${previewScript}
+</body>
+</html>`
+}
+
+const renderSample3Section = (title, content) => content ? `
+  <section class="s3-section">
+    <h2>${escapeHtml(title)}</h2>
+    ${content}
+  </section>
+` : ''
+
+const buildSample3ResumeHtml = ({ personal = {}, summary = '', experiences = [], skills = {}, projects = [], certifications = [], educations = [], achievements = '', softSkills = '', languages = '', preview = false, previewFit = 'contain' }) => {
+  const contact = [
+    personal.phone && `Phone: ${escapeHtml(personal.phone)}`,
+    personal.email && `Email: <a href="mailto:${escapeHtml(personal.email)}">${escapeHtml(personal.email)}</a>`,
+    renderExternalLink(personal.linkedinUrl, 'LinkedIn'),
+    renderExternalLink(personal.githubUrl, 'GitHub'),
+    renderExternalLink(personal.portfolioUrl, 'Portfolio'),
+  ].filter(Boolean).join(' <span>|</span> ')
+
+  const summaryContent = String(summary || '').trim()
+    ? `<p class="s3-summary">${escapeHtml(summary).replace(/\r?\n/g, '<br />')}</p>`
+    : ''
+
+  const skillItems = [
+    skills.languages && ['Frontend Development', skills.languages],
+    skills.frameworks && ['Frameworks & Libraries', skills.frameworks],
+    skills.databases && ['Backend & Databases', skills.databases],
+    skills.tools && ['Tools & Workflow', skills.tools],
+  ].filter(Boolean)
+  const skillsContent = skillItems.length
+    ? `<div class="s3-skills">${skillItems.map(([label, value]) => `<p><strong>${escapeHtml(label)}:</strong> ${escapeHtml(value)}</p>`).join('')}</div>`
+    : ''
+
+  const experienceContent = (experiences || [])
+    .filter(item => hasAnyValue(item, ['company', 'role', 'bullets']))
+    .map(item => `
+      <div class="s3-entry">
+        <div class="s3-entry-head">
+          <strong>${escapeHtml(item.role || item.company)}</strong>
+          ${item.company && item.role ? `<span>- ${item.companyUrl ? renderExternalLink(item.companyUrl, item.company) : escapeHtml(item.company)}</span>` : ''}
+        </div>
+        <p class="s3-meta">${[item.location, item.dates].filter(Boolean).map(escapeHtml).join(' | ')}</p>
+        ${renderBullets(item.bullets)}
+      </div>
+    `).join('')
+
+  const projectContent = (projects || [])
+    .filter(item => hasAnyValue(item, ['name', 'stack', 'bullets']))
+    .map(item => {
+      const links = [
+        renderExternalLink(item.liveUrl, 'Live'),
+        renderExternalLink(item.githubUrl, 'Client'),
+        renderExternalLink(item.githubUrl, 'Server'),
+      ].filter(Boolean).join(' - ')
+      return `
+        <div class="s3-project">
+          <div class="s3-project-head">
+            <strong>${escapeHtml(item.name)}</strong>
+            ${item.stack ? `<span>| ${escapeHtml(item.stack)}</span>` : ''}
+            ${links ? `<em>${links}</em>` : ''}
+          </div>
+          ${renderBullets(item.bullets)}
+        </div>
+      `
+    }).join('')
+
+  const certificateContent = (certifications || [])
+    .filter(item => hasAnyValue(item, ['institution', 'course']))
+    .map(item => `<p class="s3-line">${escapeHtml(item.course)}${item.institution ? ` - ${escapeHtml(item.institution)}` : ''}${item.certificateUrl ? ` - ${renderExternalLink(item.certificateUrl, 'View Certificate')}` : ''}</p>`)
+    .join('')
+
+  const educationContent = (educations || [])
+    .filter(item => hasAnyValue(item, ['institution', 'degree']))
+    .map(item => `
+      <div class="s3-education">
+        <strong>${escapeHtml(item.degree)}</strong>
+        <span>${escapeHtml(item.institution)}${item.dates ? ` (${escapeHtml(item.dates)})` : ''}${item.grade ? ` | ${escapeHtml(item.grade)}` : ''}</span>
+      </div>
+    `).join('')
+
+  const extraContent = [
+    achievements && `<p><strong>Achievements:</strong> ${splitLines(achievements).map(escapeHtml).join('; ')}</p>`,
+    softSkills && `<p><strong>Soft Skills:</strong> ${splitLines(softSkills).map(escapeHtml).join(', ')}</p>`,
+    languages && `<p><strong>Languages:</strong> ${splitLines(languages).map(escapeHtml).join(', ')}</p>`,
+  ].filter(Boolean).join('')
+
+  const isWidthFitPreview = previewFit === 'width'
+  const previewStyles = preview ? `
+    html, body.preview-body { height: 100%; }
+    body.preview-body { align-items: ${isWidthFitPreview ? 'flex-start' : 'center'}; background: #e2e8f0; display: flex; justify-content: center; overflow: hidden; padding: 10px; }
+    body.preview-body .pdf-viewport { height: 100%; position: relative; width: 100%; }
+    body.preview-body .pdf-shell { height: 11.69in; left: 50%; position: absolute; top: ${isWidthFitPreview ? '0' : '50%'}; transform-origin: ${isWidthFitPreview ? 'top center' : 'center center'}; width: 8.27in; }
+    body.preview-body .resume { background: #ffffff; box-shadow: 0 14px 30px rgba(15, 23, 42, 0.24); height: 11.69in; margin: 0; max-width: none; overflow: hidden; padding: 0.42in 0.5in; width: 8.27in; }
+  ` : ''
+  const previewScript = preview ? `
+  <script>
+    const fitResumePage = () => {
+      const viewport = document.querySelector('.pdf-viewport');
+      const shell = document.querySelector('.pdf-shell');
+      if (!viewport || !shell) return;
+
+      const pageWidth = 8.27 * 96;
+      const pageHeight = 11.69 * 96;
+      const availableWidth = Math.max(220, document.documentElement.clientWidth - 20);
+      const availableHeight = Math.max(300, document.documentElement.clientHeight - 20);
+      const scale = ${isWidthFitPreview ? 'Math.min(1, availableWidth / pageWidth)' : 'Math.min(availableWidth / pageWidth, availableHeight / pageHeight)'};
+
+      shell.style.transform = '${isWidthFitPreview ? 'translateX(-50%)' : 'translate(-50%, -50%)'} scale(' + scale + ')';
+      viewport.style.height = Math.ceil(pageHeight * scale) + 'px';
+    };
+
+    window.addEventListener('load', fitResumePage);
+    window.addEventListener('resize', fitResumePage);
+    requestAnimationFrame(fitResumePage);
+  </script>
+  ` : ''
+
+  return `<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>${escapeHtml(personal.fullName || 'Resume')}</title>
+  <style>
+    @page { size: A4; margin: 0.42in 0.5in; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #ffffff; color: #111827; font-family: Arial, Calibri, sans-serif; font-size: 10.2pt; line-height: 1.27; }
+    .resume { max-width: 8.27in; margin: 0 auto; }
+    .s3-header { text-align: center; margin-bottom: 10px; }
+    .s3-header h1 { font-size: 16pt; line-height: 1.1; margin: 0; text-transform: uppercase; }
+    .s3-role { font-size: 11pt; font-weight: 700; margin-top: 2px; }
+    .s3-contact { font-size: 9.4pt; margin-top: 4px; }
+    .s3-contact span { color: #6b7280; padding: 0 2px; }
+    a { color: #2563eb; text-decoration: none; }
+    .s3-summary { margin: 0 0 8px; text-align: justify; text-align-last: left; }
+    .s3-section { margin-top: 10px; }
+    .s3-section h2 { border-bottom: 1px solid #111827; font-size: 11.2pt; letter-spacing: 0; line-height: 1.1; margin: 0 0 6px; padding-bottom: 2px; text-transform: uppercase; }
+    .s3-skills p, .s3-line, .s3-meta { margin: 3px 0; }
+    .s3-entry, .s3-project { margin-bottom: 8px; }
+    .s3-entry-head, .s3-project-head { align-items: baseline; display: flex; flex-wrap: wrap; gap: 4px; }
+    .s3-project-head em { font-style: normal; margin-left: auto; white-space: nowrap; }
+    .s3-meta { color: #4b5563; font-size: 9.2pt; }
+    ul { margin: 3px 0 0 18px; padding: 0; }
+    li { margin-bottom: 2px; text-align: justify; text-align-last: left; }
+    .s3-education { margin-bottom: 5px; }
+    .s3-education strong { display: block; }
+    .s3-education span { color: #374151; display: block; }
+    ${previewStyles}
+    @media print {
+      body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body${preview ? ' class="preview-body"' : ''}>
+  ${preview ? '<div class="pdf-viewport"><div class="pdf-shell">' : ''}
+  <main class="resume">
+    <header class="s3-header">
+      <h1>${escapeHtml(personal.fullName)}</h1>
+      ${personal.targetRole ? `<div class="s3-role">${escapeHtml(personal.targetRole)}</div>` : ''}
+      ${contact ? `<div class="s3-contact">${contact}</div>` : ''}
+    </header>
+    ${summaryContent}
+    ${renderSample3Section('Skills', skillsContent)}
+    ${renderSample3Section('Experience', experienceContent)}
+    ${renderSample3Section('Projects', projectContent)}
+    ${renderSample3Section('Certificate', certificateContent)}
+    ${renderSample3Section('Education', educationContent)}
+    ${renderSample3Section('Additional', extraContent)}
   </main>
   ${preview ? '</div></div>' : ''}
   ${previewScript}
