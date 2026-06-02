@@ -44,6 +44,10 @@ const RESUME_TEMPLATES = [
     id: 'sample3',
     name: 'Resume Sample 3',
   },
+  {
+    id: 'sample4',
+    name: 'Resume Sample 4',
+  },
 ]
 
 const DUMMY_RESUME_PREVIEW_DATA = {
@@ -220,7 +224,7 @@ const ResumeBuilder = () => {
           <p className='text-sm text-slate-500 dark:text-gray-400'>Select one template to continue building your resume.</p>
         </div>
 
-        <div className='grid gap-5 md:grid-cols-2 xl:grid-cols-3'>
+        <div className='grid gap-5 md:grid-cols-2 xl:grid-cols-4'>
           {RESUME_TEMPLATES.map(template => (
             <div key={template.id} className='overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-blue-400 hover:shadow-lg dark:border-gray-800 dark:bg-[#111827]'>
               <div className='bg-slate-100 p-3 dark:bg-[#0B1120]'>
@@ -651,6 +655,9 @@ const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills
   }
   if (template === 'sample3') {
     return buildSample3ResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, preview, previewFit })
+  }
+  if (template === 'sample4') {
+    return buildSample4ResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, preview, previewFit })
   }
 
   const contact = [
@@ -1192,6 +1199,149 @@ const buildSample3ResumeHtml = ({ personal = {}, summary = '', experiences = [],
     ${renderSample3Section('Certificate', certificateContent)}
     ${renderSample3Section('Education', educationContent)}
     ${renderSample3Section('Additional', extraContent)}
+  </main>
+  ${preview ? '</div></div>' : ''}
+  ${previewScript}
+</body>
+</html>`
+}
+
+const renderSample4Section = (title, content) => content ? `
+  <section class="s4-section">
+    <h2>${escapeHtml(title)}</h2>
+    ${content}
+  </section>
+` : ''
+
+const buildSample4ResumeHtml = ({ personal = {}, summary = '', experiences = [], skills = {}, projects = [], certifications = [], educations = [], research = {}, achievements = '', preview = false, previewFit = 'contain' }) => {
+  const contactBlock = [
+    personal.email && `<p><strong>Email:</strong> <a href="mailto:${escapeHtml(personal.email)}">${escapeHtml(personal.email)}</a></p>`,
+    personal.phone && `<p><strong>Phone:</strong> ${escapeHtml(personal.phone)}</p>`,
+    [renderExternalLink(personal.linkedinUrl, 'LinkedIn'), renderExternalLink(personal.githubUrl, 'GitHub')].filter(Boolean).join(' <span>|</span> '),
+  ].filter(Boolean).map(item => item.startsWith('<p') ? item : `<p>${item}</p>`).join('')
+
+  const objectiveText = String(summary || '').trim()
+    ? summary
+    : `${personal.targetRole || 'Result-oriented developer'} with good programming and problem-solving skills, eager to acquire additional knowledge and utilize technical strengths to explore the software engineering domain successfully.`
+  const objectiveContent = `<p class="s4-paragraph">${escapeHtml(objectiveText).replace(/\r?\n/g, '<br />')}</p>`
+
+  const skillItems = [
+    skills.languages && ['Programming Languages', skills.languages],
+    skills.frameworks && ['Frameworks and others', skills.frameworks],
+    skills.databases && ['Databases', skills.databases],
+    skills.tools && ['Tools', skills.tools],
+  ].filter(Boolean)
+  const skillsContent = skillItems.length
+    ? `<div class="s4-skills">${skillItems.map(([label, value]) => `<p><strong>${escapeHtml(label)}:</strong> ${escapeHtml(value)}</p>`).join('')}</div>`
+    : ''
+
+  const projectContent = (projects || [])
+    .filter(item => hasAnyValue(item, ['name', 'stack', 'bullets']))
+    .map(item => {
+      const link = renderExternalLink(item.githubUrl || item.liveUrl, item.githubUrl ? 'GitHub' : 'Live')
+      const description = splitLines(item.bullets).join(' ')
+      return `<p class="s4-project"><strong>${escapeHtml(item.name)}${link ? ` (${link})` : ''}:</strong> ${escapeHtml(description || item.stack)}</p>`
+    }).join('')
+
+  const certificationContent = (certifications || [])
+    .filter(item => hasAnyValue(item, ['institution', 'course']))
+    .map(item => `<p class="s4-line"><strong>${escapeHtml(item.institution)}</strong>${item.certificateUrl ? ` (${renderExternalLink(item.certificateUrl, 'Certificate')})` : ''} - ${escapeHtml(item.course)}</p>`)
+    .join('')
+
+  const researchContent = hasAnyValue(research, ['title', 'stack'])
+    ? `<p class="s4-line"><strong>${escapeHtml(research.title)}</strong>${research.stack ? ` - ${escapeHtml(research.stack)}` : ''}</p>`
+    : ''
+
+  const educationContent = (educations || [])
+    .filter(item => hasAnyValue(item, ['institution', 'degree']))
+    .map(item => `
+      <div class="s4-education">
+        <strong>${escapeHtml(item.degree)}</strong>
+        <span>${escapeHtml(item.dates)}</span>
+        <p>${escapeHtml(item.institution)}${item.grade ? ` | ${escapeHtml(item.grade)}` : ''}</p>
+      </div>
+    `).join('')
+
+  const achievementsContent = renderBullets(achievements)
+  const isWidthFitPreview = previewFit === 'width'
+  const previewStyles = preview ? `
+    html, body.preview-body { height: 100%; }
+    body.preview-body { align-items: ${isWidthFitPreview ? 'flex-start' : 'center'}; background: #e2e8f0; display: flex; justify-content: center; overflow: hidden; padding: 10px; }
+    body.preview-body .pdf-viewport { height: 100%; position: relative; width: 100%; }
+    body.preview-body .pdf-shell { height: 11.69in; left: 50%; position: absolute; top: ${isWidthFitPreview ? '0' : '50%'}; transform-origin: ${isWidthFitPreview ? 'top center' : 'center center'}; width: 8.27in; }
+    body.preview-body .resume { background: #ffffff; box-shadow: 0 14px 30px rgba(15, 23, 42, 0.24); height: 11.69in; margin: 0; max-width: none; overflow: hidden; padding: 0.45in 0.5in; width: 8.27in; }
+  ` : ''
+  const previewScript = preview ? `
+  <script>
+    const fitResumePage = () => {
+      const viewport = document.querySelector('.pdf-viewport');
+      const shell = document.querySelector('.pdf-shell');
+      if (!viewport || !shell) return;
+
+      const pageWidth = 8.27 * 96;
+      const pageHeight = 11.69 * 96;
+      const availableWidth = Math.max(220, document.documentElement.clientWidth - 20);
+      const availableHeight = Math.max(300, document.documentElement.clientHeight - 20);
+      const scale = ${isWidthFitPreview ? 'Math.min(1, availableWidth / pageWidth)' : 'Math.min(availableWidth / pageWidth, availableHeight / pageHeight)'};
+
+      shell.style.transform = '${isWidthFitPreview ? 'translateX(-50%)' : 'translate(-50%, -50%)'} scale(' + scale + ')';
+      viewport.style.height = Math.ceil(pageHeight * scale) + 'px';
+    };
+
+    window.addEventListener('load', fitResumePage);
+    window.addEventListener('resize', fitResumePage);
+    requestAnimationFrame(fitResumePage);
+  </script>
+  ` : ''
+
+  return `<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>${escapeHtml(personal.fullName || 'Resume')}</title>
+  <style>
+    @page { size: A4; margin: 0.45in 0.5in; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #ffffff; color: #111827; font-family: Calibri, Arial, sans-serif; font-size: 10.2pt; line-height: 1.28; }
+    .resume { max-width: 8.27in; margin: 0 auto; }
+    .s4-header { display: grid; grid-template-columns: minmax(0, 1fr) 2.3in; gap: 18px; margin-bottom: 10px; }
+    .s4-header h1 { color: #473a92; font-size: 21pt; line-height: 1.1; margin: 0; }
+    .s4-contact { align-self: end; color: #111827; font-size: 9.7pt; }
+    .s4-contact p { margin: 2px 0; }
+    .s4-contact span { color: #4f46e5; padding: 0 4px; }
+    a { color: #2563eb; text-decoration: none; }
+    .s4-section { margin-top: 11px; }
+    .s4-section h2 { color: #548dd4; font-size: 13pt; line-height: 1.1; margin: 0 0 5px; text-transform: capitalize; }
+    .s4-paragraph, .s4-project, .s4-line, .s4-skills p { margin: 4px 0; text-align: justify; text-align-last: left; }
+    .s4-project strong { font-weight: 700; }
+    .s4-education { margin-bottom: 7px; position: relative; }
+    .s4-education strong { display: inline-block; }
+    .s4-education span { float: right; }
+    .s4-education p { clear: both; margin: 2px 0 0; }
+    ul { margin: 4px 0 0 18px; padding: 0; }
+    li { margin-bottom: 2px; }
+    ${previewStyles}
+    @media print {
+      body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body${preview ? ' class="preview-body"' : ''}>
+  ${preview ? '<div class="pdf-viewport"><div class="pdf-shell">' : ''}
+  <main class="resume">
+    <header class="s4-header">
+      <div>
+        <h1>${escapeHtml(personal.fullName)}</h1>
+      </div>
+      <div class="s4-contact">${contactBlock}</div>
+    </header>
+    ${renderSample4Section('Career Objective', objectiveContent)}
+    ${renderSample4Section('Skills', skillsContent)}
+    ${renderSample4Section('Projects', projectContent)}
+    ${renderSample4Section('Training & Certification', certificationContent)}
+    ${renderSample4Section('Research Experience', researchContent)}
+    ${renderSample4Section('Educational Qualification', educationContent)}
+    ${renderSample4Section('Achievements', achievementsContent)}
   </main>
   ${preview ? '</div></div>' : ''}
   ${previewScript}
