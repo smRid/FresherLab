@@ -115,68 +115,10 @@ const DUMMY_RESUME_PREVIEW_DATA = {
 const getTemplatePreviewData = (templateId) => {
   const base = {
     ...DUMMY_RESUME_PREVIEW_DATA,
+    softSkills: '',
     projects: DUMMY_RESUME_PREVIEW_DATA.projects.map(project => ({ ...project })),
     certifications: DUMMY_RESUME_PREVIEW_DATA.certifications.map(certification => ({ ...certification })),
     educations: DUMMY_RESUME_PREVIEW_DATA.educations.map(education => ({ ...education })),
-  }
-
-  if (templateId === 'classic') return { ...base, softSkills: '' }
-
-  if (templateId === 'sample3') {
-    return {
-      ...base,
-      experiences: [
-        ...base.experiences,
-        {
-          company: 'PeoplePerHour',
-          role: 'Freelance Web Developer',
-          dates: 'January 2024 - Present',
-          location: 'Remote',
-          bullets: 'Delivered CMS and frontend customization projects for international clients.\nOptimized responsive layouts, SEO basics, and website performance for small businesses.',
-        },
-      ],
-      projects: [
-        ...base.projects,
-        {
-          name: 'QuietHub Workspace',
-          stack: 'Next.js, Express.js, MongoDB, JWT',
-          liveUrl: 'https://quiethub.example.com',
-          githubUrl: 'https://github.com/alexrahman/quiethub',
-          bullets: 'Built workspace search, booking, and host listing features.\nPrevented overlapping bookings with real-time validation and protected routes.',
-        },
-      ],
-      achievements: 'Delivered 12 client-ready web projects\nMaintained a full-stack portfolio with live demos\nImproved API integration and deployment workflows',
-    }
-  }
-
-  if (templateId === 'sample4') {
-    return {
-      ...base,
-      summary: 'Result-oriented junior developer with strong programming and problem-solving skills, seeking to apply practical React, Node.js, database, and deployment knowledge to build reliable software products while continuing to grow in the software engineering domain.',
-      projects: [
-        ...base.projects,
-        {
-          name: 'Expense Tracker System',
-          stack: 'MERN, Chart.js, JWT',
-          liveUrl: 'https://expense-tracker.example.com',
-          githubUrl: 'https://github.com/alexrahman/expense-tracker',
-          bullets: 'Developed a MERN-based system for tracking income, expenses, categories, and monthly summaries with clean dashboard charts.',
-        },
-        {
-          name: 'Restaurant Booking App',
-          stack: 'React, Firebase, Tailwind CSS',
-          liveUrl: 'https://restaurant-booking.example.com',
-          githubUrl: 'https://github.com/alexrahman/restaurant-booking',
-          bullets: 'Created a responsive restaurant app with menu browsing, table booking, customer reviews, and Firebase-powered updates.',
-        },
-      ],
-      educations: [
-        ...base.educations,
-        { institution: 'City Science College', degree: 'Higher Secondary Certificate', dates: '2018 - 2020', grade: 'GPA 5.00 / 5.00' },
-        { institution: 'Model School and College', degree: 'Secondary School Certificate', dates: '2016 - 2018', grade: 'GPA 5.00 / 5.00' },
-      ],
-      research: { title: 'Skin Cancer Classification Using Dermoscopic Images with Explainable AI', stack: 'Deep Learning, CNN, Explainable AI' },
-    }
   }
 
   return base
@@ -1096,26 +1038,26 @@ const buildSample2ResumeHtml = ({ personal = {}, summary = '', experiences = [],
   <style>
     @page { size: Letter; margin: 0.22in 0.3in; }
     * { box-sizing: border-box; }
-    body { margin: 0; background: #ffffff; color: #20252a; font-family: Arial, Helvetica, sans-serif; font-size: 9.4pt; line-height: 1.18; }
+    body { margin: 0; background: #ffffff; color: #20252a; font-family: Arial, Helvetica, sans-serif; font-size: 11.2pt; line-height: 1.25; }
     .resume { max-width: 8.5in; margin: 0 auto; }
     .s2-header { margin-bottom: 8px; }
     .s2-header h1 { margin: 0 0 5px; color: #20252a; font-size: 17.5pt; font-weight: 700; line-height: 1.05; }
-    .s2-contact { display: grid; gap: 4px; font-size: 8.7pt; }
-    .s2-links { font-size: 8.8pt; margin-top: 5px; }
+    .s2-contact { display: grid; gap: 4px; font-size: 10.8pt; }
+    .s2-links { font-size: 10.8pt; margin-top: 5px; }
     a { color: #00aeea; text-decoration: none; }
     .s2-links a:nth-child(5) { color: #804080; }
     .email-link { color: #00aeea; border-bottom: 1px solid #00aeea; }
     .link-divider { color: #007bff; padding: 0 4px; }
     .s2-section { border-top: 1.25px solid #20252a; margin-top: 10px; padding-top: 5px; }
-    .s2-section h2 { color: #33786f; font-size: 10.4pt; letter-spacing: 0; line-height: 1; margin: 0 0 7px; text-transform: uppercase; }
+    .s2-section h2 { color: #33786f; font-size: 12pt; letter-spacing: 0; line-height: 1; margin: 0 0 7px; text-transform: uppercase; }
     .s2-entry { margin-bottom: 5px; }
-    .s2-entry-title { color: #20252a; font-size: 9.7pt; margin-bottom: 2px; }
-    .s2-project-header { align-items: center; color: #20252a; display: flex; font-size: 11.4pt; gap: 12px; justify-content: space-between; margin-bottom: 3px; }
-    .s2-project-header > span { font-size: 9.4pt; font-weight: 400; white-space: nowrap; }
-    .s2-meta { color: #666666; font-size: 8.6pt; margin-bottom: 2px; }
+    .s2-entry-title { color: #20252a; font-size: 11.4pt; margin-bottom: 2px; }
+    .s2-project-header { align-items: center; color: #20252a; display: flex; font-size: 12pt; gap: 12px; justify-content: space-between; margin-bottom: 3px; }
+    .s2-project-header > span { font-size: 10.8pt; font-weight: 400; white-space: nowrap; }
+    .s2-meta { color: #666666; font-size: 10.5pt; margin-bottom: 2px; }
     .s2-tech, .s2-line, .s2-paragraph, .s2-skill-list p, .s2-personal-info p { margin: 3px 0; }
     .s2-education { align-items: flex-start; display: flex; gap: 14px; justify-content: space-between; margin-bottom: 12px; }
-    .s2-education strong { font-size: 9.7pt; }
+    .s2-education strong { font-size: 11.4pt; }
     .s2-education p { margin: 2px 0 0; }
     .s2-education > span { color: #666666; white-space: nowrap; }
     ul { margin: 3px 0 8px 30px; padding: 0; }
@@ -1190,8 +1132,7 @@ const buildSample3ResumeHtml = ({ personal = {}, summary = '', experiences = [],
     .map(item => {
       const links = [
         renderExternalLink(item.liveUrl, 'Live'),
-        renderExternalLink(item.githubUrl, 'Client'),
-        renderExternalLink(item.githubUrl, 'Server'),
+        renderExternalLink(item.githubUrl, 'GitHub'),
       ].filter(Boolean).join(' - ')
       return `
         <div class="s3-project">
@@ -1305,6 +1246,7 @@ const buildSample3ResumeHtml = ({ personal = {}, summary = '', experiences = [],
     ${renderSample3Section('Projects', projectContent)}
     ${renderSample3Section('Certificate', certificateContent)}
     ${renderSample3Section('Education', educationContent)}
+    ${renderSample3Section('Achievements', renderBullets(achievements))}
     ${renderSample3Section('Additional', extraContent)}
   </main>
   ${preview ? '</div></div>' : ''}
@@ -1324,7 +1266,7 @@ const buildSample4ResumeHtml = ({ personal = {}, summary = '', experiences = [],
   const contactBlock = [
     personal.email && `<p><strong>Email:</strong> <a href="mailto:${escapeHtml(personal.email)}">${escapeHtml(personal.email)}</a></p>`,
     personal.phone && `<p><strong>Phone:</strong> ${escapeHtml(personal.phone)}</p>`,
-    [renderExternalLink(personal.linkedinUrl, 'LinkedIn'), renderExternalLink(personal.githubUrl, 'GitHub')].filter(Boolean).join(' <span>|</span> '),
+    [renderExternalLink(personal.linkedinUrl, 'LinkedIn'), renderExternalLink(personal.githubUrl, 'GitHub'), renderExternalLink(personal.portfolioUrl, 'Portfolio')].filter(Boolean).join(' <span>|</span> '),
   ].filter(Boolean).map(item => item.startsWith('<p') ? item : `<p>${item}</p>`).join('')
 
   const objectiveContent = String(summary || '').trim()
@@ -1344,10 +1286,32 @@ const buildSample4ResumeHtml = ({ personal = {}, summary = '', experiences = [],
   const projectContent = (projects || [])
     .filter(item => hasAnyValue(item, ['name', 'stack', 'bullets']))
     .map(item => {
-      const link = renderExternalLink(item.githubUrl || item.liveUrl, item.githubUrl ? 'GitHub' : 'Live')
-      const description = splitLines(item.bullets).join(' ')
-      return `<p class="s4-project"><strong>${escapeHtml(item.name)}${link ? ` (${link})` : ''}:</strong> ${escapeHtml(description || item.stack)}</p>`
+      const projectLinks = [
+        renderExternalLink(item.githubUrl, 'GitHub'),
+        renderExternalLink(item.liveUrl, 'Live link'),
+      ].filter(Boolean).join(' | ')
+      return `
+        <div class="s4-project">
+          <div class="s4-project-head">
+            <strong>${escapeHtml(item.name)}</strong>
+            ${projectLinks ? `<span>(${projectLinks})</span>` : ''}
+          </div>
+          ${item.stack ? `<p><strong>Tech Stack:</strong> ${escapeHtml(item.stack)}</p>` : ''}
+          ${renderBullets(item.bullets)}
+        </div>
+      `
     }).join('')
+
+  const experienceContent = (experiences || [])
+    .filter(item => hasAnyValue(item, ['company', 'role', 'bullets']))
+    .map(item => `
+      <div class="s4-experience">
+        <strong>${escapeHtml(item.role || item.company)}</strong>
+        <span>${escapeHtml(item.dates)}</span>
+        <p>${item.companyUrl ? renderExternalLink(item.companyUrl, item.company) : escapeHtml(item.company)}${item.location ? ` | ${escapeHtml(item.location)}` : ''}</p>
+        ${renderBullets(item.bullets)}
+      </div>
+    `).join('')
 
   const certificationContent = (certifications || [])
     .filter(item => hasAnyValue(item, ['institution', 'course']))
@@ -1408,22 +1372,25 @@ const buildSample4ResumeHtml = ({ personal = {}, summary = '', experiences = [],
   <style>
     @page { size: A4; margin: 0.45in 0.5in; }
     * { box-sizing: border-box; }
-    body { margin: 0; background: #ffffff; color: #111827; font-family: Calibri, Arial, sans-serif; font-size: 9.6pt; line-height: 1.22; }
+    body { margin: 0; background: #ffffff; color: #111827; font-family: Calibri, Arial, sans-serif; font-size: 11.2pt; line-height: 1.28; }
     .resume { max-width: 8.27in; margin: 0 auto; }
     .s4-header { display: grid; grid-template-columns: minmax(0, 1fr) 2.3in; gap: 18px; margin-bottom: 10px; }
     .s4-header h1 { color: #473a92; font-size: 21pt; line-height: 1.1; margin: 0; }
-    .s4-contact { align-self: end; color: #111827; font-size: 9.7pt; }
+    .s4-contact { align-self: end; color: #111827; font-size: 11pt; }
     .s4-contact p { margin: 2px 0; }
     .s4-contact span { color: #4f46e5; padding: 0 4px; }
     a { color: #2563eb; text-decoration: none; }
     .s4-section { margin-top: 8px; }
     .s4-section h2 { color: #548dd4; font-size: 12pt; line-height: 1.1; margin: 0 0 4px; text-transform: capitalize; }
-    .s4-paragraph, .s4-project, .s4-line, .s4-skills p { margin: 3px 0; text-align: justify; text-align-last: left; }
-    .s4-project strong { font-weight: 700; }
-    .s4-education { margin-bottom: 5px; position: relative; }
-    .s4-education strong { display: inline-block; }
-    .s4-education span { float: right; }
-    .s4-education p { clear: both; margin: 2px 0 0; }
+    .s4-paragraph, .s4-line, .s4-skills p { margin: 3px 0; text-align: justify; text-align-last: left; }
+    .s4-project { margin: 5px 0; }
+    .s4-project-head { align-items: baseline; display: flex; flex-wrap: wrap; gap: 4px; }
+    .s4-project-head strong { font-weight: 700; }
+    .s4-project p { margin: 2px 0; }
+    .s4-education, .s4-experience { margin-bottom: 5px; position: relative; }
+    .s4-education strong, .s4-experience strong { display: inline-block; }
+    .s4-education span, .s4-experience span { float: right; }
+    .s4-education p, .s4-experience p { clear: both; margin: 2px 0 0; }
     ul { margin: 4px 0 0 18px; padding: 0; }
     li { margin-bottom: 2px; }
     ${previewStyles}
@@ -1443,6 +1410,7 @@ const buildSample4ResumeHtml = ({ personal = {}, summary = '', experiences = [],
     </header>
     ${renderSample4Section('Career Objective', objectiveContent)}
     ${renderSample4Section('Skills', skillsContent)}
+    ${renderSample4Section('Work Experience', experienceContent)}
     ${renderSample4Section('Projects', projectContent)}
     ${renderSample4Section('Training & Certification', certificationContent)}
     ${renderSample4Section('Research Experience', researchContent)}
