@@ -198,6 +198,7 @@ const ResumeBuilder = () => {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState('')
   const [previewOpen, setPreviewOpen] = useState(false)
+  const [templatePreviewId, setTemplatePreviewId] = useState('')
   const { getToken } = useAuth()
 
   const [personal, setPersonal] = useState({
@@ -298,7 +299,7 @@ const ResumeBuilder = () => {
           {RESUME_TEMPLATES.map(template => (
             <div key={template.id} className='overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-blue-400 hover:shadow-lg dark:border-gray-800 dark:bg-[#111827]'>
               <div className='bg-slate-100 p-3 dark:bg-[#0B1120]'>
-                <div className='mx-auto aspect-[210/297] h-[21rem] max-w-full overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-gray-700'>
+                <div className='group relative mx-auto aspect-[210/297] h-[21rem] max-w-full overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-gray-700'>
                   <iframe
                     title={`${template.name} preview`}
                     srcDoc={buildResumeHtml({
@@ -308,6 +309,13 @@ const ResumeBuilder = () => {
                     })}
                     className='h-full w-full border-0 bg-white'
                   />
+                  <div className='absolute inset-0 flex items-center justify-center bg-slate-950/0 opacity-0 transition group-hover:bg-slate-950/45 group-hover:opacity-100'>
+                    <button type='button' onClick={() => setTemplatePreviewId(template.id)}
+                      className='inline-flex h-12 w-12 items-center justify-center rounded-full bg-white text-blue-600 shadow-lg transition hover:scale-105 hover:bg-blue-50'
+                      aria-label={`Preview ${template.name}`}>
+                      <Eye className='h-5 w-5' />
+                    </button>
+                  </div>
                 </div>
               </div>
               <div className='border-t border-slate-200 p-4 dark:border-gray-800'>
@@ -325,6 +333,36 @@ const ResumeBuilder = () => {
           ))}
         </div>
       </div>
+
+      {templatePreviewId && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 p-4 backdrop-blur-sm' onClick={() => setTemplatePreviewId('')}>
+          <div className='flex h-[94vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-slate-700 bg-[#0B1120] shadow-2xl' onClick={e => e.stopPropagation()}>
+            <div className='flex items-center justify-between border-b border-slate-800 px-5 py-4'>
+              <div>
+                <h2 className='text-lg font-semibold text-white'>{RESUME_TEMPLATES.find(template => template.id === templatePreviewId)?.name}</h2>
+                <p className='text-xs text-slate-400'>Full template preview</p>
+              </div>
+              <button type='button' onClick={() => setTemplatePreviewId('')}
+                className='inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white'
+                aria-label='Close template preview'>
+                <X className='h-4 w-4' />
+              </button>
+            </div>
+            <div className='min-h-0 flex-1 overflow-y-auto bg-slate-200 p-4 dark:bg-[#020617]'>
+              <iframe
+                title='Full template preview'
+                srcDoc={buildResumeHtml({
+                  ...getTemplatePreviewData(templatePreviewId),
+                  template: templatePreviewId,
+                  preview: true,
+                  previewFit: 'width',
+                })}
+                className='mx-auto aspect-[210/297] w-full max-w-[48rem] rounded-xl border-0 bg-white shadow-xl'
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 
