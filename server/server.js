@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
-import { clerkMiddleware, requireAuth } from '@clerk/express'
+import { clerkMiddleware, getAuth } from '@clerk/express'
 import aiRouter from './routes/aiRoutes.js';
 import connectCloudinary from './config/cloudinary.js';
 import userRouter from './routes/userRoutes.js';
@@ -23,9 +23,25 @@ app.use(clerkMiddleware())
 
 app.get('/', (req, res) => res.send('Server is Live!'));
 
-app.use('/api/ai', requireAuth(), aiRouter);
-app.use('/api/user', requireAuth(), userRouter);
-app.use('/api/stripe', requireAuth(), stripeRouter);
+const requireApiAuth = (req, res, next) => {
+  let userId;
+
+  try {
+    userId = getAuth(req).userId;
+  } catch {
+    return res.status(401).json({ success: false, message: 'Unauthorized' });
+  }
+
+  if (!userId) {
+    return res.status(401).json({ success: false, message: 'Unauthorized' });
+  }
+
+  next();
+};
+
+app.use('/api/ai', requireApiAuth, aiRouter);
+app.use('/api/user', requireApiAuth, userRouter);
+app.use('/api/stripe', requireApiAuth, stripeRouter);
 
 const PORT = process.env.PORT || 3000;
 

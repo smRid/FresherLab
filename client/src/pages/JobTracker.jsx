@@ -16,6 +16,21 @@ const STATUS_COLORS = {
 
 const emptyForm = { company: '', role: '', status: 'Applied', job_url: '', location: '', salary_range: '', source: '', contact_name: '', contact_email: '', notes: '', follow_up_date: '' }
 
+const cleanJobPayload = (form) => {
+  const payload = Object.fromEntries(
+    Object.entries(form).map(([key, value]) => [
+      key,
+      typeof value === 'string' ? value.trim() : value,
+    ])
+  )
+
+  if (payload.job_url && !/^https?:\/\//i.test(payload.job_url)) {
+    payload.job_url = `https://${payload.job_url}`
+  }
+
+  return payload
+}
+
 const JobTracker = () => {
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
@@ -25,37 +40,50 @@ const JobTracker = () => {
   const [form, setForm] = useState({ ...emptyForm })
   const [filter, setFilter] = useState('All')
   const [search, setSearch] = useState('')
-  const { getToken } = useAuth()
+  const { getToken, isLoaded, isSignedIn } = useAuth()
 
-  const headers = useCallback(async () => ({ Authorization: `Bearer ${await getToken()}` }), [getToken])
+  const headers = useCallback(async () => {
+    const token = await getToken()
+    return token ? { Authorization: `Bearer ${token}` } : {}
+  }, [getToken])
 
   const fetchJobs = useCallback(async () => {
+    if (!isLoaded) return
+    if (!isSignedIn) {
+      setJobs([])
+      setLoading(false)
+      return
+    }
+
     try {
       const { data } = await api.get('/api/user/job-applications', { headers: await headers() })
       if (data.success) setJobs(data.jobs)
       else toast.error(data.message)
     } catch (e) { toast.error(e.message) }
     setLoading(false)
-  }, [headers])
+  }, [headers, isLoaded, isSignedIn])
 
   useEffect(() => { fetchJobs() }, [fetchJobs])
 
   const handleSave = async (e) => {
     e.preventDefault()
-    if (!form.company || !form.role) return toast.error('Company and role are required')
+    const payload = cleanJobPayload(form)
+
+    if (!payload.company || !payload.role) return toast.error('Company and role are required')
+
     setSaving(true)
     try {
       const h = await headers()
       if (editId) {
-        const { data } = await api.put(`/api/user/job-applications/${editId}`, form, { headers: h })
+        const { data } = await api.put(`/api/user/job-applications/${editId}`, payload, { headers: h })
         if (data.success) { toast.success('Updated'); fetchJobs(); resetForm() }
         else toast.error(data.message)
       } else {
-        const { data } = await api.post('/api/user/job-applications', form, { headers: h })
+        const { data } = await api.post('/api/user/job-applications', payload, { headers: h })
         if (data.success) { toast.success('Added'); fetchJobs(); resetForm() }
         else toast.error(data.message)
       }
-    } catch (e) { toast.error(e.message) }
+    } catch (e) { toast.error(e.response?.data?.message || e.message) }
     setSaving(false)
   }
 

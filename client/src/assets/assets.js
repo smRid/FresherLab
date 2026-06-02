@@ -53,13 +53,13 @@ export const AiToolsData = [
         bg: { from: '#FF6B35', to: '#FF8E53' },
         path: '/ai/job-email-generator'
     },
-    {
-        title: 'Grammar Enhancer',
-        description: 'Polish resume bullets, emails, cover letters, LinkedIn posts, and professional writing.',
-        Icon: PenTool,
-        bg: { from: '#12B7AC', to: '#08B6CE' },
-        path: '/ai/grammar-enhancer'
-    },
+    // {
+    //     title: 'Grammar Enhancer',
+    //     description: 'Polish resume bullets, emails, cover letters, LinkedIn posts, and professional writing.',
+    //     Icon: PenTool,
+    //     bg: { from: '#12B7AC', to: '#08B6CE' },
+    //     path: '/ai/grammar-enhancer'
+    // },
     {
         title: 'JD Analyzer',
         description: 'Extract skills, ATS keywords, responsibilities, gaps, and project ideas from job descriptions.',
@@ -74,27 +74,27 @@ export const AiToolsData = [
         bg: { from: '#DC2626', to: '#F97316' },
         path: '/ai/readme-generator'
     },
-    {
-        title: 'Learning Plan',
-        description: 'Generate a personalized roadmap with weekly tasks, projects, resources, and interview prep.',
-        Icon: BookOpen,
-        bg: { from: '#2563EB', to: '#06B6D4' },
-        path: '/ai/learning-plan'
-    },
-    {
-        title: 'Code Snippet',
-        description: 'Generate beginner-friendly code examples with explanations, tests, and common mistakes.',
-        Icon: Code2,
-        bg: { from: '#111827', to: '#4F46E5' },
-        path: '/ai/code-snippet-generator'
-    },
-    {
-        title: 'LinkedIn Post',
-        description: 'Turn projects, certifications, learning updates, and job-seeking goals into strong posts.',
-        Icon: Linkedin,
-        bg: { from: '#0A66C2', to: '#0284C7' },
-        path: '/ai/linkedin-post-generator'
-    },
+    // {
+    //     title: 'Learning Plan',
+    //     description: 'Generate a personalized roadmap with weekly tasks, projects, resources, and interview prep.',
+    //     Icon: BookOpen,
+    //     bg: { from: '#2563EB', to: '#06B6D4' },
+    //     path: '/ai/learning-plan'
+    // },
+    // {
+    //     title: 'Code Snippet',
+    //     description: 'Generate beginner-friendly code examples with explanations, tests, and common mistakes.',
+    //     Icon: Code2,
+    //     bg: { from: '#111827', to: '#4F46E5' },
+    //     path: '/ai/code-snippet-generator'
+    // },
+    // {
+    //     title: 'LinkedIn Post',
+    //     description: 'Turn projects, certifications, learning updates, and job-seeking goals into strong posts.',
+    //     Icon: Linkedin,
+    //     bg: { from: '#0A66C2', to: '#0284C7' },
+    //     path: '/ai/linkedin-post-generator'
+    // },
     {
         title: 'Job Tracker',
         description: 'Track saved jobs, applications, interviews, follow-ups, offers, rejections, contacts, and notes.',

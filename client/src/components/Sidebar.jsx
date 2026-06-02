@@ -11,12 +11,12 @@ const navItems = [
   { to: '/ai/ats-checker', label: 'ATS Score Checker', Icon: BarChart3 },
   { to: '/ai/cover-letter', label: 'Cover Letter', Icon: Mail },
   { to: '/ai/job-email-generator', label: 'Job Email Generator', Icon: Send },
-  { to: '/ai/grammar-enhancer', label: 'Grammar Enhancer', Icon: PenTool },
+  // { to: '/ai/grammar-enhancer', label: 'Grammar Enhancer', Icon: PenTool },
   { to: '/ai/job-description-analyzer', label: 'JD Analyzer', Icon: Search },
   { to: '/ai/readme-generator', label: 'README Generator', Icon: Github },
-  { to: '/ai/learning-plan', label: 'Learning Plan', Icon: BookOpen },
-  { to: '/ai/code-snippet-generator', label: 'Code Snippet', Icon: Code2 },
-  { to: '/ai/linkedin-post-generator', label: 'LinkedIn Post', Icon: Linkedin },
+  // { to: '/ai/learning-plan', label: 'Learning Plan', Icon: BookOpen },
+  // { to: '/ai/code-snippet-generator', label: 'Code Snippet', Icon: Code2 },
+  // { to: '/ai/linkedin-post-generator', label: 'LinkedIn Post', Icon: Linkedin },
   { to: '/ai/job-tracker', label: 'Job Tracker', Icon: BriefcaseBusiness },
 ];
 

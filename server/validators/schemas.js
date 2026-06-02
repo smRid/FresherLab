@@ -3,6 +3,23 @@ import { z } from 'zod';
 const MAX_TEXT = 10000;
 const MAX_PDF_SIZE = 5 * 1024 * 1024; // 5MB
 
+const emptyToUndefined = (value) => {
+    if (typeof value !== 'string') return value;
+    const trimmed = value.trim();
+    return trimmed === '' ? undefined : trimmed;
+};
+
+const trimString = (value) => typeof value === 'string' ? value.trim() : value;
+const optionalText = (max) => z.preprocess(emptyToUndefined, z.string().max(max).optional());
+
+const optionalUrl = z.preprocess((value) => {
+    const trimmed = emptyToUndefined(value);
+    if (typeof trimmed !== 'string') return trimmed;
+    return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}, z.string().url('Enter a valid job URL').optional());
+
+const optionalEmail = z.preprocess(emptyToUndefined, z.string().email('Enter a valid contact email').optional());
+
 // ─── AI Text Tool Schemas ────────────────────────────────────
 
 export const grammarSchema = z.object({
@@ -47,17 +64,17 @@ export const readmeSchema = z.object({
 });
 
 export const jobApplicationSchema = z.object({
-    company: z.string().min(1, 'Company is required').max(200),
-    role: z.string().min(1, 'Role is required').max(200),
+    company: z.preprocess(trimString, z.string().min(1, 'Company is required').max(200)),
+    role: z.preprocess(trimString, z.string().min(1, 'Role is required').max(200)),
     status: z.enum(['Saved', 'Applied', 'Interview', 'Assignment', 'Offer', 'Rejected']).optional(),
-    job_url: z.string().url().optional().or(z.literal('')),
-    location: z.string().max(200).optional(),
-    salary_range: z.string().max(100).optional(),
-    source: z.string().max(200).optional(),
-    contact_name: z.string().max(200).optional(),
-    contact_email: z.string().email().optional().or(z.literal('')),
-    notes: z.string().max(MAX_TEXT).optional(),
-    follow_up_date: z.string().optional(),
+    job_url: optionalUrl,
+    location: optionalText(200),
+    salary_range: optionalText(100),
+    source: optionalText(200),
+    contact_name: optionalText(200),
+    contact_email: optionalEmail,
+    notes: optionalText(MAX_TEXT),
+    follow_up_date: z.preprocess(emptyToUndefined, z.string().optional()),
 });
 
 // ─── File Validation Helpers ─────────────────────────────────

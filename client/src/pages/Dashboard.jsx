@@ -7,8 +7,8 @@ import toast from 'react-hot-toast'
 
 const CAREER_TYPES = [
   'resume-review', 'ats-score', 'resume-builder', 'cover-letter',
-  'job-email', 'grammar-enhancement', 'readme',
-  'job-description-analysis', 'learning-plan', 'code-snippet', 'linkedin-post'
+  'job-email', /* 'grammar-enhancement', */ 'readme',
+  'job-description-analysis', /* 'learning-plan', 'code-snippet', 'linkedin-post' */
 ]
 
 const statCards = [
@@ -37,13 +37,26 @@ const Dashboard = () => {
   const [creations, setCreations] = useState([])
   const [loading, setLoading] = useState(true)
   const [extraLoading, setExtraLoading] = useState(true)
-  const { getToken } = useAuth()
+  const { getToken, isLoaded, isSignedIn } = useAuth()
   const { user } = useUser()
 
   const getDashboardData = useCallback(async () => {
+    if (!isLoaded) return
+    if (!isSignedIn) {
+      setCreations([])
+      setLoading(false)
+      return
+    }
+
     try {
+      const token = await getToken()
+      if (!token) {
+        setLoading(false)
+        return
+      }
+
       const { data } = await api.get('/api/user/get-user-creations', {
-        headers: { Authorization: `Bearer ${await getToken()}` }
+        headers: { Authorization: `Bearer ${token}` }
       })
       if (data.success) {
         setCreations(data.creations)
@@ -54,7 +67,7 @@ const Dashboard = () => {
       toast.error(error.message)
     }
     setLoading(false)
-  }, [getToken])
+  }, [getToken, isLoaded, isSignedIn])
 
   useEffect(() => {
     getDashboardData()
@@ -65,8 +78,22 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchExtra = async () => {
+      if (!isLoaded) return
+      if (!isSignedIn) {
+        setJobCount(0)
+        setPlan('free')
+        setExtraLoading(false)
+        return
+      }
+
       try {
         const token = await getToken()
+        if (!token) {
+          setJobCount(0)
+          setPlan('free')
+          return
+        }
+
         const headers = { Authorization: `Bearer ${token}` }
         const [jobRes, planRes] = await Promise.all([
           api.get('/api/user/job-applications', { headers }),
@@ -82,7 +109,7 @@ const Dashboard = () => {
       }
     }
     fetchExtra()
-  }, [getToken])
+  }, [getToken, isLoaded, isSignedIn])
 
   const careerCreations = creations.filter(c => CAREER_TYPES.includes(c.type))
   const countByType = (type) => creations.filter(c => c.type === type).length
