@@ -3,7 +3,7 @@ import { useAuth } from '@clerk/clerk-react'
 import { api } from '../lib/api'
 import toast from 'react-hot-toast'
 import GeneratedOutput from '../components/GeneratedOutput'
-import { CheckCircle2, Download, Eye, FileText, GripVertical, Loader2, Plus, Trash2, X } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, Download, Eye, FileText, GripVertical, Loader2, Plus, Trash2, X } from 'lucide-react'
 
 const SECTION_DEFINITIONS = [
   { key: 'personal', label: 'Personal' },
@@ -31,6 +31,81 @@ const STEP_NAV_LABELS = {
   achievements: 'Achievements',
 }
 
+const RESUME_TEMPLATES = [
+  {
+    id: 'classic',
+    name: 'Classic ATS',
+    description: 'Clean single-page style with centered header and traditional section rules.',
+  },
+  {
+    id: 'sample2',
+    name: 'Sample 2',
+    description: 'Compact teal-heading resume inspired by RESUME_Sample_2.pdf.',
+  },
+]
+
+const DUMMY_RESUME_PREVIEW_DATA = {
+  personal: {
+    fullName: 'Alex Rahman',
+    email: 'alex.rahman@example.com',
+    phone: '+880 1712 345 678',
+    location: 'Dhaka, Bangladesh',
+    linkedinUrl: 'https://linkedin.com/in/alex-rahman',
+    portfolioUrl: 'https://alexrahman.dev',
+    githubUrl: 'https://github.com/alexrahman',
+    targetRole: 'Junior Frontend Developer',
+    nationality: 'Bangladeshi',
+    dob: '15-03-2001',
+    nid: '1234567890',
+    maritalStatus: 'Single',
+    presentAddress: 'Mirpur, Dhaka - 1216',
+  },
+  summary: 'Junior frontend developer with hands-on experience building responsive React applications and API-driven dashboards.',
+  experiences: [
+    {
+      company: 'BrightApps Studio',
+      role: 'Frontend Developer Intern',
+      dates: 'June 2025 - December 2025',
+      location: 'Remote',
+      bullets: 'Built reusable React components for customer dashboards using Tailwind CSS.\nIntegrated REST APIs and improved form validation across key user flows.',
+    },
+  ],
+  skills: {
+    languages: 'HTML, CSS, JavaScript, TypeScript, Python',
+    frameworks: 'React, Next.js, Tailwind CSS, Express.js',
+    databases: 'MongoDB, PostgreSQL, Firebase',
+    tools: 'Git, GitHub, Vercel, Postman',
+  },
+  projects: [
+    {
+      name: 'Job Tracker Platform',
+      stack: 'React, Express.js, MongoDB, JWT',
+      liveUrl: 'https://job-tracker-demo.example.com',
+      githubUrl: 'https://github.com/alexrahman/job-tracker',
+      bullets: 'Created application status boards with saved jobs, interviews, and follow-up reminders.\nImplemented authentication and protected API routes for user-specific data.',
+    },
+    {
+      name: 'Portfolio CMS',
+      stack: 'Next.js, PostgreSQL, Tailwind CSS',
+      liveUrl: 'https://portfolio-cms.example.com',
+      githubUrl: 'https://github.com/alexrahman/portfolio-cms',
+      bullets: 'Built a project publishing workflow with markdown content and live previews.\nOptimized page performance with reusable server-rendered components.',
+    },
+  ],
+  certifications: [
+    { institution: 'Creative Tech Academy', course: 'Frontend Development with React', certificateUrl: 'https://example.com/certificate/react' },
+    { institution: 'FreeCodeCamp', course: 'JavaScript Algorithms and Data Structures', certificateUrl: 'https://example.com/certificate/js' },
+  ],
+  educations: [
+    { institution: 'Metropolitan University', degree: 'Bachelor of Computer Science and Engineering', dates: '2021 - 2025', grade: 'CGPA 3.72 / 4.00' },
+  ],
+  research: { title: '', stack: '' },
+  achievements: 'Selected as team lead for final-year software project\nSolved 150+ programming problems across online judges\nBuilt and deployed 6 portfolio-ready web projects',
+  softSkills: 'Communication\nTeam collaboration\nProblem solving\nTime management',
+  languages: 'English - Professional working proficiency\nBangla - Native',
+  sectionOrder: ['summary', 'experience', 'skills', 'projects', 'education', 'certifications', 'achievements', 'softSkills', 'languages'],
+}
+
 const emptyExperience = { company: '', companyUrl: '', role: '', dates: '', location: '', bullets: '' }
 const emptyProject = { name: '', stack: '', githubUrl: '', liveUrl: '', bullets: '' }
 const emptyCertification = { institution: '', course: '', certificateUrl: '' }
@@ -40,6 +115,7 @@ const inputClass = 'w-full rounded-lg border border-gray-300 dark:border-gray-70
 const labelClass = 'block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1'
 
 const ResumeBuilder = () => {
+  const [selectedTemplate, setSelectedTemplate] = useState('')
   const [activeSection, setActiveSection] = useState(DEFAULT_SECTION_ORDER[0])
   const [sectionOrder, setSectionOrder] = useState(DEFAULT_SECTION_ORDER)
   const [draggingSection, setDraggingSection] = useState('')
@@ -51,6 +127,7 @@ const ResumeBuilder = () => {
   const [personal, setPersonal] = useState({
     fullName: '', email: '', phone: '', location: '',
     linkedinUrl: '', portfolioUrl: '', githubUrl: '', targetRole: '',
+    nationality: '', dob: '', nid: '', maritalStatus: '', presentAddress: '',
   })
   const [summary, setSummary] = useState('')
   const [experiences, setExperiences] = useState([{ ...emptyExperience }])
@@ -105,6 +182,7 @@ const ResumeBuilder = () => {
         softSkills,
         languages,
         sectionOrder,
+        template: selectedTemplate,
       }
       const { data } = await api.post('/api/ai/resume-builder', payload, {
         headers: { Authorization: `Bearer ${await getToken()}` }
@@ -121,7 +199,7 @@ const ResumeBuilder = () => {
     const pdfWindow = window.open('', '_blank')
     if (!pdfWindow) return toast.error('Please allow popups to download PDF')
 
-    const html = buildResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionOrder })
+    const html = buildResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionOrder, template: selectedTemplate })
     pdfWindow.document.open()
     pdfWindow.document.write(html)
     pdfWindow.document.close()
@@ -131,6 +209,45 @@ const ResumeBuilder = () => {
       pdfWindow.print()
     }, 500)
   }
+
+  const templateSelection = (
+    <div className='h-full overflow-y-auto p-6 text-slate-700 dark:text-gray-300'>
+      <div className='mx-auto max-w-6xl'>
+        <div className='mb-5'>
+          <h1 className='mb-1 text-2xl font-bold text-slate-800 dark:text-white'>Choose a resume template</h1>
+          <p className='text-sm text-slate-500 dark:text-gray-400'>Select one template to continue building your resume.</p>
+        </div>
+
+        <div className='grid gap-5 md:grid-cols-2'>
+          {RESUME_TEMPLATES.map(template => (
+            <div key={template.id} className='overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-blue-400 hover:shadow-lg dark:border-gray-800 dark:bg-[#111827]'>
+              <div className='bg-slate-100 p-3 dark:bg-[#0B1120]'>
+                <div className='mx-auto aspect-[210/297] h-[21rem] max-w-full overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-gray-700'>
+                  <iframe
+                    title={`${template.name} preview`}
+                    srcDoc={buildResumeHtml({ ...DUMMY_RESUME_PREVIEW_DATA, template: template.id, preview: true })}
+                    className='h-full w-full border-0 bg-white'
+                  />
+                </div>
+              </div>
+              <div className='border-t border-slate-200 p-4 dark:border-gray-800'>
+                <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
+                  <div>
+                    <h2 className='text-lg font-semibold text-slate-900 dark:text-white'>{template.name}</h2>
+                    <p className='mt-1 text-sm text-slate-500 dark:text-gray-400'>{template.description}</p>
+                  </div>
+                  <button type='button' onClick={() => setSelectedTemplate(template.id)}
+                    className='shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700'>
+                    Use template
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
 
   // Personal step
   const personalStep = (
@@ -147,6 +264,18 @@ const ResumeBuilder = () => {
       <Field label='LinkedIn URL' value={personal.linkedinUrl} onChange={v => setPersonal({ ...personal, linkedinUrl: v })} placeholder='https://linkedin.com/in/alex-carter' />
       <Field label='Portfolio URL' value={personal.portfolioUrl} onChange={v => setPersonal({ ...personal, portfolioUrl: v })} placeholder='https://alexcarter.dev' />
       <Field label='GitHub URL' value={personal.githubUrl} onChange={v => setPersonal({ ...personal, githubUrl: v })} placeholder='https://github.com/alexcarter' />
+      <div className='rounded-xl border border-dashed border-slate-300 p-4 dark:border-gray-700'>
+        <h3 className='mb-3 text-sm font-semibold text-slate-800 dark:text-white'>Personal Information for Sample 2</h3>
+        <div className='grid grid-cols-2 gap-3'>
+          <Field label='Nationality' value={personal.nationality} onChange={v => setPersonal({ ...personal, nationality: v })} placeholder='Bangladeshi' />
+          <Field label='Date of Birth' value={personal.dob} onChange={v => setPersonal({ ...personal, dob: v })} placeholder='02-07-2000' />
+          <Field label='NID' value={personal.nid} onChange={v => setPersonal({ ...personal, nid: v })} placeholder='6911281381' />
+          <Field label='Marital Status' value={personal.maritalStatus} onChange={v => setPersonal({ ...personal, maritalStatus: v })} placeholder='Single' />
+        </div>
+        <div className='mt-3'>
+          <Field label='Present Address' value={personal.presentAddress} onChange={v => setPersonal({ ...personal, presentAddress: v })} placeholder='21, South Khilgaon, Dhaka - 1219' />
+        </div>
+      </div>
     </div>
   )
 
@@ -294,7 +423,7 @@ const ResumeBuilder = () => {
     { key: 'softSkills', label: 'Soft Skills', done: Boolean(softSkills.trim()) },
     { key: 'languages', label: 'Languages', done: Boolean(languages.trim()) },
   ]
-  const resumePreviewHtml = buildResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionOrder, preview: true })
+  const resumePreviewHtml = buildResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionOrder, template: selectedTemplate, preview: true })
 
   const buildStep = (
     <div className='space-y-5'>
@@ -383,12 +512,20 @@ const ResumeBuilder = () => {
     </aside>
   )
 
+  if (!selectedTemplate) return templateSelection
+
   return (
     <div className='h-full overflow-y-scroll p-6 text-slate-700 dark:text-gray-300'>
       <div className='grid w-full gap-5 xl:grid-cols-[minmax(0,1fr)_300px] 2xl:grid-cols-[minmax(0,1fr)_330px]'>
         <div className='min-w-0'>
           <h1 className='mb-1 text-2xl font-bold text-slate-800 dark:text-white'>AI Resume Builder</h1>
-          <p className='mb-6 text-sm text-slate-500 dark:text-gray-400'>Generate a clean LaTeX resume in the Trey-Hunner <code>resume.cls</code> format used by top freshers.</p>
+          <div className='mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+            <p className='text-sm text-slate-500 dark:text-gray-400'>Generate a clean resume with the selected <span className='font-medium text-slate-700 dark:text-gray-300'>{RESUME_TEMPLATES.find(template => template.id === selectedTemplate)?.name}</span> template.</p>
+            <button type='button' onClick={() => setSelectedTemplate('')}
+              className='inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800'>
+              <ArrowLeft className='h-4 w-4' /> Change template
+            </button>
+          </div>
 
           <div className='mb-7 grid w-full grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6'>
             {stepOrder.map((sectionKey, i) => {
@@ -458,7 +595,7 @@ const ResumeBuilder = () => {
             <div className='min-h-0 flex-1 overflow-y-auto bg-slate-200 p-4 dark:bg-[#020617]'>
               <iframe
                 title='Large resume preview'
-                srcDoc={buildResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionOrder, preview: true, previewFit: 'width' })}
+                srcDoc={buildResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionOrder, template: selectedTemplate, preview: true, previewFit: 'width' })}
                 className='aspect-[210/297] w-full rounded-xl border-0 bg-slate-100'
               />
             </div>
@@ -502,7 +639,11 @@ const renderBullets = (bullets) => {
   return `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
 }
 
-const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills = {}, projects = [], certifications = [], educations = [], research = {}, achievements = '', softSkills = '', languages = '', sectionOrder = DEFAULT_SECTION_ORDER, preview = false, previewFit = 'contain' }) => {
+const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills = {}, projects = [], certifications = [], educations = [], research = {}, achievements = '', softSkills = '', languages = '', sectionOrder = DEFAULT_SECTION_ORDER, template = 'classic', preview = false, previewFit = 'contain' }) => {
+  if (template === 'sample2') {
+    return buildSample2ResumeHtml({ personal, summary, experiences, skills, projects, certifications, educations, research, achievements, softSkills, languages, sectionOrder, preview, previewFit })
+  }
+
   const contact = [
     personal.phone && `<a href="tel:${escapeHtml(personal.phone)}">${escapeHtml(personal.phone)}</a>`,
     personal.email && `<a href="mailto:${escapeHtml(personal.email)}">${escapeHtml(personal.email)}</a>`,
@@ -680,6 +821,207 @@ const buildResumeHtml = ({ personal = {}, summary = '', experiences = [], skills
       ${location ? `<div class="location">${location}</div>` : ''}
     </header>
     ${orderedSections}
+  </main>
+  ${preview ? '</div></div>' : ''}
+  ${previewScript}
+</body>
+</html>`
+}
+
+const renderSample2Section = (title, content) => content ? `
+  <section class="s2-section">
+    <h2>${escapeHtml(title)}</h2>
+    ${content}
+  </section>
+` : ''
+
+const buildSample2ResumeHtml = ({ personal = {}, summary = '', experiences = [], skills = {}, projects = [], certifications = [], educations = [], research = {}, achievements = '', softSkills = '', languages = '', sectionOrder = DEFAULT_SECTION_ORDER, preview = false, previewFit = 'contain' }) => {
+  const contactRows = [
+    personal.email && `<div><strong>Gmail :</strong> <a class="email-link" href="mailto:${escapeHtml(personal.email)}">${escapeHtml(personal.email)}</a></div>`,
+    personal.phone && `<div><strong>Phone :</strong> ${escapeHtml(personal.phone)}</div>`,
+  ].filter(Boolean).join('')
+
+  const profileLinks = [
+    renderExternalLink(personal.linkedinUrl, 'LinkedIn'),
+    renderExternalLink(personal.githubUrl, 'GitHub'),
+    renderExternalLink(personal.portfolioUrl, 'Portfolio'),
+  ].filter(Boolean).join(' <span class="link-divider">|</span> ')
+
+  const summaryContent = String(summary || '').trim()
+    ? `<p class="s2-paragraph">${escapeHtml(summary).replace(/\r?\n/g, '<br />')}</p>`
+    : ''
+
+  const experienceContent = (experiences || [])
+    .filter(item => hasAnyValue(item, ['company', 'role', 'bullets']))
+    .map(item => `
+      <div class="s2-entry">
+        <div class="s2-entry-title">
+          <strong>${item.companyUrl ? renderExternalLink(item.companyUrl, item.company) : escapeHtml(item.company)}</strong>
+          ${item.role ? `<span>- ${escapeHtml(item.role)}</span>` : ''}
+        </div>
+        ${item.dates || item.location ? `<div class="s2-meta">${[item.dates, item.location].filter(Boolean).map(escapeHtml).join(' | ')}</div>` : ''}
+        ${renderBullets(item.bullets)}
+      </div>
+    `).join('')
+
+  const skillItems = [
+    skills.languages && ['Programming Languages', skills.languages],
+    skills.frameworks && ['Frameworks and others', skills.frameworks],
+    skills.databases && ['Databases', skills.databases],
+    skills.tools && ['Tools', skills.tools],
+  ].filter(Boolean)
+  const skillsContent = skillItems.length
+    ? `<div class="s2-skill-list">${skillItems.map(([label, value]) => `<p><strong>${escapeHtml(label)}:</strong> ${escapeHtml(value)}.</p>`).join('')}</div>`
+    : ''
+
+  const projectContent = (projects || [])
+    .filter(item => hasAnyValue(item, ['name', 'stack', 'bullets']))
+    .map(item => {
+      const projectLinks = [
+        renderExternalLink(item.liveUrl, 'Live link'),
+        renderExternalLink(item.githubUrl, 'GitHub'),
+      ].filter(Boolean).join(' | ')
+      return `
+        <div class="s2-entry">
+          <div class="s2-project-title">
+            <strong>${escapeHtml(item.name)}</strong>
+            ${projectLinks ? `<span>: ${projectLinks}</span>` : ''}
+          </div>
+          ${item.stack ? `<p class="s2-tech"><strong>Tech :</strong> ${escapeHtml(item.stack)}</p>` : ''}
+          ${renderBullets(item.bullets)}
+        </div>
+      `
+    }).join('')
+
+  const educationContent = (educations || [])
+    .filter(item => hasAnyValue(item, ['institution', 'degree']))
+    .map(item => `
+      <div class="s2-education">
+        <div>
+          <strong>${escapeHtml(item.degree)}</strong>
+          <p>${escapeHtml(item.institution)}${item.grade ? ` | ${escapeHtml(item.grade)}` : ''}</p>
+        </div>
+        <span>${escapeHtml(item.dates)}</span>
+      </div>
+    `).join('')
+
+  const certificationContent = (certifications || [])
+    .filter(item => hasAnyValue(item, ['institution', 'course']))
+    .map(item => `<p class="s2-line"><strong>${escapeHtml(item.institution)}</strong>${item.certificateUrl ? ` ${renderExternalLink(item.certificateUrl, '(Certificate)')}` : ''} - ${escapeHtml(item.course)}</p>`)
+    .join('')
+
+  const researchContent = hasAnyValue(research, ['title', 'stack'])
+    ? `<p class="s2-line"><strong>${escapeHtml(research.title)}</strong>${research.stack ? ` | ${escapeHtml(research.stack)}` : ''}</p>${summaryContent && !experienceContent ? summaryContent : ''}`
+    : ''
+
+  const achievementsContent = renderBullets(achievements)
+  const softSkillsContent = renderBullets(softSkills)
+  const languagesContent = renderBullets(languages)
+  const personalInfoRows = [
+    personal.nationality && ['Nationality', personal.nationality],
+    personal.dob && ['Date of Birth', personal.dob],
+    personal.nid && ['NID', personal.nid],
+    personal.maritalStatus && ['Marital Status', personal.maritalStatus],
+    (personal.presentAddress || personal.location) && ['Present Address', personal.presentAddress || personal.location],
+  ].filter(Boolean)
+  const personalInfoContent = personalInfoRows.length
+    ? `<div class="s2-personal-info">${personalInfoRows.map(([label, value]) => `<p><strong>${escapeHtml(label)} :</strong> ${escapeHtml(value)}</p>`).join('')}</div>`
+    : ''
+
+  const resumeSections = {
+    summary: renderSample2Section('Professional Summary', summaryContent),
+    experience: renderSample2Section('Work Experience', experienceContent),
+    skills: renderSample2Section('Skills', skillsContent),
+    projects: renderSample2Section('Projects', projectContent),
+    education: renderSample2Section('Educational Qualification', educationContent),
+    certifications: renderSample2Section('Training & Certification', certificationContent),
+    research: renderSample2Section('Research Experience', researchContent),
+    achievements: renderSample2Section('Achievements', achievementsContent),
+    softSkills: renderSample2Section('Soft Skills', softSkillsContent),
+    languages: renderSample2Section('Languages', languagesContent),
+  }
+  const requestedOrder = Array.isArray(sectionOrder) && sectionOrder.length ? sectionOrder : DEFAULT_SECTION_ORDER
+  const orderedSections = [...requestedOrder, ...DEFAULT_SECTION_ORDER.filter(key => !requestedOrder.includes(key))]
+    .map(key => resumeSections[key])
+    .filter(Boolean)
+    .join('')
+  const isWidthFitPreview = previewFit === 'width'
+  const previewStyles = preview ? `
+    html, body.preview-body { height: 100%; }
+    body.preview-body { align-items: ${isWidthFitPreview ? 'flex-start' : 'center'}; background: #e2e8f0; display: flex; justify-content: center; overflow: hidden; padding: 10px; }
+    body.preview-body .pdf-viewport { height: 100%; position: relative; width: 100%; }
+    body.preview-body .pdf-shell { height: 11in; left: 50%; position: absolute; top: ${isWidthFitPreview ? '0' : '50%'}; transform-origin: ${isWidthFitPreview ? 'top center' : 'center center'}; width: 8.5in; }
+    body.preview-body .resume { background: #ffffff; box-shadow: 0 14px 30px rgba(15, 23, 42, 0.24); height: 11in; margin: 0; max-width: none; overflow: hidden; padding: 0.22in 0.3in; width: 8.5in; }
+  ` : ''
+  const previewScript = preview ? `
+  <script>
+    const fitResumePage = () => {
+      const viewport = document.querySelector('.pdf-viewport');
+      const shell = document.querySelector('.pdf-shell');
+      if (!viewport || !shell) return;
+
+      const pageWidth = 8.5 * 96;
+      const pageHeight = 11 * 96;
+      const availableWidth = Math.max(220, document.documentElement.clientWidth - 20);
+      const availableHeight = Math.max(300, document.documentElement.clientHeight - 20);
+      const scale = ${isWidthFitPreview ? 'Math.min(1, availableWidth / pageWidth)' : 'Math.min(availableWidth / pageWidth, availableHeight / pageHeight)'};
+
+      shell.style.transform = '${isWidthFitPreview ? 'translateX(-50%)' : 'translate(-50%, -50%)'} scale(' + scale + ')';
+      viewport.style.height = Math.ceil(pageHeight * scale) + 'px';
+    };
+
+    window.addEventListener('load', fitResumePage);
+    window.addEventListener('resize', fitResumePage);
+    requestAnimationFrame(fitResumePage);
+  </script>
+  ` : ''
+
+  return `<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>${escapeHtml(personal.fullName || 'Resume')}</title>
+  <style>
+    @page { size: Letter; margin: 0.22in 0.3in; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #ffffff; color: #20252a; font-family: Arial, Helvetica, sans-serif; font-size: 11.4pt; line-height: 1.25; }
+    .resume { max-width: 8.5in; margin: 0 auto; }
+    .s2-header { margin-bottom: 12px; }
+    .s2-header h1 { margin: 0 0 7px; color: #20252a; font-size: 21.5pt; font-weight: 700; line-height: 1.05; }
+    .s2-contact { display: grid; gap: 8px; font-size: 11.2pt; }
+    .s2-links { font-size: 11.4pt; margin-top: 8px; }
+    a { color: #00aeea; text-decoration: none; }
+    .s2-links a:nth-child(5) { color: #804080; }
+    .email-link { color: #00aeea; border-bottom: 1px solid #00aeea; }
+    .link-divider { color: #007bff; padding: 0 4px; }
+    .s2-section { border-top: 1.5px solid #20252a; margin-top: 10px; padding-top: 5px; }
+    .s2-section h2 { color: #33786f; font-size: 14.8pt; letter-spacing: 0; line-height: 1; margin: 0 0 9px; text-transform: uppercase; }
+    .s2-entry { margin-bottom: 8px; }
+    .s2-entry-title, .s2-project-title { color: #20252a; font-size: 13.5pt; margin-bottom: 4px; }
+    .s2-meta { color: #666666; font-size: 11.2pt; margin-bottom: 4px; }
+    .s2-tech, .s2-line, .s2-paragraph, .s2-skill-list p, .s2-personal-info p { margin: 4px 0; }
+    .s2-education { align-items: flex-start; display: flex; gap: 14px; justify-content: space-between; margin-bottom: 10px; }
+    .s2-education strong { font-size: 13.5pt; }
+    .s2-education p { margin: 4px 0 0; }
+    .s2-education > span { color: #666666; white-space: nowrap; }
+    ul { margin: 3px 0 7px 18px; padding: 0; }
+    li { margin-bottom: 3px; text-align: justify; text-align-last: left; }
+    ${previewStyles}
+    @media print {
+      body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body${preview ? ' class="preview-body"' : ''}>
+  ${preview ? '<div class="pdf-viewport"><div class="pdf-shell">' : ''}
+  <main class="resume">
+    <header class="s2-header">
+      <h1>${escapeHtml(personal.fullName)}</h1>
+      <div class="s2-contact">${contactRows}</div>
+      ${profileLinks ? `<div class="s2-links">${profileLinks}</div>` : ''}
+    </header>
+    ${orderedSections}
+    ${renderSample2Section('Personal Information', personalInfoContent)}
   </main>
   ${preview ? '</div></div>' : ''}
   ${previewScript}
