@@ -1,0 +1,17 @@
+{
+  "name": "FresherLab",
+  "short_name": "FresherLab",
+  "description": "AI-powered job preparation tools for freshers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#080A12",
+  "theme_color": "#080A12",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
