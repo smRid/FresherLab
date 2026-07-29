@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { ArrowRight, BriefcaseBusiness, CheckCircle2, Sparkles } from "lucide-react";
 
 const stats = [

@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { ArrowRight, GraduationCap } from 'lucide-react'
 import { useClerk, UserButton, useUser } from '@clerk/clerk-react'
 

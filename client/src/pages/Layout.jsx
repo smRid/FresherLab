@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router'
 import { GraduationCap, Menu, Moon, Sun, X } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 import { useClerk, useUser } from '@clerk/clerk-react'

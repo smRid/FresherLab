@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom"
+import { Route, Routes } from "react-router"
 import Home from "./pages/Home.jsx";
 import Layout from "./pages/Layout";
 import Dashboard from "./pages/Dashboard";

@@ -2,7 +2,7 @@ import { useAuth, useClerk, useUser } from '@clerk/clerk-react'
 import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
 import { BarChart3, BookOpen, BriefcaseBusiness, Code2, FileSearch, FileText, Github, LayoutDashboard, Linkedin, LogOut, Mail, PenTool, Search, Send } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router';
 
 const navItems = [
   { to: '/ai', label: 'Dashboard', Icon: LayoutDashboard },

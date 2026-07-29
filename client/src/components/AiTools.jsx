@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router"
 import { AiToolsData } from "../assets/assets"
 import { useUser, useClerk } from "@clerk/clerk-react"
 

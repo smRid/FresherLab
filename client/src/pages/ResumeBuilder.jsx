@@ -124,7 +124,7 @@ const DUMMY_RESUME_PREVIEW_DATA = {
   sectionOrder: ['summary', 'experience', 'skills', 'projects', 'education', 'certifications', 'achievements', 'softSkills', 'languages'],
 }
 
-const getTemplatePreviewData = (templateId) => {
+const getTemplatePreviewData = () => {
   const base = {
     ...DUMMY_RESUME_PREVIEW_DATA,
     softSkills: '',
@@ -150,7 +150,7 @@ const ResumeBuilder = () => {
   const [sectionOrder, setSectionOrder] = useState(DEFAULT_SECTION_ORDER)
   const [sectionTitles, setSectionTitles] = useState(DEFAULT_RESUME_SECTION_TITLES)
   const [draggingSection, setDraggingSection] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [, setLoading] = useState(false)
   const [result, setResult] = useState('')
   const [previewOpen, setPreviewOpen] = useState(false)
   const [templatePreviewId, setTemplatePreviewId] = useState('')
