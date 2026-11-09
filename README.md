@@ -38,27 +38,35 @@ to land your first tech job into one focused workspace.
   <img src="./public/preview2.png" alt="FresherLab career workspace" width="1000" />
 </p>
 
+<p align="center">
+  <img src="./public/preview3.png" alt="FresherLab Resume Builder" width="1000" />
+</p>
+
+<p align="center">
+  <img src="./public/preview4.png" alt="FresherLab Resume ATS Score checker" width="1000" />
+</p>
+
 > **Live site:** [https://fresherlab.vercel.app](https://fresherlab.vercel.app)
 
 ---
 
 ## Features
 
-| Feature                             | Description                                                                                          |
-| :---------------------------------- | :--------------------------------------------------------------------------------------------------- |
-| **Clerk Authentication**            | Secure sign-up, sign-in, session handling, user profiles, and protected `/ai` workspace routes       |
-| **AI Resume Review**                | Upload PDF resumes (up to 5MB) to extract text and receive deep AI critique on strengths and gaps    |
-| **ATS Score & Keyword Matcher**     | Evaluates resumes against target job descriptions with keyword match scoring and section checks      |
-| **Step-by-Step Resume Builder**     | Guided form generating ATS-formatted resumes with LaTeX and structured markdown export options       |
-| **Tailored Cover Letter Generator** | Context-driven cover letters customized by role, company name, tone, and candidate achievements      |
-| **Job Email & Cold Outreach**       | Generates recruiter outreach, referral requests, application follow-ups, and interview replies       |
-| **Job Description Analyzer**        | Extracts core competencies, required tech stacks, red flags, and interview questions from raw JDs    |
-| **GitHub README Generator**         | Creates portfolio-ready repository READMEs with badges, architecture overviews, and setup steps      |
-| **Grammar & Bullet Enhancer**       | Polishes resume bullet points and professional correspondence into high-impact action statements     |
+| Feature                             | Description                                                                                             |
+| :---------------------------------- | :------------------------------------------------------------------------------------------------------ |
+| **Clerk Authentication**            | Secure sign-up, sign-in, session handling, user profiles, and protected `/ai` workspace routes          |
+| **AI Resume Review**                | Upload PDF resumes (up to 5MB) to extract text and receive deep AI critique on strengths and gaps       |
+| **ATS Score & Keyword Matcher**     | Evaluates resumes against target job descriptions with keyword match scoring and section checks         |
+| **Step-by-Step Resume Builder**     | Guided form generating ATS-formatted resumes with LaTeX and structured markdown export options          |
+| **Tailored Cover Letter Generator** | Context-driven cover letters customized by role, company name, tone, and candidate achievements         |
+| **Job Email & Cold Outreach**       | Generates recruiter outreach, referral requests, application follow-ups, and interview replies          |
+| **Job Description Analyzer**        | Extracts core competencies, required tech stacks, red flags, and interview questions from raw JDs       |
+| **GitHub README Generator**         | Creates portfolio-ready repository READMEs with badges, architecture overviews, and setup steps         |
+| **Grammar & Bullet Enhancer**       | Polishes resume bullet points and professional correspondence into high-impact action statements        |
 | **Job Application Tracker**         | Full CRUD pipeline to track applications by status, company, role, follow-up dates, and interview notes |
-| **Workspace Creation History**      | Stores AI outputs in Neon PostgreSQL with one-click copy, markdown download, and print capabilities  |
-| **Tiered Usage & Subscriptions**    | Free tier with 10 free generations tracked in PostgreSQL and unlimited usage for Stripe Premium      |
-| **Stripe Checkout & Webhooks**      | Automated checkout sessions, webhook lifecycle processing, customer portal, and plan synchronization |
+| **Workspace Creation History**      | Stores AI outputs in Neon PostgreSQL with one-click copy, markdown download, and print capabilities     |
+| **Tiered Usage & Subscriptions**    | Free tier with 10 free generations tracked in PostgreSQL and unlimited usage for Stripe Premium         |
+| **Stripe Checkout & Webhooks**      | Automated checkout sessions, webhook lifecycle processing, customer portal, and plan synchronization    |
 
 ---
 
@@ -78,24 +86,24 @@ to land your first tech job into one focused workspace.
 
 <div align="center">
 
-|       Technology       | Purpose                                                                             |
-| :--------------------: | :---------------------------------------------------------------------------------- |
-|      **React 19**      | Interactive component-based landing page, career tools, and workspace UI            |
-|       **Vite 7**       | Modern build tooling, fast hot module replacement, and client bundling              |
-|     **Express 5**      | Modular REST API server, authentication middleware, and route handlers              |
-|   **Tailwind CSS 4**   | Utility-first responsive design, modern dark/light mode palette, and typography     |
-|   **React Router 7**   | Declarative client-side routing and protected workspace subroutes                   |
-|       **Clerk**        | Hosted authentication, JWT verification, session tokens, and user profile management |
-|  **Neon PostgreSQL**   | Serverless PostgreSQL database for creations, job applications, and subscriptions   |
-|   **Google Gemini**    | High-speed `gemini-2.0-flash` LLM for career document generation and ATS analysis   |
-|       **Stripe**       | Subscription billing, checkout sessions, and automated webhook lifecycle management  |
-|        **Zod**         | Runtime schema validation, input sanitization, and error handling                   |
-|     **pdf-parse**      | Server-side text extraction from candidate resume PDF uploads                       |
-|   **React Markdown**   | GitHub-flavored markdown rendering for generated career materials                   |
-|   **React Hot Toast**  | Accessible, lightweight toast feedback for asynchronous user actions                |
-|    **Lucide React**    | Clean, consistent icon set across the workspace and navigation                      |
-|     **Cloudinary**     | Cloud-based file handling and media asset management                                |
-|       **Vercel**       | Production hosting for client Single Page Application and serverless API functions  |
+|     Technology      | Purpose                                                                              |
+| :-----------------: | :----------------------------------------------------------------------------------- |
+|    **React 19**     | Interactive component-based landing page, career tools, and workspace UI             |
+|     **Vite 7**      | Modern build tooling, fast hot module replacement, and client bundling               |
+|    **Express 5**    | Modular REST API server, authentication middleware, and route handlers               |
+| **Tailwind CSS 4**  | Utility-first responsive design, modern dark/light mode palette, and typography      |
+| **React Router 7**  | Declarative client-side routing and protected workspace subroutes                    |
+|      **Clerk**      | Hosted authentication, JWT verification, session tokens, and user profile management |
+| **Neon PostgreSQL** | Serverless PostgreSQL database for creations, job applications, and subscriptions    |
+|  **Google Gemini**  | High-speed `gemini-2.0-flash` LLM for career document generation and ATS analysis    |
+|     **Stripe**      | Subscription billing, checkout sessions, and automated webhook lifecycle management  |
+|       **Zod**       | Runtime schema validation, input sanitization, and error handling                    |
+|    **pdf-parse**    | Server-side text extraction from candidate resume PDF uploads                        |
+| **React Markdown**  | GitHub-flavored markdown rendering for generated career materials                    |
+| **React Hot Toast** | Accessible, lightweight toast feedback for asynchronous user actions                 |
+|  **Lucide React**   | Clean, consistent icon set across the workspace and navigation                       |
+|   **Cloudinary**    | Cloud-based file handling and media asset management                                 |
+|     **Vercel**      | Production hosting for client Single Page Application and serverless API functions   |
 
 </div>
 
@@ -194,38 +202,38 @@ FresherLab/
 
 All AI career endpoints require an authenticated Clerk Bearer token.
 
-| Endpoint                            |  Method  | Access              | Purpose                                                                |
-| :---------------------------------- | :------: | :------------------ | :--------------------------------------------------------------------- |
-| `/api/ai/resume-review`             |  `POST`  | Free (10) / Premium | Upload PDF resume to receive comprehensive AI feedback and critique    |
-| `/api/ai/ats-score`                 |  `POST`  | Free (10) / Premium | Score resume PDF against target JD with matched and missing keywords   |
-| `/api/ai/resume-builder`            |  `POST`  | Free (10) / Premium | Generate structured resume content with LaTeX export support           |
-| `/api/ai/generate-cover-letter`     |  `POST`  | Free (10) / Premium | Create targeted cover letters customized for specific job roles        |
-| `/api/ai/generate-email`            |  `POST`  | Free (10) / Premium | Draft professional cold outreach, referral requests, and follow-ups    |
-| `/api/ai/job-description-analysis`  |  `POST`  | Free (10) / Premium | Analyze job postings for required skills, gaps, and interview questions|
-| `/api/ai/generate-readme`           |  `POST`  | Free (10) / Premium | Build portfolio-ready GitHub README files with setup and tech stack    |
-| `/api/ai/enhance-grammar`           |  `POST`  | Free (10) / Premium | Polish resume bullet points and professional statements                |
-| `/api/ai/learning-plan`             |  `POST`  | Free (10) / Premium | Generate customized learning roadmaps for target tech roles            |
-| `/api/ai/code-snippet`              |  `POST`  | Free (10) / Premium | Generate educational, interview-focused code examples                  |
+| Endpoint                           | Method | Access              | Purpose                                                                 |
+| :--------------------------------- | :----: | :------------------ | :---------------------------------------------------------------------- |
+| `/api/ai/resume-review`            | `POST` | Free (10) / Premium | Upload PDF resume to receive comprehensive AI feedback and critique     |
+| `/api/ai/ats-score`                | `POST` | Free (10) / Premium | Score resume PDF against target JD with matched and missing keywords    |
+| `/api/ai/resume-builder`           | `POST` | Free (10) / Premium | Generate structured resume content with LaTeX export support            |
+| `/api/ai/generate-cover-letter`    | `POST` | Free (10) / Premium | Create targeted cover letters customized for specific job roles         |
+| `/api/ai/generate-email`           | `POST` | Free (10) / Premium | Draft professional cold outreach, referral requests, and follow-ups     |
+| `/api/ai/job-description-analysis` | `POST` | Free (10) / Premium | Analyze job postings for required skills, gaps, and interview questions |
+| `/api/ai/generate-readme`          | `POST` | Free (10) / Premium | Build portfolio-ready GitHub README files with setup and tech stack     |
+| `/api/ai/enhance-grammar`          | `POST` | Free (10) / Premium | Polish resume bullet points and professional statements                 |
+| `/api/ai/learning-plan`            | `POST` | Free (10) / Premium | Generate customized learning roadmaps for target tech roles             |
+| `/api/ai/code-snippet`             | `POST` | Free (10) / Premium | Generate educational, interview-focused code examples                   |
 
 ### User & Job Tracker (`/api/user`)
 
-| Endpoint                       |   Method   | Purpose                                                                |
-| :----------------------------- | :--------: | :--------------------------------------------------------------------- |
-| `/api/user/get-user-creations` |   `GET`    | Retrieve all saved AI creations for the authenticated user             |
-| `/api/user/get-published-creations` | `GET` | Retrieve community-shared creations                                    |
-| `/api/user/toggle-like-creation`| `POST`    | Like or unlike a shared creation                                       |
-| `/api/user/job-applications`   |   `GET`    | Fetch all tracked job applications for the candidate                   |
-| `/api/user/job-applications`   |   `POST`   | Add a new job application (company, role, status, contact, notes)      |
-| `/api/user/job-applications/:id` | `PUT`    | Update application status, salary range, follow-up dates, or notes     |
-| `/api/user/job-applications/:id` | `DELETE` | Delete a job application from the tracker                              |
+| Endpoint                            |  Method  | Purpose                                                            |
+| :---------------------------------- | :------: | :----------------------------------------------------------------- |
+| `/api/user/get-user-creations`      |  `GET`   | Retrieve all saved AI creations for the authenticated user         |
+| `/api/user/get-published-creations` |  `GET`   | Retrieve community-shared creations                                |
+| `/api/user/toggle-like-creation`    |  `POST`  | Like or unlike a shared creation                                   |
+| `/api/user/job-applications`        |  `GET`   | Fetch all tracked job applications for the candidate               |
+| `/api/user/job-applications`        |  `POST`  | Add a new job application (company, role, status, contact, notes)  |
+| `/api/user/job-applications/:id`    |  `PUT`   | Update application status, salary range, follow-up dates, or notes |
+| `/api/user/job-applications/:id`    | `DELETE` | Delete a job application from the tracker                          |
 
 ### Stripe Subscriptions (`/api/stripe`)
 
-| Endpoint                                | Method | Purpose                                                                |
-| :-------------------------------------- | :----: | :--------------------------------------------------------------------- |
-| `/api/stripe/create-checkout-session`   | `POST` | Initialize a Stripe Checkout session for the Premium subscription      |
-| `/api/stripe/subscription-status`       | `GET`  | Return user's active plan (`free` or `premium`), status, and usage     |
-| `/api/stripe/webhook`                   | `POST` | Raw body webhook handler verifying events and updating subscriptions   |
+| Endpoint                              | Method | Purpose                                                              |
+| :------------------------------------ | :----: | :------------------------------------------------------------------- |
+| `/api/stripe/create-checkout-session` | `POST` | Initialize a Stripe Checkout session for the Premium subscription    |
+| `/api/stripe/subscription-status`     | `GET`  | Return user's active plan (`free` or `premium`), status, and usage   |
+| `/api/stripe/webhook`                 | `POST` | Raw body webhook handler verifying events and updating subscriptions |
 
 ---
 
@@ -372,10 +380,10 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ### Backend (`server/`)
 
-| Command           | Description                                        |
-| :---------------- | :------------------------------------------------- |
-| `npm run dev`     | Start the API server with `nodemon` hot reloading  |
-| `npm start`       | Start the production Node.js Express server        |
+| Command       | Description                                       |
+| :------------ | :------------------------------------------------ |
+| `npm run dev` | Start the API server with `nodemon` hot reloading |
+| `npm start`   | Start the production Node.js Express server       |
 
 ---
 
